@@ -508,7 +508,7 @@ try {
     }
 
     $OUTFILE     = '/var/tmp/your_list_'.$descriptors[array_rand($descriptors)].'_'.rand(10000,99999).'.pdf';
-    $OUTFILE     = '/var/tmp/your_list_sucks.pdf';
+#    $OUTFILE     = '/var/tmp/your_list_sucks.pdf';
 
     $PDF   = new Imagick();
     $index = 0;
