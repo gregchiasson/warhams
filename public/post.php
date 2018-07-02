@@ -2,8 +2,10 @@
 # TODO: parse/render headcount of unit
 
 # TODO: general look and feel updates, because it looks like trash at the moment:
-# spacing, fonts, and iconography
-# do unit card outline at the end, once we know the final y value (and set BG color on all content as needed)
+# fonts 
+# icons
+# corners on the outline
+# background colors
 
 # TODO github
 
@@ -232,33 +234,50 @@ function render_unit($unit, $image, $x_offset) {
     $max_x = 144 * 5.5;
     $max_y = 144 * 8.5;
 
-    # border (lines, octogon, etc:
+    # border:
     $draw = get_draw();
-    $draw->setStrokeColor('#333333');
-    $draw->setFillColor('#FFFFFF');
-    $draw->setStrokeOpacity(1);
-    $draw->setFillOpacity(1);
+    $draw   = get_draw();
     $draw->setStrokeWidth(2);
-    $draw->rectangle(
-        (50 + $x_offset), 50, ($max_x + $x_offset - 50), ($max_y - 50)
+    $draw->setStrokeColor('#222222');
+
+    # start here:
+    $start = array(50, 70);
+    $segs = array(
+        array(700, 50),
+        array($max_x - 70, 50),
+        array($max_x - 50, 70),
+        array($max_x - 50, $max_y - 70),
+        array($max_x - 70, $max_y - 50),
+        array(70, $max_y - 50),
+        array(50, $max_y - 70),
+        array(50, 70)
     );
+    foreach($segs as $end) {
+        $draw->line($start[0] + $x_offset, $start[1], $end[0] + $x_offset, $end[1]);
+        $start = $end;
+    }
     $image->drawImage($draw);
 
     # title bar:
     $draw = get_draw();
+    $draw->setFillColor('#000000');
     $draw->setFillOpacity(1);
-    $draw->setFillColor('#222222');
-    $draw->setStrokeWidth(0);
-    $draw->rectangle(
-        (50 + $x_offset), 50, ($max_x + $x_offset - 50), 100
-    );
+    $draw->polygon(array(
+        array('x' => $x_offset + 50, 'y' => 70),
+        array('x' => $x_offset + 70, 'y' => 50),
+        array('x' => $x_offset + $max_x - 70, 'y' => 50),
+        array('x' => $x_offset + $max_x - 50, 'y' => 70),
+    ));
     $image->drawImage($draw);
+    $draw->rectangle((50 + $x_offset), 70, ($max_x + $x_offset - 50), 100);
+    $image->drawImage($draw);
+
 
     $draw = get_draw();
     $draw->setFillColor('#FFFFFF');
     $draw->setStrokeWidth(0);
     $draw->setFontSize(20);
-    $image->annotateImage($draw, 60 + $x_offset, 80, 0, $unit['slot']);
+    $image->annotateImage($draw, 50 + $x_offset, 80, 0, $unit['slot']);
     $image->annotateImage($draw, 100 + $x_offset, 70, 0, $unit['power'].' PL');
     $image->annotateImage($draw, 100 + $x_offset, 90, 0, '('.$unit['points'].' pts)');
     $draw->setFontSize(25);
