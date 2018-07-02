@@ -270,27 +270,41 @@ function render_unit($unit, $image, $x_offset) {
     }
 
     # model statlines:
-    list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['model_stat']);
+    if(count($unit['model_stat'])) {
+        list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['model_stat']);
+    }
 
-    # weapon statlines:
-    list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-    list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['weapon_stat']);
+    if(count($unit['weapon_stat'])) {
+        # weapon statlines:
+        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+        list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['weapon_stat']);
+    }
 
     # wizard statlines:
     if(count($unit['powers']) > 0) {
-        array_unshift($unit['powers'], array(
-            'Psychic Power' => 'Smite', 
-            'Warp Charge'   => 5, 
-            'Range'         => '18"', 
-            'Details'       => 'If manifested, the closest visible enemy unit within 18" of the psyker suffers D3 mortal wounds. If the result of the Psychic test was more than 10, the target suffers D6 mortal wounds instead.'
-        )); 
+        $needs_smite = true;
+        foreach($unit['powers'] as $power) { 
+            if($power['Psychic Power'] == 'Smite') {
+                $needs_smite = false;
+            }
+        }
+        if($needs_smite) {
+            array_unshift($unit['powers'], array(
+                'Psychic Power' => 'Smite', 
+                'Warp Charge'   => 5, 
+                'Range'         => '18"', 
+                'Details'       => 'If manifested, the closest visible enemy unit within 18" of the psyker suffers D3 mortal wounds. If the result of the Psychic test was more than 10, the target suffers D6 mortal wounds instead.'
+            )); 
+        }
         list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
         list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['powers']);
     }
 
     # abilities:
-    list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-    list($image, $current_y) = render_abilities($unit['abilities'], $image, $current_y, $x_offset);
+    if(count($unit['abilities']) > 0) {
+        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+        list($image, $current_y) = render_abilities($unit['abilities'], $image, $current_y, $x_offset);
+    }
 
     # rules:
     if(count($unit['rules']) > 0) {
@@ -360,6 +374,7 @@ $SLOTS = array(
     'Heavy Support'       => 'HS',
     'Flyer'               => 'FL',
     'Dedicated Transport' => 'DT',
+    'Fortification'       => 'FT'
     'Lord of War'         => 'LW'
 );
 
