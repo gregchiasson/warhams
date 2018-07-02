@@ -14,7 +14,7 @@ ini_set('display_startup_errors', TRUE);
 # your_list_[THIS].pdf
 $descriptors = array('sucks', 'is_puke', 'made_me_cry', 'blows', 'stinks', 'fucks', 'reeks', 'smells_like_an_unwashed_prostitute', 'is_shit',
                      'is_shit', 'has_blood_of_champion', 'is_trash', 'is_garbage', 'look_like_a_dishrag', 'is_what_we_all_expected_from_you_really',
-                     '_is_disappoint'
+                     'is_disappoint', 'is_like_something_a_child_would_make', 'is_dumb_as_hell'
 );
 
 function stat_block($stats, $rows) {
