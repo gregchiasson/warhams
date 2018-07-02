@@ -53,8 +53,18 @@ function stat_block($stats, $rows) {
 
 function get_draw() {
     $draw = new ImagickDraw();
-    $draw->setFontFamily('Helvetica');
+    $draw->setFont('../body_font.otf');
     return $draw;
+}
+
+function get_draw_font() {
+    $hdraw = new ImagickDraw();
+    $hdraw->setFontSize(14);
+    $hdraw->setFontWeight(600);
+    $hdraw->setFillColor('#000000');
+    $hdraw->setFillOpacity(1);
+    $hdraw->setFont('../font.ttf');
+    return $hdraw;
 }
 
 function render_text($image, $draw, $x, $y, $text, $limit=50) {
@@ -78,14 +88,8 @@ function render_line($x_offset, $max_x, $current_y, $image) {
 }
 
 function render_keywords($label, $data, $image, $current_y, $x_offset) {
-    $draw = get_draw();
-    $draw->setStrokeColor('#000000');
-    $draw->setFillColor('#000000');
-    $draw->setStrokeOpacity(0);
-    $draw->setFillOpacity(1);
-    $draw->setStrokeWidth(0);
+    $draw = get_draw_font();
     $draw->setFontSize(16);
-    $draw->setFontWeight(600);
     list($image, $fake_y) = render_text($image, $draw, 80 + $x_offset, $current_y + 20, strtoupper("$label"), 40);
     $image->drawImage($draw);
 
@@ -142,7 +146,8 @@ function render_table($image, $x_offset, $current_y, $rows) {
                 } else if($stat == 'Warp Charge') {
                     $text = 'Manifest';
                 }
-                list($image, $nope) = render_text($image, $tdraw, $x, $current_y - 3, strtoupper($text));
+                $hdraw = get_draw_font();
+                list($image, $nope) = render_text($image, $hdraw, $x, $current_y - 3, strtoupper($text));
                 if($first) {
                     $x     += 220;
                     $first = false;
@@ -205,14 +210,8 @@ function render_table($image, $x_offset, $current_y, $rows) {
 }
 
 function render_abilities($data, $image, $current_y, $x_offset) {
-    $draw = get_draw();
-    $draw->setStrokeColor('#000000');
-    $draw->setFillColor('#000000');
-    $draw->setStrokeOpacity(0);
-    $draw->setFillOpacity(1);
-    $draw->setStrokeWidth(0);
+    $draw = get_draw_font();
     $draw->setFontSize(16);
-    $draw->setFontWeight(600);
     list($image, $fake_y) = render_text($image, $draw, 80 + $x_offset, $current_y + 20, strtoupper("ABILITIES"));
     $image->drawImage($draw);
 
@@ -224,8 +223,9 @@ function render_abilities($data, $image, $current_y, $x_offset) {
     $draw->setStrokeWidth(0);
     $draw->setFontSize(12);
     foreach($data as $label => $desc) {
-        list($image, $current_y) = render_text($image, $draw, 190 + $x_offset, $current_y + 17, strtoupper($label).": $desc", 80);
+        list($image, $current_y) = render_text($image, $draw, 190 + $x_offset, $current_y + 17, trim(strtoupper($label).": $desc"), 90);
     }
+    $current_y += 5;
     return array($image, $current_y);
 }
 
@@ -234,28 +234,10 @@ function render_unit($unit, $image, $x_offset) {
     $max_x = 144 * 5.5;
     $max_y = 144 * 8.5;
 
-    # border:
+    # background (crop and cover the corners later:
     $draw = get_draw();
-    $draw   = get_draw();
-    $draw->setStrokeWidth(2);
-    $draw->setStrokeColor('#222222');
-
-    # start here:
-    $start = array(50, 70);
-    $segs = array(
-        array(700, 50),
-        array($max_x - 70, 50),
-        array($max_x - 50, 70),
-        array($max_x - 50, $max_y - 70),
-        array($max_x - 70, $max_y - 50),
-        array(70, $max_y - 50),
-        array(50, $max_y - 70),
-        array(50, 70)
-    );
-    foreach($segs as $end) {
-        $draw->line($start[0] + $x_offset, $start[1], $end[0] + $x_offset, $end[1]);
-        $start = $end;
-    }
+    $draw->setFillColor('#EEEEEE');
+    $draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
     $image->drawImage($draw);
 
     # title bar:
@@ -277,11 +259,31 @@ function render_unit($unit, $image, $x_offset) {
     $draw->setFillColor('#FFFFFF');
     $draw->setStrokeWidth(0);
     $draw->setFontSize(20);
-    $image->annotateImage($draw, 50 + $x_offset, 80, 0, $unit['slot']);
-    $image->annotateImage($draw, 100 + $x_offset, 70, 0, $unit['power'].' PL');
-    $image->annotateImage($draw, 100 + $x_offset, 90, 0, '('.$unit['points'].' pts)');
-    $draw->setFontSize(25);
-    $image->annotateImage($draw, 200 + $x_offset, 86, 0, $unit['title']);
+
+    $gon = new Imagick(); 
+    $gon->readImage('../assets/octagon.png');
+    $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
+    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 58, 52); 
+
+    $gon = new Imagick(); 
+    $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
+    $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
+    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 63, 57); 
+
+    $gon = new Imagick(); 
+    $gon->readImage('../assets/octagon.png');
+    $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
+    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 102, 52); 
+    $draw->setFontSize(26);
+    $image->annotateImage($draw, 116 + $x_offset, 84, 0, $unit['power']);
+
+    $image->annotateImage($draw, $max_x + $x_offset - 130, 90, 0, ''.$unit['points'].' pts');
+    $draw->setFontSize(28);
+    $draw->setFont('../title_font.otf');
+
+    $title_x =  (($max_x * .5) + $x_offset) - strlen($unit['title']) * 7;
+
+    $image->annotateImage($draw, $title_x, 88, 0, $unit['title']);
 
     $current_y = 100;
 
@@ -347,8 +349,17 @@ function render_unit($unit, $image, $x_offset) {
     }
 
     # wound counters
-    # line:
-    list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+    $needs_wounds = false;
+    foreach($unit['model_stat'] as $type) {
+        if($type['W'] > 1) {
+            $needs_wounds = true;
+        }
+    }
+    if($needs_wounds) {
+        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+    }
+
+
     $current_y += 10;
     foreach($unit['model_stat'] as $type) {
         if($type['W'] > 1) {
@@ -385,6 +396,60 @@ function render_unit($unit, $image, $x_offset) {
         list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['wound_track']);
     }
 
+    # border:
+    $draw = get_draw();
+    $draw   = get_draw();
+    $draw->setStrokeWidth(2);
+    $draw->setStrokeColor('#222222');
+    # start here:
+    $start = array(50, 70);
+    $segs = array(
+        array(70, 50),
+        array($max_x - 70, 50),
+        array($max_x - 50, 70),
+        array($max_x - 50, $current_y),
+        array($max_x - 70, $current_y + 20),
+        array(70, $current_y + 20),
+        array(50, $current_y),
+        array(50, 70)
+    );
+    foreach($segs as $end) {
+        $draw->line($start[0] + $x_offset, $start[1], $end[0] + $x_offset, $end[1]);
+        $start = $end;
+    }
+    $image->drawImage($draw);
+
+    $draw = get_draw();
+    $draw->setFillColor('#FFFFFF');
+    $draw->rectangle((50 + $x_offset), $current_y + 22, $max_x - 50 + $x_offset, $max_y - 50);
+    $image->drawImage($draw);
+
+    # the corners are all beefed up:
+# white part
+$draw->rectangle((50 + $x_offset), $current_y + 22, $max_x - 50 + $x_offset, $max_y - 50);
+# bckground
+$draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
+
+    $draw = get_draw();
+    $draw->setFillColor('#FFFFFF');
+    $draw->setFillOpacity(1);
+    $draw->polygon(array(
+        array('x' => $x_offset + 48, 'y' => $current_y + 22),
+        array('x' => $x_offset + 68, 'y' => $current_y + 22),
+        array('x' => $x_offset + 48, 'y' => $current_y + 2)
+    ));
+    $image->drawImage($draw);
+    $draw = get_draw();
+    $draw->setFillColor('#FFFFFF');
+    $draw->setFillOpacity(1);
+    $draw->polygon(array(
+        array('x' => $x_offset + $max_x - 48, 'y' => $current_y + 22),
+        array('x' => $x_offset + $max_x - 68, 'y' => $current_y + 22),
+        array('x' => $x_offset + $max_x - 48, 'y' => $current_y + 2)
+    ));
+    $image->drawImage($draw);
+
+
     return $image;
 }
 
@@ -414,7 +479,7 @@ try {
     foreach($ds as $d) {
     if($d->getAttribute('class') == 'rootselection') {
         $clean = array(
-            'slot'        => 'None',      # FOC slot
+            'slot'        => 'TR',        # FOC slot
             'power'       => 0,           # PL, points to come later
             'points'      => 0,           # its later now
             'title'       => 'unit name', # tactical squad
