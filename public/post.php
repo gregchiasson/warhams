@@ -374,7 +374,7 @@ $SLOTS = array(
     'Heavy Support'       => 'HS',
     'Flyer'               => 'FL',
     'Dedicated Transport' => 'DT',
-    'Fortification'       => 'FT'
+    'Fortification'       => 'FT',
     'Lord of War'         => 'LW'
 );
 
