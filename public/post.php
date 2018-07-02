@@ -283,7 +283,7 @@ function render_unit($unit, $image, $x_offset) {
 
     $title_x =  (($max_x * .5) + $x_offset) - strlen($unit['title']) * 7;
 
-    $image->annotateImage($draw, $title_x, 88, 0, $unit['title']);
+    $image->annotateImage($draw, $title_x, 88, 0, strtoupper($unit['title']));
 
     $current_y = 100;
 
