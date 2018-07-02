@@ -12,7 +12,7 @@ ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE); 
 
 # your_list_[THIS].pdf
-$descriptors = array('sucks', 'is_puke', 'made_me_cry', 'blows', 'stinks', 'fucks', 'reeks');
+$descriptors = array('sucks', 'is_puke', 'made_me_cry', 'blows', 'stinks', 'fucks', 'reeks', 'smells_like_an_unwashed_prostitute');
 
 function stat_block($stats, $rows) {
     reset($stats);
