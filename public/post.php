@@ -1,23 +1,15 @@
 <?php
 # TODO: parse/render headcount of unit
 
-# TODO: general look and feel updates, because it looks like trash at the moment:
-# fonts 
-# icons
-# corners on the outline
-# background colors
-
-# TODO github
-
 error_reporting(E_ALL); 
 ini_set('display_errors', TRUE); 
 ini_set('display_startup_errors', TRUE); 
 
-# your_list_[THIS].pdf
 $descriptors = array('sucks', 'is_puke', 'made_me_cry', 'blows', 'stinks', 'fucks', 'reeks', 'smells_like_an_unwashed_prostitute', 'is_shit',
                      'is_shit', 'has_blood_of_champion', 'is_trash', 'is_garbage', 'look_like_a_dishrag', 'is_what_we_all_expected_from_you_really',
                      'is_disappoint', 'is_like_something_a_child_would_make', 'is_dumb_as_hell'
 );
+$random_own = array_rand($descriptors);
 
 function stat_block($stats, $rows) {
     reset($stats);
@@ -234,7 +226,7 @@ function render_unit($unit, $image, $x_offset) {
     $max_x = 144 * 5.5;
     $max_y = 144 * 8.5;
 
-    # background (crop and cover the corners later:
+    # background (we crop and cover the corners later):
     $draw = get_draw();
     $draw->setFillColor('#EEEEEE');
     $draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
@@ -254,7 +246,7 @@ function render_unit($unit, $image, $x_offset) {
     $draw->rectangle((50 + $x_offset), 70, ($max_x + $x_offset - 50), 100);
     $image->drawImage($draw);
 
-
+    # FOC slot and PL:
     $draw = get_draw();
     $draw->setFillColor('#FFFFFF');
     $draw->setStrokeWidth(0);
@@ -273,16 +265,28 @@ function render_unit($unit, $image, $x_offset) {
     $gon = new Imagick(); 
     $gon->readImage('../assets/octagon.png');
     $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
-    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 102, 52); 
-    $draw->setFontSize(26);
-    $image->annotateImage($draw, 116 + $x_offset, 84, 0, $unit['power']);
-
-    $image->annotateImage($draw, $max_x + $x_offset - 130, 90, 0, ''.$unit['points'].' pts');
-    $draw->setFontSize(28);
+    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 105, 52); 
     $draw->setFont('../title_font.otf');
+    $draw->setFontSize(26);
+    if(strlen($unit['power']) == 1) {
+        $image->annotateImage($draw, 121 + $x_offset, 84, 0, $unit['power']);
+    } else {
+        $image->annotateImage($draw, 114 + $x_offset, 84, 0, $unit['power']);
+    }
 
-    $title_x =  (($max_x * .5) + $x_offset) - strlen($unit['title']) * 7;
-
+    # unit name:
+    $iters = 0;
+    $title_size = 28;
+    $draw->setFontSize($title_size);
+    $draw->setFont('../title_font.otf');
+    $check = $image->queryFontMetrics($draw, strtoupper($unit['title']));
+    while($iters < 5 && $check['textWidth'] > 500) {
+        $iters += 1;
+        $title_size -= 2;
+        $draw->setFontSize($title_size);
+        $check = $image->queryFontMetrics($draw, strtoupper($unit['title']));
+    }
+    $title_x =  ceil((($max_x * .5) + $x_offset) - ($check['textWidth'] / 2));
     $image->annotateImage($draw, $title_x, 88, 0, strtoupper($unit['title']));
 
     $current_y = 100;
@@ -348,6 +352,9 @@ function render_unit($unit, $image, $x_offset) {
         list($image, $current_y) = render_keywords('Keywords', $unit['keywords'], $image, $current_y, $x_offset);
     }
 
+    list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+    list($image, $current_y) = render_keywords('Points', array($unit['points']), $image, $current_y, $x_offset);
+
     # wound counters
     $needs_wounds = false;
     foreach($unit['model_stat'] as $type) {
@@ -357,10 +364,9 @@ function render_unit($unit, $image, $x_offset) {
     }
     if($needs_wounds) {
         list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+        list($image, $current_y) = render_keywords('Wounds', array(), $image, $current_y, $x_offset);
     }
 
-
-    $current_y += 10;
     foreach($unit['model_stat'] as $type) {
         if($type['W'] > 1) {
             $draw = get_draw();
@@ -392,6 +398,7 @@ function render_unit($unit, $image, $x_offset) {
     }
 
     if(count($unit['wound_track']) > 0) {
+        
         list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
         list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['wound_track']);
     }
@@ -425,10 +432,8 @@ function render_unit($unit, $image, $x_offset) {
     $image->drawImage($draw);
 
     # the corners are all beefed up:
-# white part
-$draw->rectangle((50 + $x_offset), $current_y + 22, $max_x - 50 + $x_offset, $max_y - 50);
-# bckground
-$draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
+#    $draw->rectangle((50 + $x_offset), $current_y + 22, $max_x - 50 + $x_offset, $max_y - 50);
+#    $draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
 
     $draw = get_draw();
     $draw->setFillColor('#FFFFFF');
@@ -609,7 +614,7 @@ try {
     }
     }
 
-    $OUTFILE     = '/var/tmp/your_list_'.$descriptors[array_rand($descriptors)].'_'.rand(10000,99999).'.pdf';
+    $OUTFILE     = '/var/tmp/your_list_'.$descriptors[$random_own].'_'.rand(10000,99999).'.pdf';
 #    $OUTFILE     = '/var/tmp/your_list_sucks.pdf';
 
     $PDF   = new Imagick();
@@ -635,7 +640,7 @@ try {
 
 header('Content-Description: File Transfer');
 header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="your_list_'.$descriptors[array_rand($descriptors)].'.pdf"');
+header('Content-Disposition: attachment; filename="your_list_'.$descriptors[$random_own].'.pdf"');
 header('Expires: 0');
 header('Cache-Control: must-revalidate');
 header('Pragma: public');

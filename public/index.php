@@ -18,16 +18,25 @@
 
 <p>Ping me on the forums or in 40k Discord if that either doesn't give you a PDF or it gives you one that's all fucked up. Namaste.</p>
 
+<h3>Release Notes</h3>
+<ul>
+<li>Last update: 2 July 2018, 22:00-ish</li>
+<li>Added release notes</li>
+<li>Unit titles now auto-scale to fit</li>
+<li>Power Level is centered better</li>
+<li>Added a "Wounds" header to that section</li>
+<li>Moved "Points" down to it's own section</li>
+</ul>
+<h3>Known issues</h3>
+<ul>
+<li>unit headcounts are missing</li>
+</ul>
+
 <h3>Credits</h3>
 <ul>
 <li>Brains of this outfit: TheChirurgeon</li>
 <li>Code: ANAmal.net</li>
 </ul>
-<h3>Known issues</h3>
-<ul>
-<li>unit headcounts are missing</li>
-<li>some of the text might be off-center or overlap other elements</li>
-<li>haven't tested with too many different codices</li>
-</ul>
+
 </body>
 </html>
