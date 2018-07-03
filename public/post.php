@@ -538,20 +538,20 @@ try {
                     $clean['rules'][] = $k;
                 }
                 sort($clean['rules']);
-/*
             } else if($c->nodeName == 'p') {
                 foreach($c->childNodes as $cc) {
-                    if($cc->nodeName == 'span' && $cc->textContent = 'Selections') {
-                        $clean['roster'][] = $cc->childNodes[1]->textContent;
+                    if($cc->nodeName == 'span' && $cc->textContent == 'Selections:') {
+#print($c->textContent."\n");
+#                        $clean['roster'][] = $cc->childNodes[1]->textContent;
                     }
                 }
             } else if($c->nodeName == 'ul') {
-                foreach($c->childNodes as $cc) {
-                    if($cc->nodeName == 'li') {
-                        $clean['roster'] = $cc->childNode[0]->textContent;
-                    }
-                }
-*/
+#var_dump($c);
+#                foreach($c->childNodes as $cc) {
+#                    if($cc->nodeName == 'li') {
+#                        $clean['roster'] = $cc->childNode[0]->textContent;
+#                    }
+#                }
             } else if($c->nodeName == 'table') {
                 # ABILITIES, STATS, WEAPONS:
                 $rows  = $c->childNodes;
@@ -615,7 +615,6 @@ try {
     }
 
     $OUTFILE     = '/var/tmp/your_list_'.$descriptors[$random_own].'_'.rand(10000,99999).'.pdf';
-#    $OUTFILE     = '/var/tmp/your_list_sucks.pdf';
 
     $PDF   = new Imagick();
     $index = 0;
