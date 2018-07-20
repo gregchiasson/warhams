@@ -7,7 +7,10 @@ ini_set('display_startup_errors', TRUE);
 
 $descriptors = array('sucks', 'is_puke', 'made_me_cry', 'blows', 'stinks', 'fucks', 'reeks', 'smells_like_an_unwashed_prostitute', 'is_shit',
                      'is_shit', 'has_blood_of_champion', 'is_trash', 'is_garbage', 'look_like_a_dishrag', 'is_what_we_all_expected_from_you_really',
-                     'is_disappoint', 'is_like_something_a_child_would_make', 'is_dumb_as_hell'
+                     'is_disappoint', 'is_like_something_a_child_would_make', 'is_dumb_as_hell', "is_the_reason_we_can't_have_nice_things",
+                     "is_the_reason_your_mother_left_us", "has_made_us_all_very_worried", "is_a_wet_fart", "is_why_no_one_loves_you"
+                     "is_probably_why_youre_going_to_die_alone", "is_clearly_a_cry_for_help", "started_the_chicago_fire_of_1904",
+                     "gained_sentience_and_liked_nazi_tweets"
 );
 $random_own = array_rand($descriptors);
 
@@ -474,6 +477,7 @@ try {
     $input = $_FILES['list'];
     move_uploaded_file($input['tmp_name'], "/var/tmp/".$input['name']);
 
+    libxml_use_internal_errors(true);
     $doc = new DOMDocument();
     $doc->loadHTMLFile("/var/tmp/".$input['name']);
 
