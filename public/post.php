@@ -5,46 +5,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', TRUE); 
 ini_set('display_startup_errors', TRUE); 
 
-$descriptors = array('sucks', 'is_puke', 'made_me_cry', 'blows', 'stinks', 'fucks', 'reeks', 'smells_like_an_unwashed_prostitute', 'is_shit',
-                     'is_shit', 'has_blood_of_champion', 'is_trash', 'is_garbage', 'look_like_a_dishrag', 'is_what_we_all_expected_from_you_really',
-                     'is_disappoint', 'is_like_something_a_child_would_make', 'is_dumb_as_hell', "is_the_reason_we_can't_have_nice_things",
-                     "is_the_reason_your_mother_left_us", "has_made_us_all_very_worried", "is_a_wet_fart", "is_why_no_one_loves_you",
-                     "is_probably_why_youre_going_to_die_alone", "is_clearly_a_cry_for_help", "started_the_chicago_fire_of_1904",
-                     "gained_sentience_and_liked_nazi_tweets"
-);
-$random_own = array_rand($descriptors);
+require_once('../lib/wh40kHTMLParser.php');
+require_once('../lib/wh40kROSParser.php');
 
-function stat_block($stats, $rows) {
-    reset($stats);
-    $skip  = key($stats);
-    $block = array();
-
-    foreach($rows as $r) {
-        $c = $r->childNodes;
-        if($c[0]->textContent == $skip) {
-            $index = 0;
-            foreach($r->childNodes as $cell) {
-                $stat = trim($cell->textContent);
-                if(array_key_exists($stat, $stats)) {
-                    $stats[$stat] = $index;
-                }
-                $index += 1;
-            }
-        } else {
-            $index = 0;
-            $stat_block = array();
-            foreach($r->childNodes as $cell) {
-                $val = trim($cell->textContent);
-                if(in_array($index, $stats)) {
-                    $stat_block[array_search($index, $stats)] = $val;
-                }
-                $index += 1;
-            }
-            $block[] = $stat_block;
-        }
-    }
-    return $block;
-}
+/*
 
 function get_draw() {
     $draw = new ImagickDraw();
@@ -435,9 +399,6 @@ function render_unit($unit, $image, $x_offset) {
     $image->drawImage($draw);
 
     # the corners are all beefed up:
-#    $draw->rectangle((50 + $x_offset), $current_y + 22, $max_x - 50 + $x_offset, $max_y - 50);
-#    $draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
-
     $draw = get_draw();
     $draw->setFillColor('#FFFFFF');
     $draw->setFillOpacity(1);
@@ -460,168 +421,40 @@ function render_unit($unit, $image, $x_offset) {
 
     return $image;
 }
-
-$SLOTS = array(
-    'HQ'                  => 'HQ',
-    'Troops'              => 'TR',
-    'Elites'              => 'EL',
-    'Fast Attack'         => 'FA',
-    'Heavy Support'       => 'HS',
-    'Flyer'               => 'FL',
-    'Dedicated Transport' => 'DT',
-    'Fortification'       => 'FT',
-    'Lord of War'         => 'LW'
-);
+*/
 
 try {
+    // move file out of tmp dir:
     $input = $_FILES['list'];
     move_uploaded_file($input['tmp_name'], "/var/tmp/".$input['name']);
+    $in_path = "/var/tmp/".$input['name'];
+    $tmp = file_get_contents($in_path);
+    $tmp = str_replace('& ', '&amp; ', $tmp);
+    file_put_contents($in_path, $tmp);
 
-    libxml_use_internal_errors(true);
-    $doc = new DOMDocument();
-    $doc->loadHTMLFile("/var/tmp/".$input['name']);
-
-    $ds = $doc->getElementsByTagName('li');
-
-    $UNITS = array();
-
-    foreach($ds as $d) {
-    if($d->getAttribute('class') == 'rootselection') {
-        $clean = array(
-            'slot'        => 'TR',        # FOC slot
-            'power'       => 0,           # PL, points to come later
-            'points'      => 0,           # its later now
-            'title'       => 'unit name', # tactical squad
-            'model_stat'  => array(),     # name M WS BS etc
-            'weapon_stat' => array(),     # name range type etc
-            'wound_track' => array(),     # remaining stat1 stat2 etc
-            'powers'      => array(),     # MUSCLE WIZARDS ONLY
-            'abilities'   => array(),     # Deep Strike, etc
-            'rules'       => array(),     # ATSKNF, etc
-            'factions'    => array(),     # IMPERIUM, etc
-            'roster'      => array(),     # 7 marines, 1 heavy weapon, sarge, etc
-            'keywords'    => array()      # INFANTRY, TANK, etc
-        );
-
-        foreach($d->childNodes as $c) { 
-            if($c->nodeName == 'h4') {
-                # TITLE, POWER, POINTS:
-                $m       = null;
-                preg_match('/(.*)\s+\[(\d+) PL, (\d+)pts\]$/', $c->textContent, $m);
-                if($m) {
-                    $clean['title']  = $m[1];
-                    $clean['power']  = $m[2];
-                    $clean['points'] = $m[3];
-                }
-            } else if($c->nodeName == 'p' && $c->getAttribute('class') == 'category-names') {
-                # KEYWORDS, FACTIONS, FOC SLOT:
-                $keywords = explode(',', $c->textContent);
-                $keywords[0] = trim($keywords[0]);
-                $keywords[0] = str_replace('Categories: ', '', $keywords[0]);
-                foreach($keywords as $k) {
-                    $k = trim($k);
-                    if(strpos($k, 'Faction: ') === 0) {
-                        $clean['factions'][] = str_replace('Faction: ', '', $k);
-                    } else {
-                        if(array_key_exists($k, $SLOTS)) {
-                            $clean['slot'] = $SLOTS[$k];
-                        } else {
-                            $clean['keywords'][] = $k;
-                        }
-                    }
-                }
-                sort($clean['keywords']);
-                sort($clean['factions']);
-            } else if($c->nodeName == 'p' && $c->getAttribute('class') == 'rule-names') {
-                # AYSKNF, etc:
-                $keywords = explode(',', $c->textContent);
-                $keywords[0] = trim($keywords[0]);
-                $keywords[0] = str_replace('Rules: ', '', $keywords[0]);
-                foreach($keywords as $k) {
-                    $k = trim($k);
-                    $clean['rules'][] = $k;
-                }
-                sort($clean['rules']);
-            } else if($c->nodeName == 'p') {
-                foreach($c->childNodes as $cc) {
-                    if($cc->nodeName == 'span' && $cc->textContent == 'Selections:') {
-#print($c->textContent."\n");
-#                        $clean['roster'][] = $cc->childNodes[1]->textContent;
-                    }
-                }
-            } else if($c->nodeName == 'ul') {
-#var_dump($c);
-#                foreach($c->childNodes as $cc) {
-#                    if($cc->nodeName == 'li') {
-#                        $clean['roster'] = $cc->childNode[0]->textContent;
-#                    }
-#                }
-            } else if($c->nodeName == 'table') {
-                # ABILITIES, STATS, WEAPONS:
-                $rows  = $c->childNodes;
-                $hr    = $rows[0];
-                $type  = $hr->childNodes[0]->textContent;
-                $type  = preg_replace('/^(.+)\s\(.*$/', '$1', $type); # eg: Wound Track (Knights)
-                switch($type) {
-                    case 'Abilities':
-                        foreach($rows as $r) {
-                            $c = $r->childNodes;
-                            if($c[0]->textContent != 'Abilities') {
-                                $clean['abilities'][$c[0]->textContent] = $c[2]->textContent;
-                            }
-                        }
-                        ksort($clean['abilities']);
-                        break;
-                    case 'Psyker':
-                        $cast = $rows[1]->childNodes[2]->textContent;
-                        $deny = $rows[1]->childNodes[3]->textContent;
-                        $cast .= $cast != 1 ? ' psychic powers' : ' psychic power';
-                        $deny .= $deny != 1 ? ' psychic powers' : ' psychic power';
-                        $clean['abilities']['Psyker'] = "This model can attempt to manifest $cast in each friendly Psychic phase, and attempt to deny $deny in each enemy Psychic phase.";
-                        break;
-                    case 'Transport':
-                        $clean['abilities']['Transport'] = $rows[1]->childNodes[2]->textContent;
-                        break;
-                    case 'Unit':
-                        $stats = array('Unit' => 0, 'M'  => 0, 'WS'   => 0, 'BS'   => 0, 
-                                       'S'    => 0, 'T'  => 0, 'W'    => 0,
-                                       'A'    => 0, 'Ld' => 0, 'Save' => 0);
-                        $clean['model_stat'] = stat_block($stats, $rows);
-                        break;
-                    case 'Weapon':
-                        $stats = array('Weapon' => 0, 'Range'  => 0, 'Type' => 0,
-                                       'S'      => 0, 'AP'     => 0, 'D'    => 0, 'Abilities' => 0);
-                        $clean['weapon_stat'] = stat_block($stats, $rows);
-                        break;
-                    case 'Psychic Power':
-                        $stats = array('Psychic Power' => 0, 'Warp Charge' => 0, 
-                                        'Range'        => 0, 'Details'     => 0);
-                        $clean['powers'] = stat_block($stats, $rows);
-                        break;
-                    case 'Wound Track':
-                        $stats = array();
-                        foreach($rows[0]->childNodes as $header) {
-                            $header = trim($header->textContent);
-                            if(strlen($header) && $header != 'Ref') {
-                                $stats[$header] = 0;
-                            }
-                        }
-                        $clean['wound_track'] = stat_block($stats, $rows);
-                        break;
-                }
-            }
-        }
-        ksort($clean);
-        if($clean['points'] || $clean['power']) {
-            $UNITS[] = $clean;
-        }
-    }
+    if(substr($input['name'], -5) == '.html') { 
+        $parser = new wh40kHTMLParser("/var/tmp/".$input['name']);
+    } else if(substr($input['name'], -5) == '.rosz') { 
+        #unzip file
+        $zip = new ZipArchive;
+        $res = $zip->open("/var/tmp/".$input['name']);
+        $zip->extractTo('/var/tmp/');
+        $zip->close();
+        $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));
+    } else if(substr($input['name'], -4) == '.ros') { 
+        $parser = new wh40kROSParser("/var/tmp/".$input['name']);
     }
 
-    $OUTFILE     = '/var/tmp/your_list_'.$descriptors[$random_own].'_'.rand(10000,99999).'.pdf';
+    $UNITS = $parser->units;
 
-    $PDF   = new Imagick();
-    $index = 0;
+print_r($UNITS); exit();
+
+/*
+
+    $OUTFILE = '/var/tmp/your_list_sucks_'.rand(10000,99999).'.pdf';
+    $PDF     = new Imagick();
+    $index   = 0;
+
     for($i = 0; $i < count($UNITS); $i++) {
         $PDF->newImage(144 * 11, 144 * 8.5, new ImagickPixel('white'), 'pdf');
         $PDF->setResolution(144, 144);
@@ -637,15 +470,16 @@ try {
 
         $PDF->writeImages($OUTFILE, true);
     }
+
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="your_list_sucks.pdf"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: '.filesize($OUTFILE));
+    readfile($OUTFILE);
+*/
 } catch(Exception $e) {
     print($e->getMessage());
 }
-
-header('Content-Description: File Transfer');
-header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="your_list_'.$descriptors[$random_own].'.pdf"');
-header('Expires: 0');
-header('Cache-Control: must-revalidate');
-header('Pragma: public');
-header('Content-Length: '.filesize($OUTFILE));
-readfile($OUTFILE);
