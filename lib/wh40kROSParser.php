@@ -100,6 +100,7 @@ class wh40kROSParser extends wh40kParser {
             $clean['rules'][] = (string) $r['name'];
         } 
         sort($clean['rules']);
+        $clean['rules'] = array_unique($clean['rules']);
 
         // weapon_stat
         $cols = array('Range', 'Type', 'S', 'AP', 'D', 'Abilities');
