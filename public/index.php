@@ -27,6 +27,7 @@
 <h3>Known issues</h3>
 <ul>
 <li>Some of the .rosz files don't want to upload. Fun!</li>
+<li>IG squads show up with "1 guardsman"</li>
 </ul>
 
 <h3>Credits</h3>

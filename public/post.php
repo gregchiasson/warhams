@@ -1,73 +1,11 @@
 <?php
-# TODO: parse/render headcount of unit
-
 error_reporting(E_ALL); 
 ini_set('display_errors', TRUE); 
 ini_set('display_startup_errors', TRUE); 
 
+require_once('../lib/wh40kRenderer.php');
 require_once('../lib/wh40kHTMLParser.php');
 require_once('../lib/wh40kROSParser.php');
-
-function get_draw() {
-    $draw = new ImagickDraw();
-    $draw->setFont('../body_font.otf');
-    return $draw;
-}
-
-function get_draw_font() {
-    $hdraw = new ImagickDraw();
-    $hdraw->setFontSize(14);
-    $hdraw->setFontWeight(600);
-    $hdraw->setFillColor('#000000');
-    $hdraw->setFillOpacity(1);
-    $hdraw->setFont('../font.ttf');
-    return $hdraw;
-}
-
-function render_text($image, $draw, $x, $y, $text, $limit=50) {
-    $text   = wordwrap($text, $limit, "\n", false);
-    $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
-    $height = ($lines * ($draw->getFontSize() + 3)) + $y;
-
-    $image->annotateImage($draw, $x, $y, 0, $text);
-    return array($image, $height);
-}
-
-function render_line($x_offset, $max_x, $current_y, $image) {
-    $stroke = 2;
-    $draw   = get_draw();
-    $draw->setStrokeWidth($stroke);
-    $draw->setStrokeColor('#000000');
-    $draw->line(50 + $x_offset, $current_y, ($max_x + $x_offset - 50), $current_y);
-    $image->drawImage($draw);
-    $current_y += $stroke;
-    return array($image, $current_y);
-}
-
-function render_keywords($label, $data, $image, $current_y, $x_offset, $all_caps=true) {
-    $draw = get_draw_font();
-    $draw->setFontSize(16);
-    list($image, $fake_y) = render_text($image, $draw, 80 + $x_offset, $current_y + 20, strtoupper("$label"), 40);
-    $image->drawImage($draw);
-
-    $draw = get_draw();
-    $draw->setStrokeColor('#000000');
-    $draw->setFillColor('#000000');
-    $draw->setStrokeOpacity(0);
-    $draw->setFillOpacity(1);
-    $draw->setStrokeWidth(0);
-    $draw->setFontSize(12);
-
-    $contents = implode(', ', $data);
-    if($all_caps) {
-        $contents = strtoupper(implode(', ', $data));
-    }
-
-    list($image, $current_y) = render_text($image, $draw, 190 + $x_offset, $current_y + 17, $contents, 75);
-    $image->drawImage($draw);
-
-    return array($image, $current_y);
-}
 
 function render_table($image, $x_offset, $current_y, $rows) {
     $col_widths = array(
@@ -172,260 +110,6 @@ function render_table($image, $x_offset, $current_y, $rows) {
     return array($image, $new_y);
 }
 
-function render_abilities($data, $image, $current_y, $x_offset) {
-    $draw = get_draw_font();
-    $draw->setFontSize(16);
-    list($image, $fake_y) = render_text($image, $draw, 80 + $x_offset, $current_y + 20, strtoupper("ABILITIES"));
-    $image->drawImage($draw);
-
-    $draw = get_draw();
-    $draw->setStrokeColor('#000000');
-    $draw->setFillColor('#000000');
-    $draw->setStrokeOpacity(0);
-    $draw->setFillOpacity(1);
-    $draw->setStrokeWidth(0);
-    $draw->setFontSize(12);
-    foreach($data as $label => $desc) {
-        list($image, $current_y) = render_text($image, $draw, 190 + $x_offset, $current_y + 17, trim(strtoupper($label).": $desc"), 90);
-    }
-    $current_y += 5;
-    return array($image, $current_y);
-}
-
-function render_unit($unit, $image, $x_offset) {
-    # landscape, obvi
-    $max_x = 144 * 5.5;
-    $max_y = 144 * 8.5;
-
-    # background (we crop and cover the corners later):
-    $draw = get_draw();
-    $draw->setFillColor('#EEEEEE');
-    $draw->rectangle((50 + $x_offset), 70, $max_x - 50 + $x_offset, $max_y - 50);
-    $image->drawImage($draw);
-
-    # title bar:
-    $draw = get_draw();
-    $draw->setFillColor('#000000');
-    $draw->setFillOpacity(1);
-    $draw->polygon(array(
-        array('x' => $x_offset + 50, 'y' => 70),
-        array('x' => $x_offset + 70, 'y' => 50),
-        array('x' => $x_offset + $max_x - 70, 'y' => 50),
-        array('x' => $x_offset + $max_x - 50, 'y' => 70),
-    ));
-    $image->drawImage($draw);
-    $draw->rectangle((50 + $x_offset), 70, ($max_x + $x_offset - 50), 100);
-    $image->drawImage($draw);
-
-    # FOC slot and PL:
-    $draw = get_draw();
-    $draw->setFillColor('#FFFFFF');
-    $draw->setStrokeWidth(0);
-    $draw->setFontSize(20);
-
-    $gon = new Imagick(); 
-    $gon->readImage('../assets/octagon.png');
-    $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
-    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 58, 52); 
-
-    $gon = new Imagick(); 
-    $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
-    $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
-    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 63, 57); 
-
-    $gon = new Imagick(); 
-    $gon->readImage('../assets/octagon.png');
-    $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
-    $image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x_offset + 105, 52); 
-    $draw->setFont('../title_font.otf');
-    $draw->setFontSize(26);
-    if(strlen($unit['power']) == 1) {
-        $image->annotateImage($draw, 121 + $x_offset, 84, 0, $unit['power']);
-    } else {
-        $image->annotateImage($draw, 114 + $x_offset, 84, 0, $unit['power']);
-    }
-
-    # unit name:
-    $iters = 0;
-    $title_size = 28;
-    $draw->setFontSize($title_size);
-    $draw->setFont('../title_font.otf');
-    $check = $image->queryFontMetrics($draw, strtoupper($unit['title']));
-    while($iters < 5 && $check['textWidth'] > 500) {
-        $iters += 1;
-        $title_size -= 2;
-        $draw->setFontSize($title_size);
-        $check = $image->queryFontMetrics($draw, strtoupper($unit['title']));
-    }
-    $title_x =  ceil((($max_x * .5) + $x_offset) - ($check['textWidth'] / 2));
-    $image->annotateImage($draw, $title_x, 88, 0, strtoupper($unit['title']));
-
-    $current_y = 100;
-
-    # model statlines:
-    if(count($unit['model_stat'])) {
-        list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['model_stat']);
-    }
-
-    if(count($unit['weapon_stat'])) {
-        # weapon statlines:
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['weapon_stat']);
-    }
-
-    # wizard statlines:
-    if(count($unit['powers']) > 0) {
-        $needs_smite = true;
-        foreach($unit['powers'] as $power) { 
-            if($power['Psychic Power'] == 'Smite') {
-                $needs_smite = false;
-            }
-        }
-        if($needs_smite) {
-            array_unshift($unit['powers'], array(
-                'Psychic Power' => 'Smite', 
-                'Warp Charge'   => 5, 
-                'Range'         => '18"', 
-                'Details'       => 'If manifested, the closest visible enemy unit within 18" of the psyker suffers D3 mortal wounds. If the result of the Psychic test was more than 10, the target suffers D6 mortal wounds instead.'
-            )); 
-        }
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['powers']);
-    }
-
-    # unit roster:
-    if(count($unit['roster']) > 0) {
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_keywords('Contents', $unit['roster'], $image, $current_y, $x_offset, false);
-    }
-
-    # abilities:
-    if(count($unit['abilities']) > 0) {
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_abilities($unit['abilities'], $image, $current_y, $x_offset);
-    }
-
-    # rules:
-    if(count($unit['rules']) > 0) {
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_keywords('Rules', $unit['rules'], $image, $current_y, $x_offset);
-    }
-
-    # faction keywords:
-    if(count($unit['factions']) > 0) {
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_keywords('Factions', $unit['factions'], $image, $current_y, $x_offset);
-    }
-
-    # non-faction keywords:
-    if(count($unit['keywords']) > 0) {
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_keywords('Keywords', $unit['keywords'], $image, $current_y, $x_offset);
-    }
-
-    list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-    list($image, $current_y) = render_keywords('Points', array($unit['points']), $image, $current_y, $x_offset);
-
-    # wound counters
-    $needs_wounds = false;
-    foreach($unit['model_stat'] as $type) {
-        if($type['W'] > 1) {
-            $needs_wounds = true;
-        }
-    }
-    if($needs_wounds) {
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_keywords('Wounds', array(), $image, $current_y, $x_offset);
-    }
-
-    foreach($unit['model_stat'] as $type) {
-        if($type['W'] > 1) {
-            $draw = get_draw();
-            $draw->setStrokeColor('#000000');
-            $draw->setFillColor('#000000');
-            $draw->setStrokeOpacity(0);
-            $draw->setFillOpacity(1);
-            $draw->setStrokeWidth(1);
-            $draw->setFontSize(16);
-            $draw->setFontWeight(600);
-            $image->annotateImage($draw, 80 + $x_offset, $current_y + 20, 0, strtoupper($type['Unit']));
-            $image->drawImage($draw);
-
-            $x = 340 + $x_offset;
-            for($w = 0; $w < $type['W']; $w++) {
-                if($w % 10 == 0 && $w > 0) {
-                    $current_y += 40;
-                    $x = 340 + $x_offset;
-                }
-                $draw->setStrokeOpacity(1);
-                $draw->setStrokeColor('#000000');
-                $draw->setFillColor('#FFFFFF');
-                $draw->rectangle($x, $current_y, ($x + 30), ($current_y + 30));
-                $image->drawImage($draw);
-                $x += 40;
-            }
-            $current_y += 40;
-        }
-    }
-
-    if(count($unit['wound_track']) > 0) {
-        
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-        list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['wound_track']);
-    }
-
-    # border:
-    $draw = get_draw();
-    $draw   = get_draw();
-    $draw->setStrokeWidth(2);
-    $draw->setStrokeColor('#222222');
-    # start here:
-    $start = array(50, 70);
-    $segs = array(
-        array(70, 50),
-        array($max_x - 70, 50),
-        array($max_x - 50, 70),
-        array($max_x - 50, $current_y),
-        array($max_x - 70, $current_y + 20),
-        array(70, $current_y + 20),
-        array(50, $current_y),
-        array(50, 70)
-    );
-    foreach($segs as $end) {
-        $draw->line($start[0] + $x_offset, $start[1], $end[0] + $x_offset, $end[1]);
-        $start = $end;
-    }
-    $image->drawImage($draw);
-
-    $draw = get_draw();
-    $draw->setFillColor('#FFFFFF');
-    $draw->rectangle((50 + $x_offset), $current_y + 22, $max_x - 50 + $x_offset, $max_y - 50);
-    $image->drawImage($draw);
-
-    # the corners are all beefed up:
-    $draw = get_draw();
-    $draw->setFillColor('#FFFFFF');
-    $draw->setFillOpacity(1);
-    $draw->polygon(array(
-        array('x' => $x_offset + 48, 'y' => $current_y + 22),
-        array('x' => $x_offset + 68, 'y' => $current_y + 22),
-        array('x' => $x_offset + 48, 'y' => $current_y + 2)
-    ));
-    $image->drawImage($draw);
-    $draw = get_draw();
-    $draw->setFillColor('#FFFFFF');
-    $draw->setFillOpacity(1);
-    $draw->polygon(array(
-        array('x' => $x_offset + $max_x - 48, 'y' => $current_y + 22),
-        array('x' => $x_offset + $max_x - 68, 'y' => $current_y + 22),
-        array('x' => $x_offset + $max_x - 48, 'y' => $current_y + 2)
-    ));
-    $image->drawImage($draw);
-
-
-    return $image;
-}
-
 try {
     // move file out of tmp dir:
     $input = $_FILES['list'];
@@ -450,24 +134,9 @@ try {
 
     $UNITS = $parser->units;
     $OUTFILE = '/var/tmp/your_list_sucks_'.rand(10000,99999).'.pdf';
-    $PDF     = new Imagick();
-    $index   = 0;
 
-    for($i = 0; $i < count($UNITS); $i++) {
-        $PDF->newImage(144 * 11, 144 * 8.5, new ImagickPixel('white'), 'pdf');
-        $PDF->setResolution(144, 144);
-        $PDF->setColorspace(Imagick::COLORSPACE_RGB);
-
-        if(array_key_exists($i, $UNITS)) {
-            $PDF = render_unit($UNITS[$i], $PDF, 0);
-        }
-        $i += 1;
-        if(array_key_exists($i, $UNITS)) {
-            $PDF = render_unit($UNITS[$i], $PDF, (144 * 5.5));
-        }
-
-        $PDF->writeImages($OUTFILE, true);
-    }
+    $output = new wh40kRenderer($OUTFILE, $UNITS);
+    $output->renderToOutFile();
 
     header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');
@@ -477,6 +146,8 @@ try {
     header('Pragma: public');
     header('Content-Length: '.filesize($OUTFILE));
     readfile($OUTFILE);
+/*
+*/
 } catch(Exception $e) {
     print($e->getMessage());
 }

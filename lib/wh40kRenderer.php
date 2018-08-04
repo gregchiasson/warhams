@@ -1,0 +1,282 @@
+<?php
+
+require_once('Renderer.php');
+
+class wh40kRenderer extends Renderer {
+    public function renderUnit($unit, $xOffset, $yOffset) {
+        // half page, landscape:
+        $this->maxX = 144 * 5.5;
+        $this->maxY = 144 * 8.5;
+
+        $this->currentX = $xOffset;
+        $this->currentY = $yOffset;
+
+        // more stuff here
+
+        # background (we crop and cover the corners later):
+        $draw = $this->getDraw();
+        $draw->setFillColor('#EEEEEE');
+        $draw->rectangle(($this->margin + $this->currentX), 70, $this->maxX - $this->margin + 
+                         $this->currentX, $this->maxY - $this->margin);
+        $this->image->drawImage($draw);
+
+        $this->renderHeader($unit);
+
+        # model statlines:
+        if(count($unit['model_stat'])) {
+            $this->renderTable($unit['model_stat']);
+        }
+        # weapon statlines:
+        if(count($unit['weapon_stat'])) {
+            $this->renderLine();
+            $this->renderTable($unit['weapon_stat']);
+        }
+
+        # wizard statlines:
+        if(count($unit['powers']) > 0) {
+            $needs_smite = true;
+            foreach($unit['powers'] as $power) {
+                if($power['Psychic Power'] == 'Smite') { $needs_smite = false; }
+            }
+            if($needs_smite) {
+                array_unshift($unit['powers'], array(
+                    'Psychic Power' => 'Smite',
+                    'Warp Charge'   => 5,
+                    'Range'         => '18"',
+                    'Details'       => 'If manifested, the closest visible enemy unit within 18" of the psyker suffers D3 mortal wounds. If the result of the Psychic test was more than 10, the target suffers D6 mortal wounds instead.'
+                ));
+            }
+            $this->renderLine();
+            $this->renderTable($unit['powers']);
+        }
+
+        # abolities:
+        if(count($unit['abilities']) > 0) {
+            $this->renderLine();
+            $this->renderAbilities('Abilities', $unit['abilities']);
+        }
+
+        # keywords and keyword-adjacents:
+        $unit['points'] = array($unit['points']);
+        $lists = array(
+            'Contents' => 'roster',
+            'Rules'    => 'rules',
+            'Factions' => 'factions',
+            'Keywords' => 'keywords',
+            'Points'   => 'points'
+        );
+        foreach($lists as $label => $data) {
+            if(count($unit[$data]) > 0) {
+                $allCaps = $label == 'Roster' ? false : true;
+                $this->renderLine();
+                $this->renderKeywords($label, $unit[$data], $allCaps);
+            }
+        }
+
+        # wound tracker:
+        $hasTracks = false;
+        foreach($unit['model_stat'] as $type) {
+            if($type['W'] > 1) { $hasTracks = true; }
+        }
+        if($hasTracks) {
+            $this->renderLine();
+            $this->currentY += 5;
+            $this->renderWoundBoxes($unit);
+        }
+
+        if(count($unit['wound_track']) > 0) {
+            $this->renderLine();
+            $this->renderTable($unit['wound_track']);
+        }
+
+        $this->renderBorder();
+    }
+
+    protected function renderHeader($unit) {
+        $draw = $this->getDraw();
+        $draw->setFillColor('#000000');
+        $draw->setFillOpacity(1);
+        $draw->polygon(array(
+            array('x' => $this->currentX + $this->margin, 'y' => 70),
+            array('x' => $this->currentX + 70, 'y' => $this->margin),
+            array('x' => $this->currentX + $this->maxX - 70, 'y' => $this->margin),
+            array('x' => $this->currentX + $this->maxX - $this->margin, 'y' => 70),
+        ));
+#        $this->image->drawImage($draw);
+        $draw->rectangle(($this->margin + $this->currentX), 70, 
+                         ($this->maxX + $this->currentX - $this->margin), 100);
+        $this->image->drawImage($draw);
+
+        # FOC slot and PL:
+        $draw = $this->getDraw();
+        $draw->setFillColor('#FFFFFF');
+        $draw->setStrokeWidth(0);
+        $draw->setFontSize(20);
+
+        $gon = new Imagick();
+        $gon->readImage('../assets/octagon.png');
+        $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
+        $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 58, 52);
+
+        $gon = new Imagick();
+        $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
+        $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
+        $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 63, 57);
+
+        $gon = new Imagick();
+        $gon->readImage('../assets/octagon.png');
+        $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
+        $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 105, 52);
+        $draw->setFont('../assets/title_font.otf');
+        $draw->setFontSize(26);
+
+        if(strlen($unit['power']) == 1) {
+            $this->image->annotateImage($draw, 121 + $this->currentX, 84, 0, $unit['power']);
+        } else {
+            $this->image->annotateImage($draw, 114 + $this->currentX, 84, 0, $unit['power']);
+        }
+
+        # unit name:
+        $iters = 0;
+        $title_size = 28;
+        $draw->setFontSize($title_size);
+        $draw->setFont('../assets/title_font.otf');
+        $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+        while($iters < 5 && $check['textWidth'] > 500) {
+            $iters += 1;
+            $title_size -= 2;
+            $draw->setFontSize($title_size);
+            $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+        }
+        $title_x =  ceil((($this->maxX * .5) + $this->currentX) - ($check['textWidth'] / 2));
+        $this->image->annotateImage($draw, $title_x, 88, 0, strtoupper($unit['title']));
+        $this->currentY += 100;
+    }
+
+    protected function renderAbilities($label='Abilities', $data=array()) {
+        $this->renderText($this->currentX + 80, $this->currentY + 20, strtoupper($label), 40, 16);
+        foreach($data as $label => $desc) {
+            $content = trim(strtoupper($label).": $desc");
+            $this->currentY += $this->renderText($this->currentX + 190, $this->currentY + 19, $content, 90);
+        }
+        $this->currentY += 5;
+        return $this->currentY;
+    }
+
+    protected function renderBorder() {
+        $draw = $this->getDraw();
+        $draw->setStrokeWidth(2);
+        $draw->setStrokeColor('#222222');
+
+        $start = array(50, 70);
+        $segs = array(
+            array(70, 50),
+            array($this->maxX - 70, 50),
+            array($this->maxX - 50, 70),
+            array($this->maxX - 50, $this->currentY),
+            array($this->maxX - 70, $this->currentY + 20),
+            array(70, $this->currentY + 20),
+            array(50, $this->currentY),
+            array(50, 70)
+        );
+        foreach($segs as $end) {
+            $draw->line($start[0] + $this->currentX, $start[1], $end[0] + $this->currentX, $end[1]);
+            $start = $end;
+        }
+        $this->image->drawImage($draw);
+
+        $draw = $this->getDraw();
+        $draw->setFillColor('#FFFFFF');
+        $draw->rectangle((50 + $this->currentX), $this->currentY + 22, $this->maxX - 50 + $this->currentX, $this->maxY - 50);
+        $this->image->drawImage($draw);
+
+        # the corners are all beefed up:
+        $draw = $this->getDraw();
+        $draw->setFillColor('#FFFFFF');
+        $draw->setFillOpacity(1);
+        $draw->polygon(array(
+            array('x' => $this->currentX + 48, 'y' => $this->currentY + 22),
+            array('x' => $this->currentX + 68, 'y' => $this->currentY + 22),
+            array('x' => $this->currentX + 48, 'y' => $this->currentY + 2)
+        ));
+        $this->image->drawImage($draw);
+        $draw = $this->getDraw();
+        $draw->setFillColor('#FFFFFF');
+        $draw->setFillOpacity(1);
+        $draw->polygon(array(
+            array('x' => $this->currentX + $this->maxX - 48, 'y' => $this->currentY + 22),
+            array('x' => $this->currentX + $this->maxX - 68, 'y' => $this->currentY + 22),
+            array('x' => $this->currentX + $this->maxX - 48, 'y' => $this->currentY + 2)
+        ));
+        $this->image->drawImage($draw);
+    }
+
+    protected function renderTable($rows=array()) {
+        # TODO
+        return $this->currentY;
+    }
+
+    protected function renderWoundBoxes($unit) {
+        # TODO: roster-based boxes:
+        # 7 1W guys: X X X X X X 
+        # 1 2W guy: X X
+        # 1 2W guy: X X
+
+        foreach($unit['model_stat'] as $type) {
+            if($type['W'] > 1) {
+                $draw = $this->getDraw();
+                $draw->setStrokeWidth(1);
+                $draw->setFontSize(16);
+                $draw->setFontWeight(600);
+                $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, strtoupper($type['Unit']));
+                $this->image->drawImage($draw);
+
+                $x = 340 + $this->currentX;
+                for($w = 0; $w < $type['W']; $w++) {
+                    if($w % 10 == 0 && $w > 0) {
+                        $this->currentY += 40;
+                        $x = 340 + $this->currentX;
+                    }
+                    $draw->setStrokeOpacity(1);
+                    $draw->setStrokeColor('#000000');
+                    $draw->setFillColor('#FFFFFF');
+                    $draw->rectangle($x, $this->currentY, ($x + 30), ($this->currentY + 30));
+                    $this->image->drawImage($draw);
+                    $x += 40;
+                }
+                $this->currentY += 40;
+            }
+        }
+    }
+
+    protected function renderKeywords($label="Something", $data=array(), $allCaps = true) {
+        $text = strtoupper($label);
+        $this->renderText($this->currentX + 80, $this->currentY + 20, $text, 40, 16);
+
+        $contents = implode(', ', $data);
+        if($allCaps) {
+            $contents = strtoupper(implode(', ', $data));
+        }
+
+        $this->currentY += $this->renderText($this->currentX + 190, $this->currentY + 19, $contents, 75);
+        $this->currentY += 5;
+        return $this->currentY;
+    }
+
+    public function renderToOutFile() {
+        for($i = 0; $i < count($this->units); $i++) {
+            $this->image->newImage($this->res * 11, $this->res * 8.5, new ImagickPixel('white'), 'pdf');
+            $this->image->setResolution($this->res, $this->res);
+            $this->image->setColorspace(Imagick::COLORSPACE_RGB);
+
+            if(array_key_exists($i, $this->units)) {
+                $this->renderUnit($this->units[$i], 0, 0);
+            }
+            $i += 1;
+            if(array_key_exists($i, $this->units)) {
+                $this->renderUnit($this->units[$i], ($this->res * 5.5), 0);
+            }
+            $this->image->writeImages($this->outFile, true);
+        }
+    }
+}
