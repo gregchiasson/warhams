@@ -102,7 +102,6 @@ class wh40kRenderer extends Renderer {
             array('x' => $this->currentX + $this->maxX - 70, 'y' => $this->margin),
             array('x' => $this->currentX + $this->maxX - $this->margin, 'y' => 70),
         ));
-#        $this->image->drawImage($draw);
         $draw->rectangle(($this->margin + $this->currentX), 70, 
                          ($this->maxX + $this->currentX - $this->margin), 100);
         $this->image->drawImage($draw);
@@ -212,8 +211,104 @@ class wh40kRenderer extends Renderer {
     }
 
     protected function renderTable($rows=array()) {
-        # TODO
-        return $this->currentY;
+        # insanely dumb hack:
+        $col_widths = array(
+            'Range'       => 55,
+            'Warp Charge' => 95,
+            'Type'        => 75,
+            'Remaining W' => 120,
+            'Characteristic 1' => 110,
+            'Characteristic 2' => 110,
+            'Characteristic 3' => 110
+        );
+
+        for($i = 0; $i < count($rows); $i++) {
+            $tdraw = $this->getDraw();
+            $tdraw->setFillColor('#000000');
+            $draw = $this->getDraw();
+            $draw->setFillOpacity(1);
+
+            # header row:
+            if($i == 0) {
+                $x      = $this->currentX + 60;
+                $height = $this->currentY + 22;
+                $draw->setFillColor('#AAAAAA');
+                $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, ($this->currentX + 740), $height);
+                $this->image->drawImage($draw);
+                $tdraw->setFontSize(14);
+                $tdraw->setFontWeight(600);
+
+                $first           = true;
+                $new_y           = 0;
+                $this->currentY = $height;
+                foreach($rows[$i] as $stat => $val) {
+                    $text = $stat;
+                    if(strpos($stat, 'Characteristic') !== false) {
+                        $text = 'Attribute';
+                    } else if($stat == 'Warp Charge') {
+                        $text = 'Manifest';
+                    }
+                    $hdraw = $this->getDrawFont();
+                    $this->renderText($x, ($this->currentY - 3), strtoupper($text));
+                    if($first) {
+                        $x     += 220;
+                        $first = false;
+                    } else if(array_key_exists($stat, $col_widths)) {
+                        $x += $col_widths[$stat];
+                    } else {
+                        $x += 45;
+                    }
+               }
+            }
+
+            # data row:
+            $tdraw->setFontSize(12);
+            $tdraw->setFontWeight(400);
+            $height = 0;
+            foreach($rows[$i] as $stat => $val) {
+                $char_limit = ($stat == 'Details' ? 55 : 33);
+                $text    = wordwrap($val, $char_limit, "\n", false);
+                $lines   = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
+                $theight = ($lines * ($tdraw->getFontSize() + 3)) + $this->currentY + 17;
+                if($theight > $height) {
+                    $height = $theight;
+                }
+            }
+
+            $draw = $this->getDraw();
+            $draw->setFillOpacity(1);
+            if($i % 2) {
+                $draw->setFillColor('#EEEEEE');
+            } else {
+                $draw->setFillColor('#FFFFFF');
+            }
+            $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, 
+                             ($this->currentX + 740), $height);
+            $this->image->drawImage($draw);
+
+            $x     = $this->currentX + 60;
+            $new_y = 0;
+            $first = true;
+            foreach($rows[$i] as $stat => $val) {
+                $tdraw->setFontWeight(400);
+                if($first) {
+                    $tdraw->setFontWeight(600);
+                }
+                $fake_y = $this->renderText($x, ($this->currentY + 17), $val, $char_limit);
+                if($fake_y > $new_y) {
+                    $new_y = $fake_y;
+                }
+                if($first) {
+                    $x     += 220;
+                    $first = false;
+                } else if(array_key_exists($stat, $col_widths)) {
+                    $x += $col_widths[$stat];
+                } else {
+                    $x += 45;
+                }
+            }
+            $this->currentY += $new_y;
+        }
     }
 
     protected function renderWoundBoxes($unit) {
