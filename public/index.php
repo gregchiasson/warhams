@@ -4,10 +4,10 @@
 </head>
 <body>
 <h3>Hello Friend</h3>
-<p>Go into BattleScribe, and click this:</p>
-<img src="butan.png" alt="Save as HTML" width="800px"/>
+<p>Go into BattleScribe, and click either "Save as HTML" or "Save":</p>
+<img src="butan.png" alt="BattleScribe Save and Save as HTML buttons" width="300px"/>
 
-<p>Then put the file here and wait for a little bit (30 seconds, tops, unless you're a dick and tried a 12,000 point Apoc list, in which case what the fuck):</p>
+<p>Then put the HTML/ROS/ROSZ file here and wait for a little bit (30 seconds, tops, unless you're a dick and tried a 12,000 point Apoc list, in which case what the fuck):</p>
 <form method="post" enctype="multipart/form-data" action="/post.php">
 <input type="file" name="list">
 <input type="submit" value="pres">
@@ -20,16 +20,13 @@
 
 <h3>Release Notes</h3>
 <ul>
-<li>Last update: 2 July 2018, 22:00-ish</li>
-<li>Added release notes</li>
-<li>Unit titles now auto-scale to fit</li>
-<li>Power Level is centered better</li>
-<li>Added a "Wounds" header to that section</li>
-<li>Moved "Points" down to it's own section</li>
+<li>Last update: 3 August 2018, 23:00-ish</li>
+<li>Added unit roster headcounts</li>
+<li>Added .ros and .rosz support</li>
 </ul>
 <h3>Known issues</h3>
 <ul>
-<li>unit headcounts are missing</li>
+<li>Some of the .rosz files don't want to upload. Fun!</li>
 </ul>
 
 <h3>Credits</h3>

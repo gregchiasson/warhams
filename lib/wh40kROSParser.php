@@ -20,11 +20,6 @@ class wh40kROSParser extends wh40kParser {
         return $this->units;
     }
 
-/* TODO:
-[powers]
-
-[wound_track]
-*/
     public function populateUnit($d, $clean) {
         // title
         $clean['title']  = (string) $d['name'];
@@ -42,6 +37,27 @@ class wh40kROSParser extends wh40kParser {
         }
         $clean['model_stat'] = $this->deDupe($clean['model_stat'], 'Unit');
 
+        // powers
+        $cols = array('Warp Charge', 'Range', 'Details');
+        foreach($d->selections->selection as $dd) {
+            $clean['powers'] = $this->readSelectionChars($dd, $clean['powers'], 'Psychic Power', $cols);
+        }
+
+        $woundCols = array();
+        foreach($d->profiles->profile as $p) {
+            if((string) $p['profileTypeName'] == 'Wound Track' && empty($woundCols)) {
+                $headerRow = array();
+                foreach($p->characteristics->characteristic as $c) {
+                    $key   = (string) $c['name'];
+                    $value = (string) $c['value'];
+                    $woundCols[] = $key;
+                    $headerRow[$key] = $value;
+                }
+                $clean['wound_track'] = $headerRow;
+            }
+        }
+        $clean['wound_track'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Wound Track', $woundCols);
+
         // abilities
         // transport is an ability
         foreach($d->profiles->profile as $p) {
@@ -53,10 +69,23 @@ class wh40kROSParser extends wh40kParser {
                 }
             }
         }
-        // TODO: "Cast X, Deny Y" is an ability
-        // $clean['abilities']['Psyker'] = "This model can attempt to manifest $cast in each friendly Psychic phase, and attempt to deny $deny in each enemy Psychic phase.";
-
-
+        foreach($d->profiles->profile as $p) {
+            if((string) $p['profileTypeName'] == 'Psyker') {
+                $cast = 0;
+                $deny = 0;
+                foreach($p->characteristics->characteristic as $c) {
+                    if((string) $c['name'] == 'Cast') {
+                        $cast = (string) $c['value'];
+                    }
+                    if((string) $c['name'] == 'Deny') {
+                        $deny = (string) $c['value'];
+                    }
+                }
+                $cast .= $cast != 1 ? ' psychic powers' : ' psychic power';
+                $deny .= $deny != 1 ? ' psychic powers' : ' psychic power';
+                $clean['abilities']['Psyker'] = "This model can attempt to manifest $cast in each friendly Psychic phase, and attempt to deny $deny in each enemy Psychic phase.";
+            }
+        }
         $clean['abilities'] = $this->readSelectionAbilities($d, $clean['abilities']);
         foreach($d->selections->selection as $dd) {
             $clean['abilities'] = $this->readSelectionAbilities($dd, $clean['abilities']);
@@ -66,6 +95,7 @@ class wh40kROSParser extends wh40kParser {
         }
         ksort($clean['abilities']);
 
+        // rules
         foreach($d->rules->rule as $r) {
             $clean['rules'][] = (string) $r['name'];
         } 

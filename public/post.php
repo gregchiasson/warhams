@@ -8,8 +8,6 @@ ini_set('display_startup_errors', TRUE);
 require_once('../lib/wh40kHTMLParser.php');
 require_once('../lib/wh40kROSParser.php');
 
-/*
-
 function get_draw() {
     $draw = new ImagickDraw();
     $draw->setFont('../body_font.otf');
@@ -46,7 +44,7 @@ function render_line($x_offset, $max_x, $current_y, $image) {
     return array($image, $current_y);
 }
 
-function render_keywords($label, $data, $image, $current_y, $x_offset) {
+function render_keywords($label, $data, $image, $current_y, $x_offset, $all_caps=true) {
     $draw = get_draw_font();
     $draw->setFontSize(16);
     list($image, $fake_y) = render_text($image, $draw, 80 + $x_offset, $current_y + 20, strtoupper("$label"), 40);
@@ -59,7 +57,13 @@ function render_keywords($label, $data, $image, $current_y, $x_offset) {
     $draw->setFillOpacity(1);
     $draw->setStrokeWidth(0);
     $draw->setFontSize(12);
-    list($image, $current_y) = render_text($image, $draw, 190 + $x_offset, $current_y + 17, strtoupper(implode(', ', $data)), 75);
+
+    $contents = implode(', ', $data);
+    if($all_caps) {
+        $contents = strtoupper(implode(', ', $data));
+    }
+
+    list($image, $current_y) = render_text($image, $draw, 190 + $x_offset, $current_y + 17, $contents, 75);
     $image->drawImage($draw);
 
     return array($image, $current_y);
@@ -258,12 +262,6 @@ function render_unit($unit, $image, $x_offset) {
 
     $current_y = 100;
 
-    # unit roster:
-    if(count($unit['roster']) > 0) {
-        list($image, $current_y) = render_keywords('Contents', $unit['roster'], $image, $current_y, $x_offset);
-        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
-    }
-
     # model statlines:
     if(count($unit['model_stat'])) {
         list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['model_stat']);
@@ -293,6 +291,12 @@ function render_unit($unit, $image, $x_offset) {
         }
         list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
         list($image, $current_y) = render_table($image, $x_offset, $current_y, $unit['powers']);
+    }
+
+    # unit roster:
+    if(count($unit['roster']) > 0) {
+        list($image, $current_y) = render_line($x_offset, $max_x, $current_y, $image);
+        list($image, $current_y) = render_keywords('Contents', $unit['roster'], $image, $current_y, $x_offset, false);
     }
 
     # abilities:
@@ -421,7 +425,6 @@ function render_unit($unit, $image, $x_offset) {
 
     return $image;
 }
-*/
 
 try {
     // move file out of tmp dir:
@@ -446,11 +449,6 @@ try {
     }
 
     $UNITS = $parser->units;
-
-print_r($UNITS); exit();
-
-/*
-
     $OUTFILE = '/var/tmp/your_list_sucks_'.rand(10000,99999).'.pdf';
     $PDF     = new Imagick();
     $index   = 0;
@@ -479,7 +477,6 @@ print_r($UNITS); exit();
     header('Pragma: public');
     header('Content-Length: '.filesize($OUTFILE));
     readfile($OUTFILE);
-*/
 } catch(Exception $e) {
     print($e->getMessage());
 }
