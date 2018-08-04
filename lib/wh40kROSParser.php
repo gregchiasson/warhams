@@ -95,13 +95,6 @@ class wh40kROSParser extends wh40kParser {
         }
         ksort($clean['abilities']);
 
-        // rules
-        foreach($d->rules->rule as $r) {
-            $clean['rules'][] = (string) $r['name'];
-        } 
-        sort($clean['rules']);
-        $clean['rules'] = array_unique($clean['rules']);
-
         // weapon_stat
         $cols = array('Range', 'Type', 'S', 'AP', 'D', 'Abilities');
         $clean['weapon_stat'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Weapon', $cols);
@@ -117,6 +110,8 @@ class wh40kROSParser extends wh40kParser {
         foreach($d->rules->rule as $r) {
             $clean['rules'][] = (string) $r['name'];
         } 
+        $clean['rules'] = array_unique($clean['rules']);
+        sort($clean['rules']);
 
         // roster
         if((string) $d['type'] == 'model') {
