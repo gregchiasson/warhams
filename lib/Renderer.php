@@ -64,8 +64,7 @@ abstract class Renderer {
         $this->currentY += 2;
     }
 
-    // extend this
     public abstract function renderToOutFile();
-    // extend this
-    public abstract function renderUnit($unit, $xOffset, $yOffset);
+
+    protected abstract function renderUnit($unit, $xOffset, $yOffset);
 }

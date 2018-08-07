@@ -3,7 +3,7 @@
 require_once('Renderer.php');
 
 class wh40kRenderer extends Renderer {
-    public function renderUnit($unit, $xOffset, $yOffset) {
+    protected function renderUnit($unit, $xOffset, $yOffset) {
         // half page, landscape:
         $this->maxX = 144 * 5.5;
         $this->maxY = 144 * 8.5;
@@ -50,7 +50,7 @@ class wh40kRenderer extends Renderer {
             $this->renderTable($unit['powers']);
         }
 
-        # abolities:
+        # abilities:
         if(count($unit['abilities']) > 0) {
             $this->renderLine();
             $this->renderAbilities('Abilities', $unit['abilities']);

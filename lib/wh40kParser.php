@@ -116,4 +116,46 @@ class wh40kParser {
 
         return $newItems;
     }
+
+    protected function readSelectionCosts($d, $clean) {
+        foreach($d->costs->cost as $cost) {
+            if((string) $cost['name'] == 'pts') {
+                $clean['points'] += (integer) $cost['value'];
+            } else if((string) $cost['name'] == ' PL') {
+                $clean['power'] += (integer) $cost['value'];
+            }
+        }
+        return $clean;
+    }
+
+    protected function readSelectionAbilities($d, $stats, $key='Abilities') {
+        foreach($d->profiles->profile as $p) {
+            if((string) $p['profileTypeName'] == $key) {
+                foreach($p->characteristics->characteristic as $c) {
+                    if((string) $c['name'] == 'Description') {
+                        $stats[(string) $p['name']] = (string) $c['value'];
+                    }
+                }
+            }
+        }
+        return $stats;
+    }
+
+    protected function readSelectionChars($d, $stats, $type, $check) {
+        foreach($d->profiles->profile as $p) {
+            if((string) $p['profileTypeName'] == $type) {
+                $model = array();
+                $model[$type] = (string) $p['name'];
+                foreach($p->characteristics->characteristic as $c) {
+                    $key   = (string) $c['name'];
+                    $value = (string) $c['value'];
+                    if(in_array($key, $check)) {
+                        $model[$key] = $value;
+                    }
+                }
+                $stats[] = $model;
+            }
+        }
+        return $stats;
+    }
 }

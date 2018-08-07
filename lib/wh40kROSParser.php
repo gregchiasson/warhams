@@ -96,15 +96,7 @@ class wh40kROSParser extends wh40kParser {
         ksort($clean['abilities']);
 
         // weapon_stat
-        $cols = array('Range', 'Type', 'S', 'AP', 'D', 'Abilities');
-        $clean['weapon_stat'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Weapon', $cols);
-        foreach($d->selections->selection as $dd) {
-            $clean['weapon_stat'] = $this->readSelectionChars($dd, $clean['weapon_stat'], 'Weapon', $cols);
-            foreach($dd->selections->selection as $ddd) {
-                $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
-            }
-        }
-        $clean['weapon_stat'] = $this->deDupe($clean['weapon_stat'], 'Weapon');
+        $clean = $this->readWeaponStats($d, $clean);
 
         // rules
         foreach($d->rules->rule as $r) {
@@ -140,6 +132,12 @@ class wh40kROSParser extends wh40kParser {
         }
 
         // points, power
+        $clean = $this->readPointCosts($d, $clean);
+
+        return $clean;
+    }
+
+    protected function readPointCosts($d, $clean) {
         $clean = $this->readSelectionCosts($d, $clean);
         foreach($d->selections->selection as $dd) {
             $clean = $this->readSelectionCosts($dd, $clean);
@@ -147,49 +145,20 @@ class wh40kROSParser extends wh40kParser {
                 $clean = $this->readSelectionCosts($ddd, $clean);
             }
         }
-
         return $clean;
     }
 
-    private function readSelectionCosts($d, $clean) {
-        foreach($d->costs->cost as $cost) {
-            if((string) $cost['name'] == 'pts') {
-                $clean['points'] += (integer) $cost['value'];
-            } else if((string) $cost['name'] == ' PL') {
-                $clean['power'] += (integer) $cost['value'];
+    protected function readWeaponStats($d, $clean) {
+        $cols = array('Range', 'Type', 'S', 'AP', 'D', 'Abilities');
+        $clean['weapon_stat'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Weapon', $cols);
+        foreach($d->selections->selection as $dd) {
+            $clean['weapon_stat'] = $this->readSelectionChars($dd, $clean['weapon_stat'], 'Weapon', $cols);
+            foreach($dd->selections->selection as $ddd) {
+                $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
             }
         }
+        $clean['weapon_stat'] = $this->deDupe($clean['weapon_stat'], 'Weapon');
+
         return $clean;
-    }
-
-    private function readSelectionAbilities($d, $stats) {
-        foreach($d->profiles->profile as $p) {
-            if((string) $p['profileTypeName'] == 'Abilities') {
-                foreach($p->characteristics->characteristic as $c) {
-                    if((string) $c['name'] == 'Description') {
-                        $stats[(string) $p['name']] = (string) $c['value'];
-                    }
-                }
-            }
-        }
-        return $stats;
-    }
-
-    private function readSelectionChars($d, $stats, $type, $check) {
-        foreach($d->profiles->profile as $p) {
-            if((string) $p['profileTypeName'] == $type) {
-                $model = array();
-                $model[$type] = (string) $p['name'];
-                foreach($p->characteristics->characteristic as $c) {
-                    $key   = (string) $c['name'];
-                    $value = (string) $c['value'];
-                    if(in_array($key, $check)) {
-                        $model[$key] = $value;
-                    }
-                }
-                $stats[] = $model;
-            }
-        }
-        return $stats;
     }
 }
