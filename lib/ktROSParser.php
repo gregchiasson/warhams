@@ -53,6 +53,9 @@ class ktROSParser extends wh40kROSParser {
 
         // weapon_stat
         $clean = $this->readWeaponStats($d, $clean);
+        foreach($clean['weapon_stat'] as $gun) {
+            $gun['Abilities'] = '-';
+        }
 
         // points, power
         $clean = $this->readPointCosts($d, $clean);
