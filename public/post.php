@@ -9,19 +9,24 @@ require_once('../lib/wh40kROSParser.php');
 
 try {
     // move file out of tmp dir:
-    $input = $_FILES['list'];
-    move_uploaded_file($input['tmp_name'], "/var/tmp/".$input['name']);
-    $in_path = "/var/tmp/".$input['name'];
-    $tmp = file_get_contents($in_path);
-    $tmp = str_replace('& ', '&amp; ', $tmp);
-    file_put_contents($in_path, $tmp);
+    $input  = $_FILES['list'];
+    $inPath = "/var/tmp/".$input['name'];
+    move_uploaded_file($input['tmp_name'], $inPath);
 
-    if(substr($input['name'], -5) == '.html') { 
+    if(substr($input['name'], -5) == '.html') {
+        # escape these (should fix zip files, while im at it):
+        $tmp = file_get_contents($inPath);
+        $tmp = str_replace('& ', '&amp; ', $tmp);
+        file_put_contents($inPath, $tmp);
         $parser = new wh40kHTMLParser("/var/tmp/".$input['name']);
     } else if(substr($input['name'], -5) == '.rosz') { 
         #unzip file
         $zip = new ZipArchive;
-        $res = $zip->open("/var/tmp/".$input['name']);
+        $res = $zip->open($inPath);
+        if($res == ZipArchive::ER_NOZIP) {
+            print("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try unzipping the ROSZ into a ROS, or use the HTML upload. Sorry, but I'm working on it!</p>");
+            exit();
+        }
         $zip->extractTo('/var/tmp/');
         $zip->close();
         $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));

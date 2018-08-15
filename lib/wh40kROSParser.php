@@ -25,8 +25,10 @@ class wh40kROSParser extends wh40kParser {
         $clean['title']  = (string) $d['name'];
 
         // keywords, factions, slot
-        foreach($d->categories->category as $c) {
-            $clean = $this->binKeyword((string) $c['name'], $clean);
+        if($d->categories->category) {
+            foreach($d->categories->category as $c) {
+                $clean = $this->binKeyword((string) $c['name'], $clean);
+            }
         }
 
         // model_stat

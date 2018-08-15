@@ -141,7 +141,7 @@ class wh40kRenderer extends Renderer {
         $draw->setFontSize($title_size);
         $draw->setFont('../assets/title_font.otf');
         $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
-        while($iters < 5 && $check['textWidth'] > 500) {
+        while($iters < 5 && $check['textWidth'] > 470) {
             $iters += 1;
             $title_size -= 2;
             $draw->setFontSize($title_size);
@@ -210,17 +210,19 @@ class wh40kRenderer extends Renderer {
         $this->image->drawImage($draw);
     }
 
-    protected function renderTable($rows=array()) {
+    protected function renderTable($rows=array(), $col_widths = array(), $width=740, $showHeaders=true) {
         # insanely dumb hack:
-        $col_widths = array(
-            'Range'       => 55,
-            'Warp Charge' => 95,
-            'Type'        => 75,
-            'Remaining W' => 120,
-            'Characteristic 1' => 110,
-            'Characteristic 2' => 110,
-            'Characteristic 3' => 110
-        );
+        if(empty($col_widths)) {
+            $col_widths = array(
+                'Range'       => 55,
+                'Warp Charge' => 95,
+                'Type'        => 75,
+                'Remaining W' => 120,
+                'Characteristic 1' => 110,
+                'Characteristic 2' => 110,
+                'Characteristic 3' => 110
+            );
+        }
 
         for($i = 0; $i < count($rows); $i++) {
             $tdraw = $this->getDraw();
@@ -229,11 +231,11 @@ class wh40kRenderer extends Renderer {
             $draw->setFillOpacity(1);
 
             # header row:
-            if($i == 0) {
+            if($i == 0 && $showHeaders) {
                 $x      = $this->currentX + 60;
                 $height = $this->currentY + 22;
                 $draw->setFillColor('#AAAAAA');
-                $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, ($this->currentX + 740), $height);
+                $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, ($this->currentX + $width), $height);
                 $this->image->drawImage($draw);
                 $tdraw->setFontSize(14);
                 $tdraw->setFontWeight(600);
@@ -283,7 +285,7 @@ class wh40kRenderer extends Renderer {
                 $draw->setFillColor('#FFFFFF');
             }
             $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, 
-                             ($this->currentX + 740), $height);
+                             ($this->currentX + $width), $height);
             $this->image->drawImage($draw);
 
             $x     = $this->currentX + 60;
@@ -323,7 +325,13 @@ class wh40kRenderer extends Renderer {
                 $draw->setStrokeWidth(1);
                 $draw->setFontSize(16);
                 $draw->setFontWeight(600);
-                $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, strtoupper($type['Unit']));
+
+                $text   = wordwrap(strtoupper($type['Unit']), 22, "\n", false);
+                $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
+                $height = (($lines + 1) * ($draw->getFontSize() + 4));
+                $height = $height < 40 ? 40 : $height;
+
+                $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, $text);
                 $this->image->drawImage($draw);
 
                 $x = 340 + $this->currentX;
@@ -339,7 +347,7 @@ class wh40kRenderer extends Renderer {
                     $this->image->drawImage($draw);
                     $x += 40;
                 }
-                $this->currentY += 40;
+                $this->currentY += $height;
             }
         }
     }

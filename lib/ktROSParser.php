@@ -50,12 +50,20 @@ class ktROSParser extends wh40kROSParser {
             }
         }
         ksort($clean['abilities']);
+        $stuff = array();
+        foreach($clean['abilities'] as $k => $v) {
+            $stuff[] = $k;
+        }
+        $clean['abilities'] = $stuff;
 
         // weapon_stat
         $clean = $this->readWeaponStats($d, $clean);
+        $guns  = array();
         foreach($clean['weapon_stat'] as $gun) {
-            $gun['Abilities'] = '-';
+            unset($gun['Abilities']);
+            $guns[] = $gun;
         }
+        $clean['weapon_stat'] = $guns;
 
         // points, power
         $clean = $this->readPointCosts($d, $clean);
