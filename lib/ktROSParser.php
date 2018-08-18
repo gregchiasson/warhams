@@ -38,7 +38,7 @@ class ktROSParser extends wh40kROSParser {
         $clean['title']  = (string) $d['name'];
 
         // model_stat
-        $cols = array('M', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Save');
+        $cols = array('M', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Sv');
         $clean['model_stat'] = $this->readSelectionChars($d, $clean['model_stat'], 'Model', $cols);
 
         // abilities

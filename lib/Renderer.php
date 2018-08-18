@@ -42,8 +42,11 @@ abstract class Renderer {
         return $hdraw;
     }
 
-    protected function renderText($x, $y, $text, $limit=50, $fontSize=12) {
+    protected function renderText($x, $y, $text, $limit=50, $fontSize=12, $font=null) {
         $draw = $this->getDraw();
+        if($font) {
+            $draw->setFont($font);
+        }
         $draw->setFontSize($fontSize);
         $text   = wordwrap($text, $limit, "\n", false);
         $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
