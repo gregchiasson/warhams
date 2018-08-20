@@ -35,7 +35,11 @@ class ktROSParser extends wh40kROSParser {
 
 
         // title
+        $clean['custom_name']  = null;
         $clean['title']  = (string) $d['name'];
+        if(isset($d['customName'])) {
+            $clean['custom_name']  = (string) $d['customName'];
+        }
 
         // model_stat
         $cols = array('M', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Sv');

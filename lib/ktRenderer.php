@@ -26,8 +26,8 @@ class ktRenderer extends wh40kRenderer {
         $draw = $this->getDraw();
         $draw->setFontSize(15);
         $draw->setFont('../assets/kt_font.ttf');
-        $this->image->annotateImage($draw, 70 + $this->currentX, 20 + $this->currentY, 0, 'Name:');
-        $this->image->annotateImage($draw, 530 + $this->currentX, 20 + $this->currentY, 0, $unit['points'].' points');
+        $this->image->annotateImage($draw, 30 + $this->currentX, 20 + $this->currentY, 0, 'Name: '.$unit['custom_name']);
+        $this->image->annotateImage($draw, 540 + $this->currentX, 20 + $this->currentY, 0, $unit['points'].' points');
 
         $this->currentY += 24;
 
@@ -49,6 +49,17 @@ class ktRenderer extends wh40kRenderer {
         }
 
         # weapon statlines:
+        for($fake = count($unit['weapon_stat']); $fake < 5; $fake++) {
+            $unit['weapon_stat'][] = array(
+                'Weapon' => '',
+                'Range'  => '',
+                'Type'   => '',
+                'S'      => '',
+                'AP'     => '',
+                'D'      => '',
+            );
+        }
+
         if(count($unit['weapon_stat'])) {
             $colWidths = array(
                 'Weapon'    => 211,
@@ -112,11 +123,11 @@ class ktRenderer extends wh40kRenderer {
     public function renderKeywords($label='Something', $data=array(), $allCaps=true) {
         $x = $this->currentX + $this->margin + 10; 
         $font = '../assets/kt_title_font.ttf';
-        $text = strtoupper($label);
+        $text = strtoupper("$label:");
         $this->renderText($x, $this->currentY + 20, $text, 69, 14, $font);
 
 
-        $x        += 123;
+        $x        += 110;
         $font     = '../assets/kt_font.ttf';
         $contents = strtoupper(implode(', ', $data));
         $this->currentY += $this->renderText($x, $this->currentY + 19, $contents, 69, 16, $font);
@@ -150,7 +161,7 @@ return;
                 $guns[] = $gun['Weapon'];
             }
             $units[] = array(
-                'Name'       => ' ',
+                'Name'       => $unit['custom_name'],
                 'Model Type' => $unit['title'],
                 'Wargear'    => implode(', ', $guns),
                 'EXP'        => ' ',
