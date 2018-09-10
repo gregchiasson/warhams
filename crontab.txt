@@ -1,0 +1,2 @@
+# delete list files and datacards after a couple of days:
+0 0 * * * find /var/tmp/ -mtime +2 -type f -delete
