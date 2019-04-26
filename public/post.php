@@ -20,7 +20,6 @@ file #1:  bad zipfile offset (local header sig):  4
 
 # TODO dont require the www. part of the URL
 # TODO add SSL support
-# TODO web ui is trash
 
 error_reporting(E_ALL); 
 ini_set('display_errors', TRUE); 
