@@ -17,7 +17,6 @@ class wh40kROSParser extends wh40kParser {
                 }
             }
         }
-#print_r($this->units); exit();
         return $this->units;
     }
 
@@ -48,7 +47,7 @@ class wh40kROSParser extends wh40kParser {
 
         $woundCols = array();
         foreach($d->profiles->profile as $p) {
-            if((string) $p['profileTypeName'] == 'Wound Track' && empty($woundCols)) {
+            if($this->checkProfileType($p, 'Wound Track') && empty($woundCols)) {
                 $headerRow = array();
                 foreach($p->characteristics->characteristic as $c) {
                     $key   = (string) $c['name'];
@@ -64,24 +63,35 @@ class wh40kROSParser extends wh40kParser {
         // abilities
         // transport is an ability
         foreach($d->profiles->profile as $p) {
-            if((string) $p['profileTypeName'] == 'Transport') {
+            if($this->checkProfileType($p, 'Transport')) {
                 foreach($p->characteristics->characteristic as $c) {
                     if((string) $c['name'] == 'Capacity') {
-                        $clean['abilities']['Transport'] = (string) $c['value'];
+                        $words = (string) $c['value'];
+                        if($words) {
+                            $clean['abilities']['Transport'] = $words;
+                        } else {
+                            $clean['abilities']['Transport'] = (string) $c;
+                        }
                     }
                 }
             }
         }
         foreach($d->profiles->profile as $p) {
-            if((string) $p['profileTypeName'] == 'Psyker') {
+            if($this->checkProfileType($p, 'Psyker')) {
                 $cast = 0;
                 $deny = 0;
                 foreach($p->characteristics->characteristic as $c) {
                     if((string) $c['name'] == 'Cast') {
                         $cast = (string) $c['value'];
+                        if(!$cast) {
+                            $cast = (string) $c;
+                        }
                     }
                     if((string) $c['name'] == 'Deny') {
                         $deny = (string) $c['value'];
+                        if(!$deny) {
+                            $deny = (string) $c;
+                        }
                     }
                 }
                 $cast .= $cast != 1 ? ' psychic powers' : ' psychic power';
@@ -104,8 +114,10 @@ class wh40kROSParser extends wh40kParser {
         $clean = $this->readWeaponStats($d, $clean);
 
         // rules
-        foreach($d->rules->rule as $r) {
-            $clean['rules'][] = (string) $r['name'];
+        if($d->rules->rule) {
+            foreach($d->rules->rule as $r) {
+                $clean['rules'][] = (string) $r['name'];
+            } 
         } 
         $clean['rules'] = array_unique($clean['rules']);
         sort($clean['rules']);
@@ -141,6 +153,7 @@ class wh40kROSParser extends wh40kParser {
         // points, power
         $clean = $this->readPointCosts($d, $clean);
 
+#print("<pre>\n"); print_r($clean); exit();
         return $clean;
     }
 

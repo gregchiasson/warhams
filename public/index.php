@@ -1,19 +1,17 @@
 <?php include('inc/header.php'); ?>
 
 
+<!--
+Uncomment if there's known outages
+-->
 <div class="panel panel-danger">
     <div class="panel-heading">
         <h3 class="panel-title">Ahh crap</h3>
     </div>
     <div class="panel-body">
-        <p>Sorry folks, but it looks like the latest BattleScribe update (2.02.01.112 or so) changed up the way ros/rosz files get created, and ButtScribe has some compatibility issues. That was always going to happen sooner or later, but I believe it to be a relatively simple fix, and I'm working on it.</p>
-
-        <p>For 40k lists, you can work around this by uploading HTML lists, but Kill Team support isn't working at all. I'm hoping to have an update to ButtScribe out soon, likely by April 28th, to address this.</p>
-
-        <p>Apologies for the temporary outage, but this is the sort of thing that happens when you're piggy-backing on someone else's tools. It'll get fixed ASAP, just bear with me, and thanks to everyone who reported the issues.</p>
+        <p>Kill Team might not be working, but 40k lists from BattleScribe 2.02+ work again.</p>
     </div>
 </div>
-
 
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -41,6 +39,7 @@
         <ul>
             <li>Last update: <strong>29 April 2019</strong></li>
             <li>Updated UI.</li>
+            <li><strong>BattleScribe 2.02+ works properly now.</strong></li>
             <li>Added URL to printouts so people can stop asking me where I printed these.</li>
             <li>Moved points cost to header, next to power level.</li>
             <li>Fix duplicate keywords appearing in some cases.</li>

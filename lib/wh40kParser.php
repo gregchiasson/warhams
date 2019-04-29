@@ -130,14 +130,28 @@ class wh40kParser {
         return $clean;
     }
 
+
+    protected function checkProfileType($p, $type) {
+        if((string) $p['profileTypeName'] == $type || (string) $p['typeName'] == $type) {
+            return true;
+        } else {
+            return false; 
+        }
+    }
+
     protected function readSelectionAbilities($d, $stats, $key='Abilities') {
         if($d->profiles->profile) {
             foreach($d->profiles->profile as $p) {
-                if((string) $p['profileTypeName'] == $key) {
+                if($this->checkProfileType($p, $key)) {
                     if($p->characteristics->characteristic) {
                         foreach($p->characteristics->characteristic as $c) {
                             if((string) $c['name'] == 'Description') {
-                                $stats[(string) $p['name']] = (string) $c['value'];
+                                $key   = (string) $p['name'];
+                                $value = (string) $c['value'];
+                                if(!$value) {
+                                    $value = (string) $c;
+                                }
+                                $stats[$key] = $value;
                             }
                         }
                     }
@@ -150,12 +164,15 @@ class wh40kParser {
     protected function readSelectionChars($d, $stats, $type, $check) {
         if($d->profiles->profile) {
             foreach($d->profiles->profile as $p) {
-                if((string) $p['profileTypeName'] == $type) {
+                if($this->checkProfileType($p, $type)) {
                     $model = array();
                     $model[$type] = (string) $p['name'];
                     foreach($p->characteristics->characteristic as $c) {
                         $key   = (string) $c['name'];
                         $value = (string) $c['value'];
+                        if(!$value) {
+                            $value = (string) $c;
+                        }
                         if(in_array($key, $check)) {
                             $model[$key] = $value;
                         }
