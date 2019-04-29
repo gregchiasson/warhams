@@ -17,6 +17,7 @@ class wh40kROSParser extends wh40kParser {
                 }
             }
         }
+#print_r($this->units); exit();
         return $this->units;
     }
 
@@ -91,8 +92,10 @@ class wh40kROSParser extends wh40kParser {
         $clean['abilities'] = $this->readSelectionAbilities($d, $clean['abilities']);
         foreach($d->selections->selection as $dd) {
             $clean['abilities'] = $this->readSelectionAbilities($dd, $clean['abilities']);
-            foreach($dd->selections->selection as $ddd) {
-                $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities']);
+            if($dd->selections->selection) {
+                foreach($dd->selections->selection as $ddd) {
+                    $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities']);
+                }
             }
         }
         ksort($clean['abilities']);
@@ -114,9 +117,11 @@ class wh40kROSParser extends wh40kParser {
         foreach($d->selections->selection as $dd) {
             if((string) $dd['type'] == 'model') {
                 $clean['roster'][] = (string) $dd['number'].' '.(string) $dd['name'];
-                foreach($dd->selections->selection as $ddd) {
-                    if((string) $ddd['type'] == 'model') {
-                        $clean['roster'][] = (string) $ddd['number'].' '.(string) $ddd['name'];
+                if($dd->selections->selection) {
+                    foreach($dd->selections->selection as $ddd) {
+                        if((string) $ddd['type'] == 'model') {
+                            $clean['roster'][] = (string) $ddd['number'].' '.(string) $ddd['name'];
+                        }
                     }
                 }
             } 
@@ -141,10 +146,14 @@ class wh40kROSParser extends wh40kParser {
 
     protected function readPointCosts($d, $clean) {
         $clean = $this->readSelectionCosts($d, $clean);
-        foreach($d->selections->selection as $dd) {
-            $clean = $this->readSelectionCosts($dd, $clean);
-            foreach($dd->selections->selection as $ddd) {
-                $clean = $this->readSelectionCosts($ddd, $clean);
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $dd) {
+                $clean = $this->readSelectionCosts($dd, $clean);
+                if($dd->selections->selection) {
+                    foreach($dd->selections->selection as $ddd) {
+                        $clean = $this->readSelectionCosts($ddd, $clean);
+                    }
+                }
             }
         }
         return $clean;
@@ -155,8 +164,10 @@ class wh40kROSParser extends wh40kParser {
         $clean['weapon_stat'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Weapon', $cols);
         foreach($d->selections->selection as $dd) {
             $clean['weapon_stat'] = $this->readSelectionChars($dd, $clean['weapon_stat'], 'Weapon', $cols);
-            foreach($dd->selections->selection as $ddd) {
-                $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
+            if($dd->selections->selection) {
+                foreach($dd->selections->selection as $ddd) {
+                    $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
+                }
             }
         }
         $clean['weapon_stat'] = $this->deDupe($clean['weapon_stat'], 'Weapon');
