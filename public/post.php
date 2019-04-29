@@ -1,4 +1,6 @@
 <?php
+# bugs:
+# TODO new version of BScribe is all fucked up
 # TODO zips are fucked. to wit:
 /*
 warning [1-5_CampaignRooster.rosz]:  4 extra bytes at beginning or within zipfile
@@ -9,15 +11,13 @@ file #1:  bad zipfile offset (local header sig):  4
   error:  invalid compressed data to inflate
  bad CRC a0a123d7  (should be 5b44cc82)
 */
-
-# TODO add URL to printouts
-# TODO points cost to header, next to PL/FOC slot/name
-# TODO roster page that lists summary of all units on a page before the cards
-# TODO Grey Knight Paladins are a squad of 3, Paragon and 2 Paladins, but the buttscribe output only has wound boxes for a paragon and one paladin (general headcount issue, semi-known - see also IG squads and Terminarors)
 # TODO also, techpriest enginseer text overlaps the edge of the dataslate - it's where it explains the master of machines rule or QUESTOR MECHANICUS models (line length on abilities)
-# TODO 30k support, possibly
-# TODO (big one) improve print quality
+# TODO Grey Knight Paladins are a squad of 3, Paragon and 2 Paladins, but the buttscribe output only has wound boxes for a paragon and one paladin (general headcount issue, semi-known - see also IG squads and Terminarors)
 
+# features:
+# TODO roster page that lists summary of all units on a page before the cards
+# TODO (big one) improve print quality
+# TODO 30k support, possibly
 # TODO dont require the www. part of the URL
 # TODO add SSL support
 

@@ -59,11 +59,10 @@ class wh40kRenderer extends Renderer {
         # keywords and keyword-adjacents:
         $unit['points'] = array($unit['points']);
         $lists = array(
-            'Contents' => 'roster',
             'Rules'    => 'rules',
             'Factions' => 'factions',
             'Keywords' => 'keywords',
-            'Points'   => 'points'
+            'Contents' => 'roster'
         );
         foreach($lists as $label => $data) {
             if(count($unit[$data]) > 0) {
@@ -90,6 +89,7 @@ class wh40kRenderer extends Renderer {
         }
 
         $this->renderBorder();
+        $this->renderWatermark();
     }
 
     protected function renderHeader($unit) {
@@ -106,7 +106,7 @@ class wh40kRenderer extends Renderer {
                          ($this->maxX + $this->currentX - $this->margin), 100);
         $this->image->drawImage($draw);
 
-        # FOC slot and PL:
+        # FOC slot and PL and points:
         $draw = $this->getDraw();
         $draw->setFillColor('#FFFFFF');
         $draw->setStrokeWidth(0);
@@ -135,13 +135,25 @@ class wh40kRenderer extends Renderer {
             $this->image->annotateImage($draw, 114 + $this->currentX, 84, 0, $unit['power']);
         }
 
+        $gon = new Imagick();
+        $gon->readImage('../assets/octagon.png');
+        $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
+        $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 152, 52);
+        $draw->setFont('../assets/title_font.otf');
+        $draw->setFontSize(20);
+        if(strlen($unit['points']) == 2) {
+            $this->image->annotateImage($draw, 165 + $this->currentX, 82, 0, $unit['points']);
+        } else {
+            $this->image->annotateImage($draw, 158 + $this->currentX, 82, 0, $unit['points']);
+        }
+
         # unit name:
         $iters = 0;
         $title_size = 28;
         $draw->setFontSize($title_size);
         $draw->setFont('../assets/title_font.otf');
         $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
-        while($iters < 5 && $check['textWidth'] > 470) {
+        while($iters < 6 && $check['textWidth'] > 430) {
             $iters += 1;
             $title_size -= 2;
             $draw->setFontSize($title_size);
@@ -160,6 +172,11 @@ class wh40kRenderer extends Renderer {
         }
         $this->currentY += 5;
         return $this->currentY;
+    }
+
+    protected function renderWatermark() {
+        $content = 'CREATED WITH BUTTSCRIBE: http://www.buttscri.be';
+        $this->currentY += $this->renderText($this->currentX + 80, $this->currentY + 12, $content, 90);
     }
 
     protected function renderBorder() {
@@ -355,6 +372,8 @@ class wh40kRenderer extends Renderer {
     protected function renderKeywords($label="Something", $data=array(), $allCaps = true) {
         $text = strtoupper($label);
         $this->renderText($this->currentX + 80, $this->currentY + 20, $text, 40, 16);
+
+        $data = array_unique($data);
 
         $contents = implode(', ', $data);
         if($allCaps) {

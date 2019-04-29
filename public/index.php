@@ -39,8 +39,11 @@
     </div>
     <div class="panel-body">
         <ul>
-            <li>Last update: <strong>26 April 2019</strong></li>
+            <li>Last update: <strong>29 April 2019</strong></li>
             <li>Updated UI.</li>
+            <li>Added URL to printouts so people can stop asking me where I printed these.</li>
+            <li>Moved points cost to header, next to power level.</li>
+            <li>Fix duplicate keywords appearing in some cases.</li>
         </ul>
     </div>
 </div>
