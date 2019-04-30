@@ -3,7 +3,6 @@
 
 <!--
 Uncomment if there's known outages
--->
 <div class="panel panel-danger">
     <div class="panel-heading">
         <h3 class="panel-title">Ahh crap</h3>
@@ -12,6 +11,7 @@ Uncomment if there's known outages
         <p>Kill Team might not be working, but 40k lists from BattleScribe 2.02+ work again.</p>
     </div>
 </div>
+-->
 
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -25,7 +25,9 @@ Uncomment if there's known outages
 </div>
 
 <p>
-    <img src="output.png" alt="Output data card example" width="700px"/>
+    <a href="/output.png">
+        <img src="/output.png" alt="Output data card example" width="700px"/>
+    </a>
 </p>
 <p>
     <img src="output_kt.png" alt="Output data card example" width="350px"/><img src="output_kard.png" alt="Output data card example" width="350px"/>
@@ -37,8 +39,9 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Last update: <strong>29 April 2019</strong></li>
+            <li>Last update: <strong>30 April 2019</strong></li>
             <li><strong>BattleScribe 2.02+ works properly now.</strong></li>
+            <li>Fixed KillTeam rosters as well.</li>
             <li>Updated UI.</li>
             <li>Fix a bug where certain rules/abilities weren't appearing.</li>
             <li>Added URL to printouts so people can stop asking me where I printed these.</li>

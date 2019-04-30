@@ -25,9 +25,11 @@ class ktROSParser extends wh40kROSParser {
 
         if($isSpecial) {
             foreach($d->selections->selection as $dd) {
-                foreach($dd->selections->selection as $ddd) {
-                    if(strpos((string) $ddd['name'], 'Level ') === 0) {
-                        $clean['keywords'][] = (string) $dd['name'];
+                if($dd->selections->selection) {
+                    foreach($dd->selections->selection as $ddd) {
+                        if(strpos((string) $ddd['name'], 'Level ') === 0) {
+                            $clean['keywords'][] = (string) $dd['name'];
+                        }
                     }
                 }
             }
@@ -49,8 +51,10 @@ class ktROSParser extends wh40kROSParser {
         $clean['abilities'] = $this->readSelectionAbilities($d, $clean['abilities'], 'Ability');
         foreach($d->selections->selection as $dd) {
             $clean['abilities'] = $this->readSelectionAbilities($dd, $clean['abilities'], 'Ability');
-            foreach($dd->selections->selection as $ddd) {
-                $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities'], 'Ability');
+            if($dd->selections->selection) {
+                foreach($dd->selections->selection as $ddd) {
+                    $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities'], 'Ability');
+                }
             }
         }
         ksort($clean['abilities']);
