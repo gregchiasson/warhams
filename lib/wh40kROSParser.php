@@ -46,59 +46,67 @@ class wh40kROSParser extends wh40kParser {
         }
 
         $woundCols = array();
-        foreach($d->profiles->profile as $p) {
-            if($this->checkProfileType($p, 'Wound Track') && empty($woundCols)) {
-                $headerRow = array();
-                foreach($p->characteristics->characteristic as $c) {
-                    $key   = (string) $c['name'];
-                    $value = (string) $c['value'];
-                    $woundCols[] = $key;
-                    $headerRow[$key] = $value;
+        $trackNames = array('Wound Track', 'Stat Damage');
+        $trackName = null;
+        if($d->profiles->profile) {
+            foreach($d->profiles->profile as $p) {
+                if($this->checkProfileTypes($p, $trackNames) && empty($woundCols)) {
+                    $trackName = (string) $p['profileTypeName'] ? (string) $p['profileTypeName'] : (string) $p['typeName'];
+                    $headerRow = array();
+                    foreach($p->characteristics->characteristic as $c) {
+                        $key   = (string) $c['name'];
+                        $value = (string) $c['value'];
+                        $woundCols[] = $key;
+                        $headerRow[$key] = $value;
+                    }
+                    $clean['wound_track'] = $headerRow;
                 }
-                $clean['wound_track'] = $headerRow;
             }
-        }
-        $clean['wound_track'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Wound Track', $woundCols);
+            if(!empty($woundCols)) {
+                $clean['wound_track'] = $this->readSelectionChars($d, $clean['weapon_stat'], $trackName, $woundCols);
+            }
 
-        // abilities
-        // transport is an ability
-        foreach($d->profiles->profile as $p) {
-            if($this->checkProfileType($p, 'Transport')) {
-                foreach($p->characteristics->characteristic as $c) {
-                    if((string) $c['name'] == 'Capacity') {
-                        $words = (string) $c['value'];
-                        if($words) {
-                            $clean['abilities']['Transport'] = $words;
-                        } else {
-                            $clean['abilities']['Transport'] = (string) $c;
+            // abilities
+            // transport is an ability
+            foreach($d->profiles->profile as $p) {
+                if($this->checkProfileType($p, 'Transport')) {
+                    foreach($p->characteristics->characteristic as $c) {
+                        if((string) $c['name'] == 'Capacity') {
+                            $words = (string) $c['value'];
+                            if($words) {
+                                $clean['abilities']['Transport'] = $words;
+                            } else {
+                                $clean['abilities']['Transport'] = (string) $c;
+                            }
                         }
                     }
                 }
             }
-        }
-        foreach($d->profiles->profile as $p) {
-            if($this->checkProfileType($p, 'Psyker')) {
-                $cast = 0;
-                $deny = 0;
-                foreach($p->characteristics->characteristic as $c) {
-                    if((string) $c['name'] == 'Cast') {
-                        $cast = (string) $c['value'];
-                        if(!$cast) {
-                            $cast = (string) $c;
+            foreach($d->profiles->profile as $p) {
+                if($this->checkProfileType($p, 'Psyker')) {
+                    $cast = 0;
+                    $deny = 0;
+                    foreach($p->characteristics->characteristic as $c) {
+                        if((string) $c['name'] == 'Cast') {
+                            $cast = (string) $c['value'];
+                            if(!$cast) {
+                                $cast = (string) $c;
+                            }
+                        }
+                        if((string) $c['name'] == 'Deny') {
+                            $deny = (string) $c['value'];
+                            if(!$deny) {
+                                $deny = (string) $c;
+                            }
                         }
                     }
-                    if((string) $c['name'] == 'Deny') {
-                        $deny = (string) $c['value'];
-                        if(!$deny) {
-                            $deny = (string) $c;
-                        }
-                    }
+                    $cast .= $cast != 1 ? ' psychic powers' : ' psychic power';
+                    $deny .= $deny != 1 ? ' psychic powers' : ' psychic power';
+                    $clean['abilities']['Psyker'] = "This model can attempt to manifest $cast in each friendly Psychic phase, and attempt to deny $deny in each enemy Psychic phase.";
                 }
-                $cast .= $cast != 1 ? ' psychic powers' : ' psychic power';
-                $deny .= $deny != 1 ? ' psychic powers' : ' psychic power';
-                $clean['abilities']['Psyker'] = "This model can attempt to manifest $cast in each friendly Psychic phase, and attempt to deny $deny in each enemy Psychic phase.";
             }
         }
+
         $clean['abilities'] = $this->readSelectionAbilities($d, $clean['abilities']);
         foreach($d->selections->selection as $dd) {
             $clean['abilities'] = $this->readSelectionAbilities($dd, $clean['abilities']);
@@ -153,7 +161,6 @@ class wh40kROSParser extends wh40kParser {
         // points, power
         $clean = $this->readPointCosts($d, $clean);
 
-#print("<pre>\n"); print_r($clean); exit();
         return $clean;
     }
 

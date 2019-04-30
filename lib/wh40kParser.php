@@ -130,6 +130,26 @@ class wh40kParser {
         return $clean;
     }
 
+    # match multiple types on a startsWith basis
+    protected function checkProfileTypes($p, $types=array()) {
+        $matches = false;
+        foreach($types as $type) {
+            $len = strlen($type);
+
+            $toMatch = (string) $p['profileTypeName'];
+            if(!$toMatch) { 
+                $toMatch = (string) $p['typeName'];
+            }
+
+            strtoupper($type);
+            strtoupper($toMatch);
+
+            if(substr($toMatch, 0, $len) == $type) {
+                $matches = true;
+            }
+        }
+        return $matches;
+    }
 
     protected function checkProfileType($p, $type) {
         if((string) $p['profileTypeName'] == $type || (string) $p['typeName'] == $type) {
@@ -146,12 +166,12 @@ class wh40kParser {
                     if($p->characteristics->characteristic) {
                         foreach($p->characteristics->characteristic as $c) {
                             if((string) $c['name'] == 'Description') {
-                                $key   = (string) $p['name'];
+                                $kkey  = (string) $p['name'];
                                 $value = (string) $c['value'];
                                 if(!$value) {
                                     $value = (string) $c;
                                 }
-                                $stats[$key] = $value;
+                                $stats[$kkey] = $value;
                             }
                         }
                     }
