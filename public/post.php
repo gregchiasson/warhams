@@ -1,6 +1,5 @@
 <?php
 # bugs:
-# TODO killteam! fix it or remove it
 # TODO zips are fucked. to wit:
 /*
 warning [1-5_CampaignRooster.rosz]:  4 extra bytes at beginning or within zipfile
@@ -12,15 +11,13 @@ file #1:  bad zipfile offset (local header sig):  4
  bad CRC a0a123d7  (should be 5b44cc82)
 */
 # TODO also, techpriest enginseer text overlaps the edge of the dataslate - it's where it explains the master of machines rule or QUESTOR MECHANICUS models (line length on abilities)
-# TODO Grey Knight Paladins are a squad of 3, Paragon and 2 Paladins, but the buttscribe output only has wound boxes for a paragon and one paladin (general headcount issue, semi-known - see also IG squads and Terminarors)
 
 # features:
+# TODO Grey Knight Paladins are a squad of 3, Paragon and 2 Paladins, but the buttscribe output only has wound boxes for a paragon and one paladin (general headcount issue, semi-known - see also IG squads and Terminarors)
 # TODO one sheet per page instead of 2
 # TODO roster page that lists summary of all units on a page before the cards
 # TODO (big one) improve print quality
 # TODO 30k support, possibly
-# TODO dont require the www. part of the URL
-# TODO add SSL support
 
 error_reporting(E_ALL); 
 ini_set('display_errors', TRUE); 
@@ -43,15 +40,23 @@ try {
         file_put_contents($inPath, $tmp);
         $parser = new wh40kHTMLParser("/var/tmp/".$input['name']);
     } else if(substr($input['name'], -5) == '.rosz') { 
-        #unzip file
+        // Try the PHP ZipArchive solution first:
         $zip = new ZipArchive;
         $res = $zip->open($inPath);
+
+        // if that didn't work, just exec the thing, I guess?
         if($res == ZipArchive::ER_NOZIP) {
-            print("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try unzipping the ROSZ into a ROS, or use the HTML upload. Sorry, but I'm working on it!</p>");
-            exit();
+            exec("unzip $inPath -d /var/tmp/");
+            if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $input['name']))) {
+                // OK, now we truly are fucked.
+                print("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
+                exit();
+            }
+        } else {
+            $zip->extractTo('/var/tmp/');
+            $zip->close();
         }
-        $zip->extractTo('/var/tmp/');
-        $zip->close();
+
         $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));
     } else if(substr($input['name'], -4) == '.ros') { 
         $parser = new wh40kROSParser("/var/tmp/".$input['name']);
