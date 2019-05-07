@@ -39,16 +39,11 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Last update: <strong>1 May 2019</strong></li>
+            <li>Last update: <strong>7 May 2019</strong></li>
             <li><strong>BattleScribe 2.02+ works properly now.</strong></li>
-            <li>Fixed KillTeam rosters as well.</li>
+            <li>Fixed Explodes tables for some armies (AdMech).</li>
             <li>Fixed .rosz files not unzipping properly, finally.</li>
             <li>Added SSL support and no-www support.</li>
-            <li>Fix a bug where certain rules/abilities weren't appearing.</li>
-            <li>Added URL to printouts so people can stop asking me where I printed these.</li>
-            <li>Moved points cost to header, next to power level.</li>
-            <li>Fix duplicate keywords appearing in some cases.</li>
-            <li>Updated UI.</li>
         </ul>
     </div>
 </div>

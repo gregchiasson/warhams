@@ -1,18 +1,5 @@
 <?php
-# bugs:
-# TODO zips are fucked. to wit:
-/*
-warning [1-5_CampaignRooster.rosz]:  4 extra bytes at beginning or within zipfile
-  (attempting to process anyway)
-file #1:  bad zipfile offset (local header sig):  4
-  (attempting to re-compensate)
-  inflating: 1-5_CampaignRooster.ros
-  error:  invalid compressed data to inflate
- bad CRC a0a123d7  (should be 5b44cc82)
-*/
 # TODO also, techpriest enginseer text overlaps the edge of the dataslate - it's where it explains the master of machines rule or QUESTOR MECHANICUS models (line length on abilities)
-
-# features:
 # TODO Grey Knight Paladins are a squad of 3, Paragon and 2 Paladins, but the buttscribe output only has wound boxes for a paragon and one paladin (general headcount issue, semi-known - see also IG squads and Terminarors)
 # TODO one sheet per page instead of 2
 # TODO roster page that lists summary of all units on a page before the cards

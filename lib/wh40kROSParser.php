@@ -34,20 +34,27 @@ class wh40kROSParser extends wh40kParser {
         // model_stat
         $cols = array('M', 'WS', 'BS', 'S', 'T', 'W', 'A', 'Ld', 'Save');
         $clean['model_stat'] = $this->readSelectionChars($d, $clean['model_stat'], 'Unit', $cols);
-        foreach($d->selections->selection as $dd) {
-            $clean['model_stat'] = $this->readSelectionChars($dd, $clean['model_stat'], 'Unit', $cols);
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $dd) {
+                $clean['model_stat'] = $this->readSelectionChars($dd, $clean['model_stat'], 'Unit', $cols);
+        }
         }
         $clean['model_stat'] = $this->deDupe($clean['model_stat'], 'Unit');
 
         // powers
         $cols = array('Warp Charge', 'Range', 'Details');
-        foreach($d->selections->selection as $dd) {
-            $clean['powers'] = $this->readSelectionChars($dd, $clean['powers'], 'Psychic Power', $cols);
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $dd) {
+                $clean['powers'] = $this->readSelectionChars($dd, $clean['powers'], 'Psychic Power', $cols);
+            }
         }
 
-        $woundCols = array();
-        $trackNames = array('Wound Track', 'Stat Damage');
-        $trackName = null;
+        # TODO: this needs a re-factor
+        $explodeCols = array(); # thanks, whoever maintains the AdMech repo, for doing this weird.
+        $woundCols   = array();
+        $explodeName = null;
+        $trackNames  = array('Wound Track', 'Stat Damage');
+        $trackName   = null;
         if($d->profiles->profile) {
             foreach($d->profiles->profile as $p) {
                 if($this->checkProfileTypes($p, $trackNames) && empty($woundCols)) {
@@ -56,14 +63,29 @@ class wh40kROSParser extends wh40kParser {
                     foreach($p->characteristics->characteristic as $c) {
                         $key   = (string) $c['name'];
                         $value = (string) $c['value'];
-                        $woundCols[] = $key;
+                        $woundCols[]     = $key;
                         $headerRow[$key] = $value;
                     }
                     $clean['wound_track'] = $headerRow;
+                } 
+                if($this->checkProfileTypes($p, array('Explosion', 'Explode')) && empty($explodeCols)) {
+                    $explodeName = (string) $p['profileTypeName'] ? (string) $p['profileTypeName'] : (string) $p['typeName'];
+                    $headerRow = array();
+                    foreach($p->characteristics->characteristic as $c) {
+                        $key   = (string) $c['name'];
+                        $value = (string) $c['value'];
+
+                        $explodeCols[]   = $key;
+                        $headerRow[$key] = $value;
+                    }
+                    $clean['explode_table'] = $headerRow;
                 }
             }
             if(!empty($woundCols)) {
                 $clean['wound_track'] = $this->readSelectionChars($d, $clean['weapon_stat'], $trackName, $woundCols);
+            }
+            if(!empty($explodeCols)) {
+                $clean['explode_table'] = $this->readSelectionChars($d, $clean['weapon_stat'], $explodeName, $explodeCols);
             }
 
             // abilities
@@ -108,11 +130,13 @@ class wh40kROSParser extends wh40kParser {
         }
 
         $clean['abilities'] = $this->readSelectionAbilities($d, $clean['abilities']);
-        foreach($d->selections->selection as $dd) {
-            $clean['abilities'] = $this->readSelectionAbilities($dd, $clean['abilities']);
-            if($dd->selections->selection) {
-                foreach($dd->selections->selection as $ddd) {
-                    $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities']);
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $dd) {
+                $clean['abilities'] = $this->readSelectionAbilities($dd, $clean['abilities']);
+                if($dd->selections->selection) {
+                    foreach($dd->selections->selection as $ddd) {
+                        $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities']);
+                    }
                 }
             }
         }
@@ -134,17 +158,19 @@ class wh40kROSParser extends wh40kParser {
         if((string) $d['type'] == 'model') {
             $clean['roster'][] = (string) $d['number'].' '.(string) $d['name'];
         }
-        foreach($d->selections->selection as $dd) {
-            if((string) $dd['type'] == 'model') {
-                $clean['roster'][] = (string) $dd['number'].' '.(string) $dd['name'];
-                if($dd->selections->selection) {
-                    foreach($dd->selections->selection as $ddd) {
-                        if((string) $ddd['type'] == 'model') {
-                            $clean['roster'][] = (string) $ddd['number'].' '.(string) $ddd['name'];
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $dd) {
+                if((string) $dd['type'] == 'model') {
+                    $clean['roster'][] = (string) $dd['number'].' '.(string) $dd['name'];
+                    if($dd->selections->selection) {
+                        foreach($dd->selections->selection as $ddd) {
+                            if((string) $ddd['type'] == 'model') {
+                                $clean['roster'][] = (string) $ddd['number'].' '.(string) $ddd['name'];
+                            }
                         }
                     }
-                }
-            } 
+                } 
+            }
         }
         foreach($clean['model_stat'] as $model) {
             $notInRoster = true;
@@ -182,11 +208,13 @@ class wh40kROSParser extends wh40kParser {
     protected function readWeaponStats($d, $clean) {
         $cols = array('Range', 'Type', 'S', 'AP', 'D', 'Abilities');
         $clean['weapon_stat'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Weapon', $cols);
-        foreach($d->selections->selection as $dd) {
-            $clean['weapon_stat'] = $this->readSelectionChars($dd, $clean['weapon_stat'], 'Weapon', $cols);
-            if($dd->selections->selection) {
-                foreach($dd->selections->selection as $ddd) {
-                    $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $dd) {
+                $clean['weapon_stat'] = $this->readSelectionChars($dd, $clean['weapon_stat'], 'Weapon', $cols);
+                if($dd->selections->selection) {
+                    foreach($dd->selections->selection as $ddd) {
+                        $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
+                    }
                 }
             }
         }

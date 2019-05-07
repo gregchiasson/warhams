@@ -30,6 +30,7 @@ class wh40kParser {
             'model_stat'  => array(),     # name M WS BS etc
             'weapon_stat' => array(),     # name range type etc
             'wound_track' => array(),     # remaining stat1 stat2 etc
+            'explode_table' => array(),   # some vehicles apparently use this?
             'powers'      => array(),     # MUSCLE WIZARDS ONLY
             'abilities'   => array(),     # Deep Strike, etc
             'rules'       => array(),     # ATSKNF, etc

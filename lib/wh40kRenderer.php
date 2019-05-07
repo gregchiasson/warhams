@@ -88,6 +88,11 @@ class wh40kRenderer extends Renderer {
             $this->renderTable($unit['wound_track']);
         }
 
+        if(count($unit['explode_table']) > 0) {
+            $this->renderLine();
+            $this->renderTable($unit['explode_table']);
+        }
+
         $this->renderBorder();
         $this->renderWatermark();
     }
@@ -235,6 +240,8 @@ class wh40kRenderer extends Renderer {
                 'Warp Charge' => 95,
                 'Type'        => 75,
                 'Remaining W' => 120,
+                'Dice Roll'   => 100,
+                'Distance'    => 100,
                 'Characteristic 1' => 110,
                 'Characteristic 2' => 110,
                 'Characteristic 3' => 110
