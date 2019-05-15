@@ -392,7 +392,43 @@ class wh40kRenderer extends Renderer {
         return $this->currentY;
     }
 
+    public function renderList() {
+        $forces = array_shift($this->units);
+        if(array_key_exists('0', $forces)) {
+
+            $this->image->newImage($this->res * 11, $this->res * 8.5, new ImagickPixel('white'), 'pdf');
+            $this->image->setResolution($this->res, $this->res);
+            $this->image->setColorspace(Imagick::COLORSPACE_RGB);
+
+            $this->maxX = 144 * 5.5;
+            $this->maxY = 144 * 8.5;
+            $draw = $this->getDraw();
+            $draw->setFillColor('#000000');
+            $draw->setFillOpacity(1);
+            $draw->rectangle($this->margin, 70, ($this->maxX - $this->margin), 100);
+            $this->image->drawImage($draw);
+
+            foreach($forces as $force) {
+                $label = $force['faction'].' ('.$force['detachment'].')';
+                $this->currentY += $this->renderText($this->currentX + 80, $this->currentY + 20, $label, 150, 16);
+                foreach($force['units'] as $slot => $units) {
+                    $this->renderTable($units, array(
+                        'name'   => 220,
+                        'slot'   => 50,
+                        'roster' => 200,
+                        'points' => 69,
+                        'power'  => 69
+                    ));
+                }
+            }
+        } else {
+            // not a roster, abort!
+            array_unshift($this->units, $forces);
+        }
+    }
+
     public function renderToOutFile() {
+        $this->renderList();
         for($i = 0; $i < count($this->units); $i++) {
             $this->image->newImage($this->res * 11, $this->res * 8.5, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);

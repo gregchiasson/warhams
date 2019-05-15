@@ -9,14 +9,35 @@ class wh40kROSParser extends wh40kParser {
     }
 
     public function findUnitsToParse() {
+        $forces = array();
         foreach($this->doc->forces->force as $force) {
+            $units = array();
             foreach($force->selections->selection as $d) {
                 $unit = $this->createUnit($d);
                 if($unit) {
                     $this->units[] = $unit;
+
+                    $slot = $unit['slot'];
+                    if(!array_key_exists($slot, $units)) {
+                        $units[$slot] = array();
+                    }
+
+                    $units[$slot][] = array(
+                        'name'   => $unit['title'],
+                        'slot'   => $unit['slot'],
+                        'roster' => implode($unit['roster'], ', '),
+                        'points' => $unit['points'],
+                        'power'  => $unit['power']
+                    );
                 }
             }
+            $forces[] = array(
+                'faction'    => (string) $force['catalogueName'],
+                'detachment' => (string) $force['name'],
+                'units'      => $units
+            );
         }
+        array_unshift($this->units, $forces);
         return $this->units;
     }
 
