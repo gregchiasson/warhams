@@ -397,24 +397,22 @@ class wh40kRenderer extends Renderer {
         $forces = array_shift($this->units);
         if(array_key_exists('0', $forces)) {
 
-            $this->image->newImage($this->res * 11, $this->res * 8.5, new ImagickPixel('white'), 'pdf');
+            $this->image->newImage($this->res * 8.5, $this->res * 11, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);
             $this->image->setColorspace(Imagick::COLORSPACE_RGB);
 
             $this->currentY += 30;
-            $this->maxX = 144 * 5.5;
-            $this->maxY = 144 * 8.5;
-            # TODO: fix this
-#            $draw = $this->getDraw();
-#            $draw->setFillColor('#000000');
-#            $draw->setFillOpacity(1);
-#            $draw->rectangle($this->margin, 70, ($this->maxX - $this->margin), 100);
-#            $this->image->drawImage($draw);
+            $this->maxX = 144 * 8.5;
+            $this->maxY = 144 * 11;
+
+            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster", 50, 22);
+            $this->currentY -= 20;
 
             foreach($forces as $force) {
                 $this->currentY += 20;
                 $label = $force['faction'].' ('.$force['detachment'].')';
                 $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
+                $this->currentY -= 10;
                 $allUnits = array();
                 foreach($force['units'] as $slot => $units) {
                     foreach($units as $unit) {
