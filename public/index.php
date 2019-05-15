@@ -41,8 +41,8 @@ Uncomment if there's known outages
         <ul>
             <li>Last update: <strong>7 May 2019</strong></li>
             <li><strong>BattleScribe 2.02+ works properly now.</strong></li>
-            <li>Fixed Explodes tables for some armies (AdMech).</li>
-            <li>Fixed .rosz files not unzipping properly, finally.</li>
+            <li>Added a Roster Overview on the first page of .ros/.rosz lists for 40.</li>
+            <li>Fixed .rosz files not unzipping properly, most of the time.</li>
             <li>Added SSL support and no-www support.</li>
         </ul>
     </div>

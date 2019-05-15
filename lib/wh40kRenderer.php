@@ -292,7 +292,8 @@ class wh40kRenderer extends Renderer {
             $tdraw->setFontWeight(400);
             $height = 0;
             foreach($rows[$i] as $stat => $val) {
-                $char_limit = ($stat == 'Details' ? 55 : 33);
+                # TODO: use the width attribute here, or base it on actual rendered width instead
+                $char_limit = (($stat == 'Details' || $stat == 'roster') ? 55 : 33);
                 $text    = wordwrap($val, $char_limit, "\n", false);
                 $lines   = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
                 $theight = ($lines * ($tdraw->getFontSize() + 3)) + $this->currentY + 17;
@@ -400,26 +401,33 @@ class wh40kRenderer extends Renderer {
             $this->image->setResolution($this->res, $this->res);
             $this->image->setColorspace(Imagick::COLORSPACE_RGB);
 
+            $this->currentY += 30;
             $this->maxX = 144 * 5.5;
             $this->maxY = 144 * 8.5;
-            $draw = $this->getDraw();
-            $draw->setFillColor('#000000');
-            $draw->setFillOpacity(1);
-            $draw->rectangle($this->margin, 70, ($this->maxX - $this->margin), 100);
-            $this->image->drawImage($draw);
+            # TODO: fix this
+#            $draw = $this->getDraw();
+#            $draw->setFillColor('#000000');
+#            $draw->setFillOpacity(1);
+#            $draw->rectangle($this->margin, 70, ($this->maxX - $this->margin), 100);
+#            $this->image->drawImage($draw);
 
             foreach($forces as $force) {
+                $this->currentY += 20;
                 $label = $force['faction'].' ('.$force['detachment'].')';
-                $this->currentY += $this->renderText($this->currentX + 80, $this->currentY + 20, $label, 150, 16);
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
+                $allUnits = array();
                 foreach($force['units'] as $slot => $units) {
-                    $this->renderTable($units, array(
-                        'name'   => 220,
-                        'slot'   => 50,
-                        'roster' => 200,
-                        'points' => 69,
-                        'power'  => 69
-                    ));
+                    foreach($units as $unit) {
+                        $allUnits[] = $unit;
+                    } 
                 }
+                $this->renderTable($allUnits, array(
+                    'name'   => 220,
+                    'slot'   => 50,
+                    'roster' => 280,
+                    'points' => 69,
+                    'power'  => 69
+                ));
             }
         } else {
             // not a roster, abort!
