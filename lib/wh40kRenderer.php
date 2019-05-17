@@ -396,7 +396,6 @@ class wh40kRenderer extends Renderer {
     public function renderList() {
         $forces = array_shift($this->units);
         if(array_key_exists('0', $forces)) {
-
             $this->image->newImage($this->res * 8.5, $this->res * 11, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);
             $this->image->setColorspace(Imagick::COLORSPACE_RGB);
@@ -405,7 +404,19 @@ class wh40kRenderer extends Renderer {
             $this->maxX = 144 * 8.5;
             $this->maxY = 144 * 11;
 
-            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster", 50, 22);
+
+            $tpl = 0;
+            $tp  = 0;
+            foreach($forces as $force) {
+                foreach($force['units'] as $slot => $units) {
+                    foreach($units as $unit) {
+                        $tp  += $unit['points'];
+                        $tpl += $unit['power'];
+                    }
+                }
+            }
+
+            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL)", 50, 22);
             $this->currentY -= 20;
 
             foreach($forces as $force) {
