@@ -1,2 +1,4 @@
 # delete list files and datacards after a couple of days:
 0 0 * * * find /var/tmp/ -mtime +2 -type f -delete
+0 0 * * * find /var/www/html/public/lists/ -mtime +7 -type f | grep pdf$ | xargs rm
+0 0 * * * find /var/www/html/public/lists/ -mtime +30 -type f -delete
