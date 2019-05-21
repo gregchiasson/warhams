@@ -9,10 +9,22 @@ error_reporting(E_ALL);
 ini_set('display_errors', TRUE); 
 ini_set('display_startup_errors', TRUE); 
 
+ob_start();
+?>
+    <?php include('inc/header.php'); ?>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">Results</h3>
+        </div>
+        <div class="panel-body">
+<?php
+
 require_once('../lib/wh40kRenderer.php');
 require_once('../lib/wh40kHTMLParser.php');
 require_once('../lib/wh40kROSParser.php');
 
+$downloads = array();
+$error     = null;
 try {
     // move file out of tmp dir:
     $input  = $_FILES['list'];
@@ -35,33 +47,65 @@ try {
             exec("unzip $inPath -d /var/tmp/");
             if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $input['name']))) {
                 // OK, now we truly are fucked.
-                print("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
-                exit();
+                $error = ("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
+                
             }
         } else {
             $zip->extractTo('/var/tmp/');
             $zip->close();
         }
 
-        $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));
+        if(!$error) {
+            $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));
+        }
     } else if(substr($input['name'], -4) == '.ros') { 
         $parser = new wh40kROSParser("/var/tmp/".$input['name']);
+    } else {
+        $error = 'No file uploaded';
     }
 
-    $UNITS = $parser->units;
-    $OUTFILE = '/var/tmp/your_list_sucks_'.rand(10000,99999).'.pdf';
+    if(!$error) {
+        $UNITS = $parser->units;
+        $OUTFILE = '/var/tmp/'.uniqid().'.pdf';
 
-    $output = new wh40kRenderer($OUTFILE, $UNITS);
-    $output->renderToOutFile();
+        $output    = new wh40kRenderer($OUTFILE, $UNITS);
+        $downloads = $output->renderToOutFile();
+    }
 
+    # TODO: move downloads to S3, and serve from there
+    foreach($downloads as $key => $file) {
+        $new = str_replace('/var/tmp/', __DIR__.'/lists/', $file);
+        copy($file, $new);
+        $downloads[$key] = str_replace(__DIR__, '', $new);
+    }
+} catch(Exception $e) {
+    $error = $e->getMessage();
+} ?>
+
+<?php if($error) { ?>
+    <?php print($error); ?>
+    <?php ob_end_flush(); ?>
+    </div>
+    <?php include('inc/footer.php'); ?>
+    </div>
+<?php } else if($downloads['summary']) { ?>
+    <?php ob_end_flush(); ?>
+    <p><a href="<?php print($downloads['list']);?>" target="_blank">Click here to download/print list as a PDF</a></p>
+    <p>And here's a convenient list summary, that you can feel free to link this on Discord/Forums, or send to your TO (click for big):</p>
+    <a href="<?php print($downloads['summary']);?>" target="_blank">
+        <img src="<?php print($downloads['summary']);?>" style="width:500px; border:1px solid black"/>
+    </a>
+    </div>
+    </div>
+    <?php include('inc/footer.php'); ?>
+<?php } else {
+    ob_end_clean();
     header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="your_list_sucks.pdf"');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
-    header('Content-Length: '.filesize($OUTFILE));
-    readfile($OUTFILE);
-} catch(Exception $e) {
-    print($e->getMessage());
-}
+    header('Content-Length: '.filesize($downloads['list']));
+    readfile($downloads['list']);
+} ?>

@@ -3,15 +3,15 @@
 
 <!--
 Uncomment if there's known outages
+-->
 <div class="panel panel-danger">
     <div class="panel-heading">
         <h3 class="panel-title">Ahh crap</h3>
     </div>
     <div class="panel-body">
-        <p>Kill Team might not be working, but 40k lists from BattleScribe 2.02+ work again.</p>
+        <p>Kill Team: Elites doesn't seem to work properly. The workaround is, uhh, don't use Elites.</p>
     </div>
 </div>
--->
 
 <div class="panel panel-primary">
     <div class="panel-heading">
@@ -39,10 +39,10 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Last update: <strong>15 May 2019</strong></li>
+            <li>Last update: <strong>21 May 2019</strong></li>
             <li><strong>BattleScribe 2.02+ works properly now.</strong></li>
+            <li>Changed upload behavior to add better error messaging, and offer a linkable PNG preview.</li>
             <li>Added a Roster Overview on the first page of .ros/.rosz lists for 40.</li>
-            <li>Fixed .rosz files not unzipping properly, most of the time.</li>
             <li>Added SSL support and no-www support.</li>
         </ul>
     </div>

@@ -420,16 +420,22 @@ class wh40kRenderer extends Renderer {
             $this->currentY -= 20;
 
             foreach($forces as $force) {
-                $this->currentY += 20;
-                $label = $force['faction'].' ('.$force['detachment'].')';
-                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
-                $this->currentY -= 10;
+                $pts = 0;
+                $pl  = 0;
                 $allUnits = array();
                 foreach($force['units'] as $slot => $units) {
                     foreach($units as $unit) {
                         $allUnits[] = $unit;
-                    } 
+                        $pts += $unit['points'];
+                        $pl  += $unit['power'];
+                    }
                 }
+
+                $this->currentY += 20;
+                $label = $force['faction'].' '.$force['detachment']." ($pts pts, $pl PL)";
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
+                $this->currentY -= 10;
+                
                 $this->renderTable($allUnits, array(
                     'name'   => 220,
                     'slot'   => 50,
@@ -438,14 +444,30 @@ class wh40kRenderer extends Renderer {
                     'power'  => 69
                 ));
             }
+            $this->renderWatermark();
+
+            $url = '/var/tmp/'.uniqid().'.png';
+            $preview = clone $this->image;
+
+            $preview->setFormat('gif');
+            $preview->trimImage(0);
+            $preview->borderImage('white', 10, 10);
+            $preview->writeImages($url, false);
+
+            return $url;
         } else {
             // not a roster, abort!
             array_unshift($this->units, $forces);
+            return null;
         }
     }
 
     public function renderToOutFile() {
-        $this->renderList();
+        $files = array();
+        $summary  = $this->renderList();
+        if($summary) {
+            $files['summary'] = $summary;
+        }
         for($i = 0; $i < count($this->units); $i++) {
             $this->image->newImage($this->res * 11, $this->res * 8.5, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);
@@ -460,5 +482,7 @@ class wh40kRenderer extends Renderer {
             }
             $this->image->writeImages($this->outFile, true);
         }
+        $files['list'] = $this->outFile;
+        return $files;
     }
 }
