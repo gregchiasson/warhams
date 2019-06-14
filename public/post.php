@@ -73,6 +73,7 @@ try {
     }
 
     # TODO: move downloads to S3, and serve from there
+    $original = $downloads;
     foreach($downloads as $key => $file) {
         $new = str_replace('/var/tmp/', __DIR__.'/lists/', $file);
         copy($file, $new);
@@ -106,6 +107,6 @@ try {
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
-    header('Content-Length: '.filesize($downloads['list']));
-    readfile($downloads['list']);
+    header('Content-Length: '.filesize($original['list']));
+    readfile('/var/tmp/'.$original['list']);
 } ?>
