@@ -108,5 +108,5 @@ try {
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
     header('Content-Length: '.filesize($original['list']));
-    readfile('/var/tmp/'.$original['list']);
+    readfile($original['list']);
 } ?>
