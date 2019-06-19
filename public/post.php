@@ -47,7 +47,7 @@ try {
             exec("unzip $inPath -d /var/tmp/");
             if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $input['name']))) {
                 // OK, now we truly are fucked.
-                $error = ("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
+                $error = ("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try saving the list as .ros in BattleScribe, or unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
                 
             }
         } else {
