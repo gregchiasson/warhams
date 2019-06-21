@@ -89,7 +89,7 @@ try {
     </div>
     <?php include('inc/footer.php'); ?>
     </div>
-<?php } else if($downloads['summary']) { ?>
+<?php } else if(array_key_exists('summary', $downloads)) { ?>
     <?php ob_end_flush(); ?>
     <p><a href="<?php print($downloads['list']);?>" target="_blank">Click here to download/print list as a PDF</a></p>
     <p>And here's a convenient list summary, that you can feel free to link this on Discord/Forums, or send to your TO (click for big):</p>
