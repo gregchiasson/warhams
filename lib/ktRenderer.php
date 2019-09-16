@@ -315,7 +315,6 @@ return;
         $this->renderList();
         $this->margin -= 20;
         $i = 0;
-#        for($i = 0; $i < count($this->units); $i++) {
         while($i < count($this->units)) {
             $this->image->newImage($this->res * 8.5, $this->res * 11, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);

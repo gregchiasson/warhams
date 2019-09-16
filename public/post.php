@@ -28,24 +28,28 @@ $error     = null;
 try {
     // move file out of tmp dir:
     $input  = $_FILES['list'];
-    $inPath = "/var/tmp/".$input['name'];
+
+    $path_parts = pathinfo($input['tmp_name']);
+    $fileName = uniqid().$path_parts['extension'];
+
+    $inPath = "/var/tmp/".$fileName;
     move_uploaded_file($input['tmp_name'], $inPath);
 
-    if(substr($input['name'], -5) == '.html') {
-        # escape these (should fix zip files, while im at it):
+    if(substr($fileName, -5) == '.html') {
+        # escape these:
         $tmp = file_get_contents($inPath);
         $tmp = str_replace('& ', '&amp; ', $tmp);
         file_put_contents($inPath, $tmp);
-        $parser = new wh40kHTMLParser("/var/tmp/".$input['name']);
-    } else if(substr($input['name'], -5) == '.rosz') { 
+        $parser = new wh40kHTMLParser("/var/tmp/".$fileName);
+    } else if(substr($fileName, -5) == '.rosz') { 
         // Try the PHP ZipArchive solution first:
         $zip = new ZipArchive;
         $res = $zip->open($inPath);
 
         // if that didn't work, just exec the thing, I guess?
         if($res == ZipArchive::ER_NOZIP) {
-            exec("unzip $inPath -d /var/tmp/");
-            if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $input['name']))) {
+#            exec("unzip $inPath -d /var/tmp/");
+            if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $fileName))) {
                 // OK, now we truly are fucked.
                 $error = ("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try saving the list as .ros in BattleScribe, or unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
                 
@@ -56,10 +60,10 @@ try {
         }
 
         if(!$error) {
-            $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));
+            $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $fileName));
         }
-    } else if(substr($input['name'], -4) == '.ros') { 
-        $parser = new wh40kROSParser("/var/tmp/".$input['name']);
+    } else if(substr($fileName, -4) == '.ros') { 
+        $parser = new wh40kROSParser("/var/tmp/".$fileName);
     } else {
         $error = 'No file uploaded';
     }

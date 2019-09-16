@@ -14,6 +14,44 @@ class ktROSParser extends wh40kROSParser {
         $this->doc = simplexml_load_file($file);
     }
 
+    protected function createUnit($d) {
+        $template = array(
+            'points'      => 0,           # its later now
+            'title'       => 'unit name', # tactical squad
+            'model_stat'  => array(),     # name M WS BS etc
+            'weapon_stat' => array(),     # name range type etc
+            'powers'      => array(),     # MUSCLE WIZARDS ONLY
+            'abilities'   => array(),     # Deep Strike, etc
+            'rules'       => array(),     # ATSKNF, etc
+            'factions'    => array(),     # IMPERIUM, etc
+            'keywords'    => array()      # INFANTRY, TANK, etc
+        );
+
+        $unit = $this->populateUnit($d, $template);
+
+        if($unit['points']) {
+            ksort($unit);
+            sort($unit['keywords']);
+            sort($unit['factions']);
+            return $unit;
+        } else {
+            return null;
+        }
+    }
+
+    public function findUnitsToParse() {
+        foreach($this->doc->forces->force as $force) {
+            $units = array();
+            foreach($force->selections->selection as $d) {
+                $unit = $this->createUnit($d);
+                if($unit) {
+                    $this->units[] = $unit;
+                }
+            }
+        }
+        return $this->units;
+    }
+
     public function populateUnit($d, $clean) {
         // is this a specialist? 
         $isSpecial = false; # brutal

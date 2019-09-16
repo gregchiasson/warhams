@@ -302,6 +302,7 @@ class wh40kRenderer extends Renderer {
                 }
             }
 
+            # TODO: looks like $height is all beefed up, hence the backgrounds being off
             $draw = $this->getDraw();
             $draw->setFillOpacity(1);
             if($i % 2) {

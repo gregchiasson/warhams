@@ -23,7 +23,7 @@ class wh40kParser {
 
     protected function createUnit($d) {
         $template = array(
-            'slot'        => 'TR',        # FOC slot
+            'slot'        => null,        # FOC slot
             'power'       => 0,           # PL, points to come later
             'points'      => 0,           # its later now
             'title'       => 'unit name', # tactical squad
@@ -41,7 +41,7 @@ class wh40kParser {
 
         $unit = $this->populateUnit($d, $template);
 
-        if($unit['points'] || $unit['power']) { 
+        if($unit['slot'] && ($unit['points'] || $unit['power'])) { 
             ksort($unit);
             sort($unit['keywords']);
             sort($unit['factions']);

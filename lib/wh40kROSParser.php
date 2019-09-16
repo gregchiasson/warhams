@@ -17,18 +17,20 @@ class wh40kROSParser extends wh40kParser {
                 if($unit) {
                     $this->units[] = $unit;
 
-                    $slot = $unit['slot'];
-                    if(!array_key_exists($slot, $units)) {
-                        $units[$slot] = array();
-                    }
+                    if(array_exist_exists('slot', $unit) && $unit['slot'] !== null) {
+                        $slot = $unit['slot'];
+                        if(!array_key_exists($slot, $units)) {
+                            $units[$slot] = array();
+                        }
 
-                    $units[$slot][] = array(
-                        'name'   => $unit['title'],
-                        'slot'   => $unit['slot'],
-                        'roster' => implode($unit['roster'], ', '),
-                        'points' => $unit['points'],
-                        'power'  => $unit['power']
-                    );
+                        $units[$slot][] = array(
+                            'name'   => $unit['title'],
+                            'slot'   => $unit['slot'],
+                            'roster' => implode($unit['roster'], ', '),
+                            'points' => $unit['points'],
+                            'power'  => $unit['power']
+                        );
+                    }
                 }
             }
             $forces[] = array(
