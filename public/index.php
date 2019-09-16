@@ -44,7 +44,7 @@ Uncomment if there's known outages
         <ul>
             <li>Last update: <strong>17 September 2019</strong></li>
             <li>Fixed issues with Kill Team Elite support, which was actually a problem with Kill Team in general. Oops.</li>
-            <li>Fixed a bug with the new Space Marine Codex and selections without a FOC slot..</li>
+            <li>Fixed a bug with the new Space Marine Codex and selections without a FOC slot.</li>
             <li>Started hacking in 30k support. Don't hold your breath on that one.</li>
         </ul>
     </div>
