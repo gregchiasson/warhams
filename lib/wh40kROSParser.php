@@ -17,7 +17,7 @@ class wh40kROSParser extends wh40kParser {
                 if($unit) {
                     $this->units[] = $unit;
 
-                    if(array_exist_exists('slot', $unit) && $unit['slot'] !== null) {
+                    if(array_key_exists('slot', $unit) && $unit['slot'] !== null) {
                         $slot = $unit['slot'];
                         if(!array_key_exists($slot, $units)) {
                             $units[$slot] = array();

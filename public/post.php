@@ -29,8 +29,8 @@ try {
     // move file out of tmp dir:
     $input  = $_FILES['list'];
 
-    $path_parts = pathinfo($input['tmp_name']);
-    $fileName = uniqid().$path_parts['extension'];
+    $path_parts = pathinfo($input['name']);
+    $fileName = uniqid().'.'.$path_parts['extension'];
 
     $inPath = "/var/tmp/".$fileName;
     move_uploaded_file($input['tmp_name'], $inPath);
