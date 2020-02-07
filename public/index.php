@@ -1,5 +1,6 @@
 <?php include('inc/header.php'); ?>
 
+<h4>A <a href="https://goonhammer.com">Goonhammer</a> Production</h4>
 
 <!--
 Uncomment if there's known outages
@@ -27,6 +28,19 @@ Uncomment if there's known outages
     </div>
 </div>
 
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Release Notes</h3>
+    </div>
+    <div class="panel-body">
+        <ul>
+            <li>Last update: <strong>7 Feburary 2020</strong></li>
+            <li>If you're a Big Data Sheet Appreciator, you can use the checkbox to print 40k sheets at one giant sheet per page instead of two small ones. Recommend this for units like Magnus or Knights or whatever that don't normally fit.</li>
+            <li>Random other layout improvements.</li>
+        </ul>
+    </div>
+</div>
+
 <p>
     <a href="/output.png">
         <img src="/output.png" alt="Output data card example" width="700px"/>
@@ -35,20 +49,6 @@ Uncomment if there's known outages
 <p>
     <img src="output_kt.png" alt="Output data card example" width="350px"/><img src="output_kard.png" alt="Output data card example" width="350px"/>
 </p>
-
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title">Release Notes</h3>
-    </div>
-    <div class="panel-body">
-        <ul>
-            <li>Last update: <strong>17 September 2019</strong></li>
-            <li>Fixed issues with Kill Team Elite support, which was actually a problem with Kill Team in general. Oops.</li>
-            <li>Fixed a bug with the new Space Marine Codex and selections without a FOC slot.</li>
-            <li>Started hacking in 30k support. Don't hold your breath on that one.</li>
-        </ul>
-    </div>
-</div>
 
 <div class="panel panel-danger">
     <div class="panel-heading">

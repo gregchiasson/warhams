@@ -1,9 +1,7 @@
 <?php
 # TODO also, techpriest enginseer text overlaps the edge of the dataslate - it's where it explains the master of machines rule or QUESTOR MECHANICUS models (line length on abilities)
 # TODO Grey Knight Paladins are a squad of 3, Paragon and 2 Paladins, but the buttscribe output only has wound boxes for a paragon and one paladin (general headcount issue, semi-known - see also IG squads and Terminarors)
-# TODO one sheet per page instead of 2
 # TODO (big one) improve print quality
-# TODO 30k support, possibly
 
 error_reporting(E_ALL); 
 ini_set('display_errors', TRUE); 
@@ -69,10 +67,9 @@ try {
     }
 
     if(!$error) {
-        $UNITS = $parser->units;
-        $OUTFILE = '/var/tmp/'.uniqid().'.pdf';
-
-        $output    = new wh40kRenderer($OUTFILE, $UNITS);
+        $UNITS     = $parser->units;
+        $OUTFILE   = '/var/tmp/'.uniqid().'.pdf';
+        $output    = new wh40kRenderer($OUTFILE, $UNITS, array_key_exists('big_data_sheet_appreciator', $_POST));
         $downloads = $output->renderToOutFile();
     }
 

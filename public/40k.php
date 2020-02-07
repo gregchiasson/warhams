@@ -9,8 +9,23 @@
         <img src="/butan.png" alt="BattleScribe Save and Save as HTML buttons" width="300px"/>
         <p>Then put the HTML/ROS/ROSZ file here and wait for a little bit (a few seconds, tops, unless you're a dick and tried a 12,000 point Apoc list, in which case what the fuck):</p>
         <form method="post" enctype="multipart/form-data" action="/post.php">
-        <input type="file" name="list">
-        <input type="submit" value="pres">
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input type="file" name="list">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <div class="checkbox">
+                    <input type="checkbox" name="big_data_sheet_appreciator">GIMME THEM BIG SHEETS 
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input type="submit" value="pres" class="btn btn-default">
+            </div>
+        </div>
         </form>
     </div>
 </div>

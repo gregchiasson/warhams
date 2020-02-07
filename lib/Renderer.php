@@ -4,6 +4,7 @@ abstract class Renderer {
     protected $outFile = null;
     protected $image   = null;
     protected $units   = array();
+    protected $bigBoys = false;
 
     protected $margin = 50;
     protected $res    = 144;
@@ -14,10 +15,15 @@ abstract class Renderer {
     protected $maxX = 0;
     protected $maxY = 0;
 
-    public function __construct($outFile, $units=array()) {
+    public function __construct($outFile, $units=array(), $bigBoys=false) {
         $this->image   = new Imagick();
         $this->units   = $units;
+        $this->bigBoys = $bigBoys ? true : false;
         $this->outFile = $outFile;
+    }
+
+    public function getFontSize() {
+        return $this->bigBoys ? 19 : 16;
     }
 
     public function getDraw() {
@@ -49,8 +55,8 @@ abstract class Renderer {
         }
         $draw->setFontSize($fontSize);
         $text   = wordwrap($text, $limit, "\n", false);
-        $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
-        $height = (($lines + 1) * ($draw->getFontSize() + 4));
+        $lines  = substr_count($text, "\n") + 1;
+        $height = ($lines * ($draw->getFontSize() + 4));
 
         $this->image->annotateImage($draw, $x, $y, 0, $text);
         $this->image->drawImage($draw);

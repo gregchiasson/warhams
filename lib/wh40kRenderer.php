@@ -4,14 +4,12 @@ require_once('Renderer.php');
 
 class wh40kRenderer extends Renderer {
     protected function renderUnit($unit, $xOffset, $yOffset) {
-        // half page, landscape:
-        $this->maxX = 144 * 5.5;
-        $this->maxY = 144 * 8.5;
+        // half page landscape or full page portrait:
+        $this->maxX = 144 * ($this->bigBoys ? 8.5 : 5.5);
+        $this->maxY = 144 * ($this->bigBoys ? 11 : 8.5);
 
         $this->currentX = $xOffset;
         $this->currentY = $yOffset;
-
-        // more stuff here
 
         # background (we crop and cover the corners later):
         $draw = $this->getDraw();
@@ -158,7 +156,8 @@ class wh40kRenderer extends Renderer {
         $draw->setFontSize($title_size);
         $draw->setFont('../assets/title_font.otf');
         $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
-        while($iters < 6 && $check['textWidth'] > 430) {
+        $maxNameWidth = $this->bigBoys ? 600 : 420;
+        while($iters < 6 && $check['textWidth'] > $maxNameWidth) {
             $iters += 1;
             $title_size -= 2;
             $draw->setFontSize($title_size);
@@ -170,10 +169,13 @@ class wh40kRenderer extends Renderer {
     }
 
     protected function renderAbilities($label='Abilities', $data=array()) {
-        $this->renderText($this->currentX + 80, $this->currentY + 20, strtoupper($label), 40, 16);
+        $fontSize = $this->getFontSize();
+        $leftMargin = $this->bigBoys ? 250 : 190;
+        $this->renderText($this->currentX + 80, $this->currentY + 20, strtoupper($label), 40, $fontSize);
         foreach($data as $label => $desc) {
             $content = trim(strtoupper($label).": $desc");
-            $this->currentY += $this->renderText($this->currentX + 190, $this->currentY + 19, $content, 90);
+            $width = $this->bigBoys ? 100 : 69;
+            $this->currentY += $this->renderText($this->currentX + $leftMargin, $this->currentY + 19, $content, $width, $fontSize);
         }
         $this->currentY += 5;
         return $this->currentY;
@@ -236,21 +238,24 @@ class wh40kRenderer extends Renderer {
         # insanely dumb hack:
         if(empty($col_widths)) {
             $col_widths = array(
-                'Range'       => 55,
-                'Warp Charge' => 95,
-                'Type'        => 75,
-                'Remaining W' => 120,
-                'Dice Roll'   => 100,
-                'Distance'    => 100,
-                'Characteristic 1' => 110,
-                'Characteristic 2' => 110,
-                'Characteristic 3' => 110
+                'Range'       => $this->bigBoys ? 75 : 55,
+                'S'           => $this->bigBoys ? 55 : 35,
+                'AP'          => $this->bigBoys ? 55 : 35,
+                'Damage'      => $this->bigBoys ? 55 : 35,
+                'Warp Charge' => $this->bigBoys ? 125 : 95,
+                'Type'        => $this->bigBoys ? 115 : 85,
+                'Remaining W' => $this->bigBoys ? 150 : 120,
+                'Dice Roll'   => $this->bigBoys ? 130 : 100,
+                'Distance'    => $this->bigBoys ? 130 : 100,
+                'Characteristic 1' => $this->bigBoys ? 130 : 110,
+                'Characteristic 2' => $this->bigBoys ? 130 : 110,
+                'Characteristic 3' => $this->bigBoys ? 130 : 110
             );
         }
 
+        $width = $this->bigBoys ? 1175 : 740;
+
         for($i = 0; $i < count($rows); $i++) {
-            $tdraw = $this->getDraw();
-            $tdraw->setFillColor('#000000');
             $draw = $this->getDraw();
             $draw->setFillOpacity(1);
 
@@ -261,8 +266,6 @@ class wh40kRenderer extends Renderer {
                 $draw->setFillColor('#AAAAAA');
                 $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, ($this->currentX + $width), $height);
                 $this->image->drawImage($draw);
-                $tdraw->setFontSize(14);
-                $tdraw->setFontWeight(600);
 
                 $first           = true;
                 $new_y           = 0;
@@ -275,34 +278,31 @@ class wh40kRenderer extends Renderer {
                         $text = 'Manifest';
                     }
                     $hdraw = $this->getDrawFont();
-                    $this->renderText($x, ($this->currentY - 3), strtoupper($text));
+                    $this->renderText($x, ($this->currentY - 3), strtoupper($text), $this->getfontSize());
                     if($first) {
-                        $x     += 220;
+                        $x     += $this->bigBoys ? 335 : 220;
                         $first = false;
                     } else if(array_key_exists($stat, $col_widths)) {
                         $x += $col_widths[$stat];
                     } else {
-                        $x += 45;
+                        $x += $this->bigBoys ? 65 : 45;
                     }
                }
             }
 
             # data row:
-            $tdraw->setFontSize(12);
-            $tdraw->setFontWeight(400);
             $height = 0;
             foreach($rows[$i] as $stat => $val) {
                 # TODO: use the width attribute here, or base it on actual rendered width instead
-                $char_limit = (($stat == 'Details' || $stat == 'roster') ? 55 : 33);
+                $char_limit = (($stat == 'Details' || $stat == 'roster') ? 55 : $this->bigBoys ? 45 : 30);
                 $text    = wordwrap($val, $char_limit, "\n", false);
-                $lines   = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
-                $theight = ($lines * ($tdraw->getFontSize() + 3)) + $this->currentY + 17;
+                $lines   = substr_count($text, "\n") + 1;
+                $theight = $this->currentY + ($lines * ($this->getFontSize() + 4));
                 if($theight > $height) {
                     $height = $theight;
                 }
             }
 
-            # TODO: looks like $height is all beefed up, hence the backgrounds being off
             $draw = $this->getDraw();
             $draw->setFillOpacity(1);
             if($i % 2) {
@@ -318,21 +318,17 @@ class wh40kRenderer extends Renderer {
             $new_y = 0;
             $first = true;
             foreach($rows[$i] as $stat => $val) {
-                $tdraw->setFontWeight(400);
-                if($first) {
-                    $tdraw->setFontWeight(600);
-                }
-                $fake_y = $this->renderText($x, ($this->currentY + 17), $val, $char_limit);
+                $fake_y = $this->renderText($x, ($this->currentY + 17), $val, $char_limit, $this->getFontSize());
                 if($fake_y > $new_y) {
                     $new_y = $fake_y;
                 }
                 if($first) {
-                    $x     += 220;
+                    $x     += $this->bigBoys ? 335 : 220;
                     $first = false;
                 } else if(array_key_exists($stat, $col_widths)) {
                     $x += $col_widths[$stat];
                 } else {
-                    $x += 45;
+                    $x += $this->bigBoys ? 65 : 45;
                 }
             }
             $this->currentY += $new_y;
@@ -349,29 +345,33 @@ class wh40kRenderer extends Renderer {
             if($type['W'] > 1) {
                 $draw = $this->getDraw();
                 $draw->setStrokeWidth(1);
-                $draw->setFontSize(16);
+                $draw->setFontSize($this->getFontSize());
                 $draw->setFontWeight(600);
 
                 $text   = wordwrap(strtoupper($type['Unit']), 22, "\n", false);
                 $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
                 $height = (($lines + 1) * ($draw->getFontSize() + 4));
-                $height = $height < 40 ? 40 : $height;
+
+                $lineHeight = 40;
+                $height = $height < $lineHeight ? $lineHeight : $height;
 
                 $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, $text);
                 $this->image->drawImage($draw);
 
-                $x = 340 + $this->currentX;
+                $boxSize   = 30;
+                $boxOffset = ($this->bigBoys ? 400 : 340);
+                $x = $this->currentX + $boxOffset;
                 for($w = 0; $w < $type['W']; $w++) {
-                    if($w % 10 == 0 && $w > 0) {
-                        $this->currentY += 40;
-                        $x = 340 + $this->currentX;
+                    if($w % ($this->bigBoys ? 15 : 10 ) == 0 && $w > 0) {
+                        $this->currentY += $boxSize + 10;
+                        $x = $this->currentX + $boxOffset;
                     }
                     $draw->setStrokeOpacity(1);
                     $draw->setStrokeColor('#000000');
                     $draw->setFillColor('#FFFFFF');
-                    $draw->rectangle($x, $this->currentY, ($x + 30), ($this->currentY + 30));
+                    $draw->rectangle($x, $this->currentY, ($x + $boxSize), ($this->currentY + $boxSize));
                     $this->image->drawImage($draw);
-                    $x += 40;
+                    $x += $boxSize + 10;
                 }
                 $this->currentY += $height;
             }
@@ -380,17 +380,19 @@ class wh40kRenderer extends Renderer {
 
     protected function renderKeywords($label="Something", $data=array(), $allCaps = true) {
         $text = strtoupper($label);
-        $this->renderText($this->currentX + 80, $this->currentY + 20, $text, 40, 16);
+        $fontSize = $this->getFontSize(); 
+        $this->renderText($this->currentX + 80, $this->currentY + 20, $text, 40, $fontSize);
 
-        $data = array_unique($data);
-
+        $data     = array_unique($data);
         $contents = implode(', ', $data);
         if($allCaps) {
             $contents = strtoupper(implode(', ', $data));
         }
 
-        $this->currentY += $this->renderText($this->currentX + 190, $this->currentY + 19, $contents, 75);
-        $this->currentY += 5;
+        $leftMargin = $this->bigBoys ? 250 : 190;
+        $width = $this->bigBoys ? 100 : 65;
+        $this->currentY += $this->renderText($this->currentX + $leftMargin, $this->currentY + 19, $contents, $width, $fontSize);
+        $this->currentY += 4;
         return $this->currentY;
     }
 
@@ -418,7 +420,6 @@ class wh40kRenderer extends Renderer {
             }
 
             $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL)", 50, 22);
-            $this->currentY -= 20;
 
             foreach($forces as $force) {
                 $pts = 0;
@@ -432,15 +433,13 @@ class wh40kRenderer extends Renderer {
                     }
                 }
 
-                $this->currentY += 20;
                 $label = $force['faction'].' '.$force['detachment']." ($pts pts, $pl PL)";
                 $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
-                $this->currentY -= 10;
                 
                 $this->renderTable($allUnits, array(
-                    'name'   => 220,
+                    'name'   => $this->bigBoys ? 350 : 220,
                     'slot'   => 50,
-                    'roster' => 280,
+                    'roster' => $this->bigBoys ? 350 : 280,
                     'points' => 69,
                     'power'  => 69
                 ));
@@ -470,16 +469,26 @@ class wh40kRenderer extends Renderer {
             $files['summary'] = $summary;
         }
         for($i = 0; $i < count($this->units); $i++) {
-            $this->image->newImage($this->res * 11, $this->res * 8.5, new ImagickPixel('white'), 'pdf');
+            if($this->bigBoys) {
+                $height = $this->res * 11;
+                $width  = $this->res * 8.5;
+            } else {
+                $height = $this->res * 8.5;
+                $width  = $this->res * 11;
+            }
+            $this->image->newImage($width, $height, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);
             $this->image->setColorspace(Imagick::COLORSPACE_RGB);
 
             if(array_key_exists($i, $this->units)) {
                 $this->renderUnit($this->units[$i], 0, 0);
             }
-            $i += 1;
-            if(array_key_exists($i, $this->units)) {
-                $this->renderUnit($this->units[$i], ($this->res * 5.5), 0);
+
+            if(!$this->bigBoys) {
+                $i += 1;
+                if(array_key_exists($i, $this->units)) {
+                    $this->renderUnit($this->units[$i], ($this->res * 5.5), 0);
+                }
             }
             $this->image->writeImages($this->outFile, true);
         }
