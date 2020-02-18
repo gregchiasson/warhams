@@ -237,6 +237,12 @@ class wh40kROSParser extends wh40kParser {
                 if($dd->selections->selection) {
                     foreach($dd->selections->selection as $ddd) {
                         $clean['weapon_stat'] = $this->readSelectionChars($ddd, $clean['weapon_stat'], 'Weapon', $cols);
+
+                        if($ddd->selections->selection) {
+                            foreach($ddd->selections->selection as $dddd) {
+                                $clean['weapon_stat'] = $this->readSelectionChars($dddd, $clean['weapon_stat'], 'Weapon', $cols);
+                            }
+                        }
                     }
                 }
             }

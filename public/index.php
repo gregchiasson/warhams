@@ -38,9 +38,9 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Last update: <strong>7 Feburary 2020</strong></li>
-            <li>If you're a Big Data Sheet Appreciator, you can use the checkbox to print 40k sheets at one giant sheet per page instead of two small ones. Recommend this for units like Magnus or Knights or whatever that don't normally fit.</li>
-            <li>Random other layout improvements.</li>
+            <li>Last update: <strong>18 Feburary 2020</strong></li>
+            <li>Fixed an issue with Kill Team rosters not downloading. The fix, by the by, is to use .ros files instead of .rosz files.
+            <li>Fixed an issue with Phobos Lts not displaying weapon options.</li>
         </ul>
     </div>
 </div>
