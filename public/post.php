@@ -21,14 +21,32 @@ require_once('../lib/wh40kRenderer.php');
 require_once('../lib/wh40kHTMLParser.php');
 require_once('../lib/wh40kROSParser.php');
 
+function delete_directory($dirname) {
+         if (is_dir($dirname))
+           $dir_handle = opendir($dirname);
+     if (!$dir_handle)
+          return false;
+     while($file = readdir($dir_handle)) {
+           if ($file != "." && $file != "..") {
+                if (!is_dir($dirname."/".$file))
+                     unlink($dirname."/".$file);
+                else
+                     delete_directory($dirname.'/'.$file);
+           }
+     }
+     closedir($dir_handle);
+     rmdir($dirname);
+     return true;
+}
+
 $downloads = array();
 $error     = null;
 try {
     // move file out of tmp dir:
     $input  = $_FILES['list'];
-
+    $fileId = uniqid();
     $path_parts = pathinfo($input['name']);
-    $fileName = uniqid().'.'.$path_parts['extension'];
+    $fileName = $fileId.'.'.$path_parts['extension'];
 
     $inPath = "/var/tmp/".$fileName;
     move_uploaded_file($input['tmp_name'], $inPath);
@@ -44,17 +62,19 @@ try {
         $zip = new ZipArchive;
         $res = $zip->open($inPath);
 
-        // if that didn't work, just exec the thing, I guess?
-        if($res == ZipArchive::ER_NOZIP) {
-#            exec("unzip $inPath -d /var/tmp/");
-            if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $fileName))) {
-                // OK, now we truly are fucked.
-                $error = ("<h2>I fucked up!</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's fucked up!. Try saving the list as .ros in BattleScribe, or unzipping the ROSZ into a ROS, or use the HTML upload. Sorry. :(</p>");
-                
-            }
-        } else {
-            $zip->extractTo('/var/tmp/');
+        if($res == TRUE) {
+            $zip->extractTo('/var/tmp/'.$fileId);
             $zip->close();
+
+            // grabbing the first ros file and moving it to the /tmp folder
+            foreach (glob('/var/tmp/'.$fileId.'/*.ros') as $file) {
+                rename($file, '/var/tmp/'.$fileId.'.ros');
+                break;
+            }
+            unlink($inPath);
+            delete_directory('/var/tmp/'.$fileId);
+        } else {
+            $error = ("Not a valid rosz file.");   
         }
 
         if(!$error) {
