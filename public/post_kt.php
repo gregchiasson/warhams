@@ -11,28 +11,12 @@ $error = null;
 try {
     // move file out of tmp dir:
     $input = $_FILES['list'];
-    move_uploaded_file($input['tmp_name'], "/var/tmp/".$input['name']);
-    $in_path = "/var/tmp/".$input['name'];
-    $tmp = file_get_contents($in_path);
-    $tmp = str_replace('& ', '&amp; ', $tmp);
-    file_put_contents($in_path, $tmp);
+    $fileToParse = Upload::Process($input);
 
-    if(substr($input['name'], -5) == '.rosz') { 
-        #unzip file
-        $zip = new ZipArchive;
-        $res = $zip->open("/var/tmp/".$input['name']);
-        $zip->extractTo('/var/tmp/');
-        $zip->close();
-
-        if(!file_exists("/var/tmp/".str_replace('.rosz', '.ros', $input['name']))) {
-            $error = ("<h2>Invalid File Format</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's messed up! Try saving the list as .ros in BattleScribe, or unzipping the ROSZ into a ROS. Sorry. :(</p>");
-        } else {
-            $parser = new ktROSParser("/var/tmp/".str_replace('.rosz', '.ros', $input['name']));
-        }
-    } else if(substr($input['name'], -4) == '.ros') { 
-        $parser = new ktROSParser("/var/tmp/".$input['name']);
+    if (substr(strtolower($fileToParse), -4) == '.ros'){
+        $parser = new ktROSParser($fileToParse);
     } else {
-        $error = ("<h2>Invalid File Format</h2> <p>I dunno why this happens sometimes - the ZipArchive library just does this sometimes where the zip file isn't seen as valid by PHP, even though command-line unzip commands work fine (literally the error constant is 'NOZIP'). It's messed up! Try saving the list as .ros in BattleScribe, or unzipping the ROSZ into a ROS. Sorry. :(</p>");
+        throw new Exception("We can only read your ros(z) files.");
     }
 
     if($error) {

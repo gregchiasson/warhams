@@ -20,6 +20,7 @@ ob_start();
 require_once('../lib/wh40kRenderer.php');
 require_once('../lib/wh40kHTMLParser.php');
 require_once('../lib/wh40kROSParser.php');
+require_once('../lib/Upload.php');
 
 function delete_directory($dirname) {
          if (is_dir($dirname))
@@ -44,48 +45,17 @@ $error     = null;
 try {
     // move file out of tmp dir:
     $input  = $_FILES['list'];
-    $fileId = uniqid();
-    $path_parts = pathinfo($input['name']);
-    $fileName = $fileId.'.'.$path_parts['extension'];
 
-    $inPath = "/var/tmp/".$fileName;
-    move_uploaded_file($input['tmp_name'], $inPath);
+    $fileToParse = Upload::Process($input);
 
-    if(substr($fileName, -5) == '.html') {
-        # escape these:
-        $tmp = file_get_contents($inPath);
-        $tmp = str_replace('& ', '&amp; ', $tmp);
-        file_put_contents($inPath, $tmp);
-        $parser = new wh40kHTMLParser("/var/tmp/".$fileName);
-    } else if(substr($fileName, -5) == '.rosz') { 
-        // Try the PHP ZipArchive solution first:
-        $zip = new ZipArchive;
-        $res = $zip->open($inPath);
-
-        if($res == TRUE) {
-            $zip->extractTo('/var/tmp/'.$fileId);
-            $zip->close();
-
-            // grabbing the first ros file and moving it to the /tmp folder
-            foreach (glob('/var/tmp/'.$fileId.'/*.ros') as $file) {
-                rename($file, '/var/tmp/'.$fileId.'.ros');
-                break;
-            }
-            unlink($inPath);
-            delete_directory('/var/tmp/'.$fileId);
-        } else {
-            $error = ("Not a valid rosz file.");   
-        }
-
-        if(!$error) {
-            $parser = new wh40kROSParser("/var/tmp/".str_replace('.rosz', '.ros', $fileName));
-        }
-    } else if(substr($fileName, -4) == '.ros') { 
-        $parser = new wh40kROSParser("/var/tmp/".$fileName);
+    if (substr(strtolower($fileToParse), -4) == '.ros'){
+        $parser = new wh40kROSParser($fileToParse);
+    } elseif (substr(strtolower($fileToParse), -5) == '.html'){
+        $parser = new wh40kHTMLParser($fileToParse); 
     } else {
-        $error = 'No file uploaded';
+        throw new Exception("File type is not accepted. Use .ros, .rosz or .html.");    
     }
-
+    
     if(!$error) {
         $UNITS     = $parser->units;
         $OUTFILE   = '/var/tmp/'.uniqid().'.pdf';
