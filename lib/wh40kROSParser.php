@@ -23,8 +23,14 @@ class wh40kROSParser extends wh40kParser {
                             $units[$slot] = array();
                         }
 
+                        if(array_key_exists('customName', $unit) && $unit['customName'] !== null) {
+                            $name = $unit['customName']
+                        } else {
+                            $name = $unit['title']
+                        }
+
                         $units[$slot][] = array(
-                            'name'   => $unit['title'],
+                            'name'   => $name,
                             'slot'   => $unit['slot'],
                             'roster' => implode($unit['roster'], ', '),
                             'points' => $unit['points'],
