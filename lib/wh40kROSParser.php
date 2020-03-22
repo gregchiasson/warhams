@@ -24,9 +24,9 @@ class wh40kROSParser extends wh40kParser {
                         }
 
                         if(array_key_exists('customName', $unit) && $unit['customName'] !== null) {
-                            $name = $unit['customName']
+                            $name = $unit['customName'];
                         } else {
-                            $name = $unit['title']
+                            $name = $unit['title'];
                         }
 
                         $units[$slot][] = array(
