@@ -174,6 +174,17 @@ class wh40kROSParser extends wh40kParser {
                 $clean['rules'][] = (string) $r['name'];
             } 
         } 
+
+        if($d->selections->selection) {
+            foreach($d->selections->selection as $s) {
+                if($s->rules->rule) {
+                    foreach($s->rules->rule as $r) {
+                        $clean['rules'][] = (string) $r['name'];
+                    } 
+                }
+            }
+        }
+
         $clean['rules'] = array_unique($clean['rules']);
         sort($clean['rules']);
 
