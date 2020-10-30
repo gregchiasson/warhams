@@ -5,6 +5,7 @@ ini_set('display_startup_errors', TRUE);
 
 require_once('../lib/ktRenderer.php');
 require_once('../lib/ktROSParser.php');
+require_once('../lib/Upload.php');
 
 $error = null;
 

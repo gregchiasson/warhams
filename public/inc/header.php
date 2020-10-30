@@ -10,7 +10,7 @@
         <div class="navbar-header"><a class="navbar-brand" href="/">ButtScribe</a></div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="/40k.php">40k (8th)</a></li>
+                <li><a href="/40k.php">40k (9th)</a></li>
                 <li><a href="/kt.php">Kill Team (2018)</a></li>
               </ul>
         </div><!--/.nav-collapse -->

@@ -5,9 +5,9 @@
         <h3 class="panel-title">Input</h3>
     </div>
     <div class="panel-body">
-        <p>Go into BattleScribe, and click either "Save as HTML" or "Save Roster":</p>
+        <p>Go into BattleScribe, and click "Save Roster":</p>
         <img src="/butan.png" alt="BattleScribe Save and Save as HTML buttons" width="300px"/>
-        <p>Then put the HTML/ROS/ROSZ (PRO TIP: .ros is the better format here - .rosz doesn't always want to expand properly, and .html won't give you the full feature set, due to missing certain data fields) file here and wait for a little bit (a few seconds, tops, unless you're a dick and tried a 12,000 point Apoc list, in which case what the fuck):</p>
+        <p>Then put the ROSZ/ROS/HTML (PRO TIP: .rosz or .ros is the better format here - .rosz doesn't always want to expand properly, but due to missing certain data fields, .html won't give you the full feature set, and is provided here as a legacy option only) file here and wait for a little bit (a few seconds, tops):</p>
         <form method="post" enctype="multipart/form-data" action="/post.php">
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">

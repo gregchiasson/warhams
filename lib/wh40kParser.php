@@ -7,6 +7,7 @@ class wh40kParser {
     public $SLOTS = array(
         'HQ'                  => 'HQ',
         'Troops'              => 'TR',
+        'No Force Org Slot'   => 'NA',
         'Elites'              => 'EL',
         'Fast Attack'         => 'FA',
         'Heavy Support'       => 'HS',

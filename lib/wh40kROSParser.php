@@ -10,6 +10,9 @@ class wh40kROSParser extends wh40kParser {
 
     public function findUnitsToParse() {
         $forces = array();
+        if(!$this->doc->forces->force) {
+            return $this->units;
+        }
         foreach($this->doc->forces->force as $force) {
             $units = array();
             foreach($force->selections->selection as $d) {
@@ -158,6 +161,7 @@ class wh40kROSParser extends wh40kParser {
             }
         }
 
+        // TODO: recurse
         $clean['abilities'] = $this->readSelectionAbilities($d, $clean['abilities']);
         if($d->selections->selection) {
             foreach($d->selections->selection as $dd) {
@@ -165,6 +169,11 @@ class wh40kROSParser extends wh40kParser {
                 if($dd->selections->selection) {
                     foreach($dd->selections->selection as $ddd) {
                         $clean['abilities'] = $this->readSelectionAbilities($ddd, $clean['abilities']);
+                        if($ddd->selections->selection) {
+                            foreach($ddd->selections->selection as $dddd) {
+                                $clean['abilities'] = $this->readSelectionAbilities($dddd, $clean['abilities']);
+                            }
+                        }
                     }
                 }
             }
@@ -196,22 +205,29 @@ class wh40kROSParser extends wh40kParser {
 
         // roster
         if((string) $d['type'] == 'model') {
-            $clean['roster'][] = (string) $d['number'].' '.(string) $d['name'];
+            $clean = $this->addToRoster($clean, $d);
         }
         if($d->selections->selection) {
             foreach($d->selections->selection as $dd) {
                 if((string) $dd['type'] == 'model') {
-                    $clean['roster'][] = (string) $dd['number'].' '.(string) $dd['name'];
+                    $clean = $this->addToRoster($clean, $dd);
                     if($dd->selections->selection) {
                         foreach($dd->selections->selection as $ddd) {
                             if((string) $ddd['type'] == 'model') {
-                                $clean['roster'][] = (string) $ddd['number'].' '.(string) $ddd['name'];
+                                $clean = $this->addToRoster($clean, $ddd);
                             }
                         }
                     }
                 } 
             }
         }
+
+        $newRoster = array();
+        foreach($clean['roster'] as $name => $num) {
+            $newRoster[] = $num.' '.$name;
+        }
+        $clean['roster'] = $newRoster;
+
         foreach($clean['model_stat'] as $model) {
             $notInRoster = true;
             foreach($clean['roster'] as $rank) { 
@@ -230,6 +246,20 @@ class wh40kROSParser extends wh40kParser {
         return $clean;
     }
 
+    protected function addToRoster($clean, $d) {
+        $name  = (string) $d['name'];
+        $quant =  (string) $d['number'];
+
+        if(array_key_exists($name, $clean['roster'])) {
+            $clean['roster'][$name] += $quant;
+        } else {
+            $clean['roster'][$name] = $quant;
+        }
+
+        return $clean;
+    }
+
+    // TODO recurse
     protected function readPointCosts($d, $clean) {
         $clean = $this->readSelectionCosts($d, $clean);
         if($d->selections->selection) {
@@ -245,6 +275,7 @@ class wh40kROSParser extends wh40kParser {
         return $clean;
     }
 
+    // TODO recurse
     protected function readWeaponStats($d, $clean) {
         $cols = array('Range', 'Type', 'S', 'AP', 'D', 'Abilities');
         $clean['weapon_stat'] = $this->readSelectionChars($d, $clean['weapon_stat'], 'Weapon', $cols);

@@ -23,10 +23,10 @@ Uncomment if there's known outages
     <div class="panel-body">
         <p><em>"The name is quite odd, but it works"</em> - User Review</p>
         <ul>
-            <li><a href="/40k.php">40k 8th Edition</a></li>
+            <li><a href="/40k.php">40k 9th Edition</a></li>
             <li><a href="/kt.php">Kill Team</a></li>
         </ul>  
-        <p>ButtScribe is a web application that runs off of BattleScribe output, and generates printable datasheets for the units in your army. It currently supports Warhammer 40k (8th Edition) and Kill-Team. The goal with ButtScribe was to bridge the gap in <em>printed materials</em>: the codices have nicely-formatted unit entries, but these are intended for selecting a unit's options, so it has a raft of information that might not be relevant depending on what options you took, and they don't include the actual points/PL costs of your specific unit. That is, the codex will have all of the wargear and rules for <em>a</em> Tactical Squad, but what you really want during a game is the wargear and rules for <em>your</em> Tactical squads, which is where ButtScribe comes in.</p>
+        <p>ButtScribe is a web application that runs off of BattleScribe output, and generates printable datasheets for the units in your army. It currently supports Warhammer 40k (9th Edition) and Kill-Team. The goal with ButtScribe was to bridge the gap in <em>printed materials</em>: the codices have nicely-formatted unit entries, but these are intended for selecting a unit's options, so it has a raft of information that might not be relevant depending on what options you took, and they don't include the actual points/PL costs of your specific unit. That is, the codex will have all of the wargear and rules for <em>a</em> Tactical Squad, but what you really want during a game is the wargear and rules for <em>your</em> Tactical squads, which is where ButtScribe comes in.</p>
         <p>Also, BattleScribe does, obviously, support printing army lists, as anyone who has ever played 40k can tell you. The problem is that those lists look like butt.</p>
         <p>The list of supported games is in the header up top, and if you run into any problems, feel free to <a href="mailto:contact@goonhammer.com">email me</a></p>
     </div>
@@ -38,9 +38,15 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>18 Feburary 2020</strong></li>
-            <li>Fixed an issue with Kill Team rosters not downloading. The fix, by the by, is if it doesn't work, try saving your list as a .ros file instead of a .rosz file. Sorry.
-            <li>Fixed an issue with Phobos LTs not displaying weapon options.</li>
+            <li>Latest update: <strong>30 October 2020</strong></li>
+            <li>Merged "Fixed missing rules for selections" by gmccabe</li>
+            <li>Merged "Added Custom Names" by FreddieRa</li>
+            <li>Merged "Unpacking a rosz file properly" by Krizzzn</li>
+            <li>Units without an org-chart slot should appear now</li>
+            <li>(Kill Team) Specialisms shouldn't overlap with Abilities anymore</li>
+            <li>Added support for 40k 9th edition (changed the 8s to 9s)</li>
+            <li>The new Exarch Powers should show up now.</li>
+            <li>Fixed <i>some</i> of the issues with unit rosters not appearing properly (see below)</li>
         </ul>
     </div>
 </div>
@@ -60,7 +66,7 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Wound trackers/degrading statlines for vehicle squadrons (IG Hellhounds) don't want to work.</li>
+            <li>So, the unit rsoters. Some of them are still off - Berzerkers, or SM bikers - due to BattleScribe data files considering some models added to squads to be "models" and other models to be "upgrades", a category which also includes grenades and wargear. It makes some sense that the files are laid out this way, but it also makes it impossible for ButtScribe to know what it should include, without that "model" tag, so unfortunately it's as fixed as it can get, save for a BattleScribe data change.</li>
         </ul>
     </div>
 </div>

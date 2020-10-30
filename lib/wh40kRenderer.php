@@ -120,10 +120,12 @@ class wh40kRenderer extends Renderer {
         $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
         $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 58, 52);
 
-        $gon = new Imagick();
-        $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
-        $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
-        $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 63, 57);
+        if($unit['slot'] != 'NA') {
+            $gon = new Imagick();
+            $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
+            $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
+            $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 63, 57);
+        }
 
         $gon = new Imagick();
         $gon->readImage('../assets/octagon.png');

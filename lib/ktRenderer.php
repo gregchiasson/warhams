@@ -76,8 +76,6 @@ class ktRenderer extends wh40kRenderer {
             $this->renderKeywords('Abilities', $unit['abilities']);
         }
 
-        $this->currentY -= 15;
-
         if(count($unit['keywords']) > 0) {
             $this->renderKeywords('Specialism', $unit['keywords']);
         }
