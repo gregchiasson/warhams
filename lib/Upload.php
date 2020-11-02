@@ -9,7 +9,7 @@ class Upload {
         $tmp = file_get_contents($inPath);
         $tmp = str_replace('& ', '&amp; ', $tmp);
         file_put_contents($inPath, $tmp);
-        return ("/var/tmp/".$fileName);
+        return $inPath;
     }
 
     private static function ProcessRos($inPath){
