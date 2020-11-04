@@ -42,6 +42,10 @@ class wh40kParser {
 
         $unit = $this->populateUnit($d, $template);
 
+        if($unit['slot'] == null) {
+            $unit['slot'] = 'NA';
+        }
+
         if($unit['slot'] && ($unit['points'] || $unit['power'])) { 
             ksort($unit);
             sort($unit['keywords']);
