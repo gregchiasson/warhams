@@ -17,7 +17,7 @@
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <div class="checkbox">
-                    <input type="checkbox" name="big_data_sheet_appreciator">GIMME THEM BIG SHEETS 
+                    <input type="checkbox" name="big_data_sheet_appreciator">GIMME THEM BIG SHEETS (Use Landscape, otherwise this is portrait mode. Usually mean 2 units per page as opposed to 1.)
                 </div>
             </div>
         </div>
