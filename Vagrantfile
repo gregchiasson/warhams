@@ -25,7 +25,7 @@ cat <<EOF > /etc/apache2/sites-available/000-default.conf
     Require all granted
   </Directory>
 
-  ServerAdmin hsnopi@hsnopi.net
+  ServerAdmin webmaster@localhost
 
   ErrorLog /home/vagrant/#{php_app}/apache_error.log
   CustomLog /home/vagrant/#{php_app}/apache_access.log combined
