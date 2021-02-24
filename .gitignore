@@ -1,3 +1,8 @@
 .vagrant
 *swp*
 public/lists/*
+reference/*
+*.log
+000-*
+public/php.php
+.gitignore
