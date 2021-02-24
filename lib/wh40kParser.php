@@ -56,6 +56,10 @@ class wh40kParser {
         }
     }
 
+    protected function loadFile($file) {
+        return $file;
+    }
+
     protected function findUnitsToParse() {
         return $this->units;
     }
