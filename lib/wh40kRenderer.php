@@ -162,7 +162,6 @@ class wh40kRenderer extends Renderer {
             $card_title = '"'.$unit['custom_name'].'"';
         }else{
             $card_title = $unit['title'];
-            $card_title="lokhust heavy destroyers12345678";
         }
         $iters = 0;
         $title_size = 28;
@@ -322,6 +321,7 @@ class wh40kRenderer extends Renderer {
             $height = 0;
             foreach($rows[$i] as $stat => $val) {
                 # TODO: use the width attribute here, or base it on actual rendered width instead
+                # @TODO Nested ternaries being deprecated in php 8
                 $char_limit = (($stat == 'Details' || $stat == 'roster') ? 55 : $this->bigBoys ? 45 : 30);
                 $text    = wordwrap($val, $char_limit, "\n", false);
                 $lines   = substr_count($text, "\n") + 1;
