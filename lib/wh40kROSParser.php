@@ -15,7 +15,9 @@ class wh40kROSParser extends wh40kParser {
         }
         foreach($this->doc->forces->force as $force) {
             $units = array();
+
             foreach($force->selections->selection as $d) {
+
                 $unit = $this->createUnit($d);
                 if($unit) {
                     $this->units[] = $unit;
@@ -26,14 +28,8 @@ class wh40kROSParser extends wh40kParser {
                             $units[$slot] = array();
                         }
 
-                        if(array_key_exists('customName', $unit) && $unit['customName'] !== null) {
-                            $name = $unit['customName'];
-                        } else {
-                            $name = $unit['title'];
-                        }
-
                         $units[$slot][] = array(
-                            'name'   => $name,
+                            'name'   => $unit['title'],
                             'slot'   => $unit['slot'],
                             'roster' => implode($unit['roster'], ', '),
                             'points' => $unit['points'],
@@ -51,10 +47,14 @@ class wh40kROSParser extends wh40kParser {
         array_unshift($this->units, $forces);
         return $this->units;
     }
-
+    /*
+    This is the core of the building process. Needs breaking up and 
+    refactoring.
+    */
     public function populateUnit($d, $clean) {
-        // title
+        // title taken from [@attributes] of the SimpleXMLElement Object
         $clean['title']  = (string) $d['name'];
+        $clean['custom_name'] = empty($d['customName'])?'':(string) $d['customName'];
 
         // keywords, factions, slot
         if($d->categories->category) {

@@ -25,6 +25,7 @@ class wh40kParser {
     protected function createUnit($d) {
         $template = array(
             'slot'        => null,        # FOC slot
+            'custom_name' => '',           # Custom Name [@attributes][customName]
             'power'       => 0,           # PL, points to come later
             'points'      => 0,           # its later now
             'title'       => 'unit name', # tactical squad
@@ -37,7 +38,8 @@ class wh40kParser {
             'rules'       => array(),     # ATSKNF, etc
             'factions'    => array(),     # IMPERIUM, etc
             'roster'      => array(),     # 7 marines, 1 heavy weapon, sarge, etc
-            'keywords'    => array()      # INFANTRY, TANK, etc
+            'keywords'    => array(),      # INFANTRY, TANK, etc
+            'notes'       => ''           #Notes
         );
 
         $unit = $this->populateUnit($d, $template);
@@ -54,6 +56,10 @@ class wh40kParser {
         } else {
             return null;
         }
+    }
+
+    protected function loadFile($file) {
+        return $file;
     }
 
     protected function findUnitsToParse() {

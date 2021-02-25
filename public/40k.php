@@ -17,7 +17,7 @@
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <div class="checkbox">
-                    <input type="checkbox" name="big_data_sheet_appreciator">GIMME THEM BIG SHEETS 
+                    <input type="checkbox" name="big_data_sheet_appreciator">GIMME THEM BIG SHEETS (Create larger font and size for easier reading. Otherwise you could fit two on a page usually in landscape)
                 </div>
             </div>
         </div>

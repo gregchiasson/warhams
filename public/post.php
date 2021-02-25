@@ -69,6 +69,7 @@ try {
     <a href="<?php print($downloads['summary']);?>" target="_blank">
         <img src="<?php print($downloads['summary']);?>" style="width:500px; border:1px solid black"/>
     </a>
+    <p><a href="40k.php">Build another list</a>
     </div>
     </div>
     <?php include('inc/footer.php'); ?>

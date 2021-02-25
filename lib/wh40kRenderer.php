@@ -99,14 +99,19 @@ class wh40kRenderer extends Renderer {
         $draw = $this->getDraw();
         $draw->setFillColor('#000000');
         $draw->setFillOpacity(1);
+        $trapezoid_height = 20;
+        $base_height = 30;
+        
+        //top trapezoid of card in black
         $draw->polygon(array(
-            array('x' => $this->currentX + $this->margin, 'y' => 70),
-            array('x' => $this->currentX + 70, 'y' => $this->margin),
-            array('x' => $this->currentX + $this->maxX - 70, 'y' => $this->margin),
-            array('x' => $this->currentX + $this->maxX - $this->margin, 'y' => 70),
+            array('x' => $this->currentX + $this->margin, 'y' => $this->margin + $trapezoid_height),//50,70
+            array('x' => $this->currentX + ($this->margin + $trapezoid_height), 'y' => $this->margin),//70,50
+            array('x' => $this->currentX + $this->maxX - ($this->margin + $trapezoid_height), 'y' => $this->margin),//722,50
+            array('x' => $this->currentX + $this->maxX - $this->margin, 'y' => ($this->margin + $trapezoid_height)),//742,70
+            array('x' => $this->currentX + $this->maxX - $this->margin, 'y' => $this->margin + $trapezoid_height + $base_height),
+            array('x' => $this->currentX + $this->margin, 'y' => $this->margin + $trapezoid_height + $base_height)
         ));
-        $draw->rectangle(($this->margin + $this->currentX), 70, 
-                         ($this->maxX + $this->currentX - $this->margin), 100);
+
         $this->image->drawImage($draw);
 
         # FOC slot and PL and points:
@@ -115,31 +120,31 @@ class wh40kRenderer extends Renderer {
         $draw->setStrokeWidth(0);
         $draw->setFontSize(20);
 
+        //draw Unit Type Octagon
         $gon = new Imagick();
         $gon->readImage('../assets/octagon.png');
         $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
         $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 58, 52);
-
+        //draw unit type
         if($unit['slot'] != 'NA') {
             $gon = new Imagick();
             $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
             $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
             $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 63, 57);
         }
-
+        //draw PowerLevel Octagon and Power Level
         $gon = new Imagick();
         $gon->readImage('../assets/octagon.png');
         $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
         $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $this->currentX + 105, 52);
         $draw->setFont('../assets/title_font.otf');
         $draw->setFontSize(26);
-
         if(strlen($unit['power']) == 1) {
             $this->image->annotateImage($draw, 121 + $this->currentX, 84, 0, $unit['power']);
         } else {
             $this->image->annotateImage($draw, 114 + $this->currentX, 84, 0, $unit['power']);
         }
-
+        //Draw Points Octagon and points
         $gon = new Imagick();
         $gon->readImage('../assets/octagon.png');
         $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
@@ -153,21 +158,41 @@ class wh40kRenderer extends Renderer {
         }
 
         # unit name:
+        if(!empty($unit['custom_name'])){
+            $card_title = '"'.$unit['custom_name'].'"';
+        }else{
+            $card_title = $unit['title'];
+        }
         $iters = 0;
         $title_size = 28;
+        $subtitle_size = 16;
         $draw->setFontSize($title_size);
         $draw->setFont('../assets/title_font.otf');
-        $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
-        $maxNameWidth = $this->bigBoys ? 600 : 420;
+        $check = $this->image->queryFontMetrics($draw, strtoupper($card_title));
+        
+        $maxNameWidth = $this->bigBoys ? 600 : 420;//needs to be adjusted for 3 octagons and centered there
+        //resize to fit width.
         while($iters < 6 && $check['textWidth'] > $maxNameWidth) {
             $iters += 1;
-            $title_size -= 2;
+            $title_size -= 1;
             $draw->setFontSize($title_size);
-            $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+            $check = $this->image->queryFontMetrics($draw, strtoupper($card_title));
         }
-        $title_x =  ceil((($this->maxX * .5) + $this->currentX) - ($check['textWidth'] / 2));
-        $this->image->annotateImage($draw, $title_x, 88, 0, strtoupper($unit['title']));
-        $this->currentY += 100;
+        $title_y = ($check['characterHeight']+$this->margin);
+
+        if(!empty($unit['custom_name'])){
+            $title_x =  ceil((($this->maxX * .5) + $this->currentX + 45) - ($check['textWidth'] / 2));
+            $this->image->annotateImage($draw, $title_x, $title_y, 0, strtoupper($card_title));
+
+            $draw->setFontSize($subtitle_size);
+            $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+            $subtitle_x =  ceil((($this->maxX * .5) + $this->currentX + 45) - ($check['textWidth'] / 2));
+            $this->image->annotateImage($draw, $subtitle_x, $this->margin + $trapezoid_height + $base_height -5, 0, strtoupper($unit['title']));
+        }else{
+            $title_x =  ceil((($this->maxX * .5) + $this->currentX + 45) - ($check['textWidth'] / 2));
+            $this->image->annotateImage($draw, $title_x, $title_y, 0, strtoupper($card_title));
+        }
+        $this->currentY += $this->margin + $trapezoid_height + $base_height;
     }
 
     protected function renderAbilities($label='Abilities', $data=array()) {
@@ -296,6 +321,7 @@ class wh40kRenderer extends Renderer {
             $height = 0;
             foreach($rows[$i] as $stat => $val) {
                 # TODO: use the width attribute here, or base it on actual rendered width instead
+                # @TODO Nested ternaries being deprecated in php 8
                 $char_limit = (($stat == 'Details' || $stat == 'roster') ? 55 : $this->bigBoys ? 45 : 30);
                 $text    = wordwrap($val, $char_limit, "\n", false);
                 $lines   = substr_count($text, "\n") + 1;
