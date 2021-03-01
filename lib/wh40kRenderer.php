@@ -5,8 +5,8 @@ require_once('Renderer.php');
 class wh40kRenderer extends Renderer {
     protected function renderUnit($unit, $xOffset, $yOffset) {
         // half page landscape or full page portrait:
-        $this->maxX = 144 * ($this->bigBoys ? 8.5 : 5.5);
-        $this->maxY = 144 * ($this->bigBoys ? 11 : 8.5);
+        $this->maxX = $this->res * ($this->bigBoys ? 8.5 : 5.5);
+        $this->maxY = $this->res * ($this->bigBoys ? 11 : 8.5);
 
         $this->currentX = $xOffset;
         $this->currentY = $yOffset;
@@ -91,10 +91,30 @@ class wh40kRenderer extends Renderer {
             $this->renderTable($unit['explode_table']);
         }
 
+        if(!empty($unit['custom_notes'])){
+            $this->renderLine();
+            $this->renderNotes($unit);
+        }
+        
         $this->renderBorder();
         $this->renderWatermark();
     }
 
+    protected function renderNotes($unit){
+        $label = "Notes";
+        $data = explode('QQQ', $unit['custom_notes']);
+        $fontSize = $this->getFontSize();
+        $leftMargin = $this->bigBoys ? 250 : 190;
+        $this->renderText($this->currentX + 80, $this->currentY + 20, strtoupper($label), 40, $fontSize);
+        foreach($data as $label => $desc) {
+            $content = trim("$desc");
+            $width = $this->bigBoys ? 100 : 69;
+            $this->currentY += $this->renderText($this->currentX + $leftMargin, $this->currentY + 19, $content, $width, $fontSize);
+        }
+        $this->currentY += 5;
+        return $this->currentY;
+
+    }
     protected function renderHeader($unit) {
         $draw = $this->getDraw();
         $draw->setFillColor('#000000');
@@ -215,9 +235,11 @@ class wh40kRenderer extends Renderer {
 
     protected function renderBorder() {
         $draw = $this->getDraw();
-        $draw->setStrokeWidth(2);
-        $draw->setStrokeColor('#222222');
-
+        $draw->setStrokeWidth(2);//exterior border width
+        $draw->setStrokeColor('#222222');//actual border color
+        //I think this is the same 70 as the polygon render in 
+        // renderHeader function above. Needs to be parameterizes
+        //I think 50 and 70 are margins? Not sure. pretty sure 50 is.
         $start = array(50, 70);
         $segs = array(
             array(70, 50),
@@ -234,13 +256,14 @@ class wh40kRenderer extends Renderer {
             $start = $end;
         }
         $this->image->drawImage($draw);
-
+        //this creates a white box fromt he bottom of the card to the bottom of the page
         $draw = $this->getDraw();
         $draw->setFillColor('#FFFFFF');
         $draw->rectangle((50 + $this->currentX), $this->currentY + 22, $this->maxX - 50 + $this->currentX, $this->maxY - 50);
         $this->image->drawImage($draw);
 
         # the corners are all beefed up:
+        //bottom left corner
         $draw = $this->getDraw();
         $draw->setFillColor('#FFFFFF');
         $draw->setFillOpacity(1);
@@ -250,6 +273,7 @@ class wh40kRenderer extends Renderer {
             array('x' => $this->currentX + 48, 'y' => $this->currentY + 2)
         ));
         $this->image->drawImage($draw);
+        //bottom right corner
         $draw = $this->getDraw();
         $draw->setFillColor('#FFFFFF');
         $draw->setFillOpacity(1);
@@ -263,6 +287,7 @@ class wh40kRenderer extends Renderer {
 
     protected function renderTable($rows=array(), $col_widths = array(), $width=740, $showHeaders=true) {
         # insanely dumb hack:
+        #@TODO maybe use a percentage. these are all between 75-84%
         if(empty($col_widths)) {
             $col_widths = array(
                 'Range'       => $this->bigBoys ? 75 : 55,
@@ -279,7 +304,7 @@ class wh40kRenderer extends Renderer {
                 'Characteristic 3' => $this->bigBoys ? 130 : 110
             );
         }
-
+        //what is this?
         $width = $this->bigBoys ? 1175 : 740;
 
         for($i = 0; $i < count($rows); $i++) {
@@ -430,10 +455,9 @@ class wh40kRenderer extends Renderer {
             $this->image->newImage($this->res * 8.5, $this->res * 11, new ImagickPixel('white'), 'pdf');
             $this->image->setResolution($this->res, $this->res);
             $this->image->setColorspace(Imagick::COLORSPACE_RGB);
-
             $this->currentY += 30;
-            $this->maxX = 144 * 8.5;
-            $this->maxY = 144 * 11;
+            $this->maxX = $this->res * 8.5;
+            $this->maxY = $this->res * 11;
 
 
             $tpl = 0;

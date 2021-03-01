@@ -54,8 +54,11 @@ class wh40kROSParser extends wh40kParser {
     public function populateUnit($d, $clean) {
         // title taken from [@attributes] of the SimpleXMLElement Object
         $clean['title']  = (string) $d['name'];
-        $clean['custom_name'] = empty($d['customName'])?'':(string) $d['customName'];
-
+        $clean['custom_name'] = empty($d['customName'])?'':(string)filter_var($d['customName'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK);
+        if(!empty($d->customNotes)){
+            $d->customNotes = str_replace(array("\r\n", "\r", "\n"),"QQQ",$d->customNotes);
+            $clean['custom_notes'] = (string)filter_var($d->customNotes, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW | FILTER_FLAG_STRIP_HIGH | FILTER_FLAG_STRIP_BACKTICK);
+        }
         // keywords, factions, slot
         if($d->categories->category) {
             foreach($d->categories->category as $c) {
