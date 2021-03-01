@@ -7,7 +7,6 @@ class Upload {
     private static function ProcessHtml($inPath){
         # escape these:
         $tmp = file_get_contents($inPath);
-        $tmp = str_replace('& ', '&amp; ', $tmp);
         file_put_contents($inPath, $tmp);
         return $inPath;
     }

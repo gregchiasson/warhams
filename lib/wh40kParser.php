@@ -39,7 +39,7 @@ class wh40kParser {
             'factions'    => array(),     # IMPERIUM, etc
             'roster'      => array(),     # 7 marines, 1 heavy weapon, sarge, etc
             'keywords'    => array(),      # INFANTRY, TANK, etc
-            'notes'       => ''           #Notes
+            'custom_notes'=> ''      #Notes
         );
 
         $unit = $this->populateUnit($d, $template);

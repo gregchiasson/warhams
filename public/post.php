@@ -77,7 +77,7 @@ try {
     ob_end_clean();
     header('Content-Description: File Transfer');
     header('Content-Type: application/pdf');
-    header('Content-Disposition: attachment; filename="your_list_sucks.pdf"');
+    header('Content-Disposition: attachment; filename="your_amazing_list.pdf"');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
     header('Pragma: public');
