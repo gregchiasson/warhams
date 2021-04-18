@@ -425,6 +425,7 @@ class wh40kRenderer extends Renderer {
         // upgrades
         $this->currentX -= 60;
         $this->currentY += 60;
+        $this->labelBox('Battles Fought', 1);
         $this->labelBox('Relics', 2);
         $this->labelBox('Warlord Traits', 2);
         $this->labelBox('Battle Honors', 3);
