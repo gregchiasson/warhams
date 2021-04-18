@@ -41,7 +41,9 @@ try {
     if(!$error) {
         $UNITS     = $parser->units;
         $OUTFILE   = '/var/tmp/'.uniqid().'.pdf';
-        $output    = new wh40kRenderer($OUTFILE, $UNITS, array_key_exists('big_data_sheet_appreciator', $_POST));
+        $big       = array_key_exists('big_data_sheet_appreciator', $_POST);
+        $crusade   = array_key_exists('crusade', $_POST);
+        $output    = new wh40kRenderer($OUTFILE, $UNITS, $big, $crusade);
         $downloads = $output->renderToOutFile();
     }
 

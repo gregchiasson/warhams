@@ -66,7 +66,7 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>So, the unit rsoters. Some of them are still off - Berzerkers, or SM bikers - due to BattleScribe data files considering some models added to squads to be "models" and other models to be "upgrades", a category which also includes grenades and wargear. It makes some sense that the files are laid out this way, but it also makes it impossible for ButtScribe to know what it should include, without that "model" tag, so unfortunately it's as fixed as it can get, save for a BattleScribe data change.</li>
+            <li>So, the unit rosters. Some of them are still off - Berzerkers, or SM bikers - due to BattleScribe data files considering some models added to squads to be "models" and other models to be "upgrades", a category which also includes grenades and wargear. It makes some sense that the files are laid out this way, but it also makes it impossible for ButtScribe to know what it should include, without that "model" tag, so unfortunately it's as fixed as it can get, save for a BattleScribe data change.</li>
         </ul>
     </div>
 </div>

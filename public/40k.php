@@ -19,6 +19,9 @@
                 <div class="checkbox">
                     <input type="checkbox" name="big_data_sheet_appreciator">GIMME THEM BIG SHEETS 
                 </div>
+                <div class="checkbox">
+                    <input type="checkbox" name="crusade">CRUSADE MODE (uses small sheets)
+                </div>
             </div>
         </div>
         <div class="form-group">

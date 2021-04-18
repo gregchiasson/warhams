@@ -241,6 +241,7 @@ class wh40kRenderer extends Renderer {
         if(empty($col_widths)) {
             $col_widths = array(
                 'Range'       => $this->bigBoys ? 75 : 55,
+                'Number'      => $this->bigBoys ? 75 : 55,
                 'S'           => $this->bigBoys ? 55 : 35,
                 'AP'          => $this->bigBoys ? 55 : 35,
                 'Damage'      => $this->bigBoys ? 55 : 35,
@@ -398,6 +399,114 @@ class wh40kRenderer extends Renderer {
         return $this->currentY;
     }
 
+    public function renderOrder() {
+        $forces = array_shift($this->units);
+        if(array_key_exists('0', $forces)) {
+            $this->bigBoys = true; // enforce big boy mode on this page
+            $this->image->newImage($this->res * 8.5, $this->res * 11, new ImagickPixel('white'), 'pdf');
+            $this->image->setResolution($this->res, $this->res);
+            $this->image->setColorspace(Imagick::COLORSPACE_RGB);
+
+            $this->currentY += 30;
+            $this->maxX = 144 * 8.5;
+            $this->maxY = 144 * 11;
+
+            $tpl = 0;
+            $tp  = 0;
+            $allUnits = array();
+            foreach($forces as $force) {
+                foreach($force['units'] as $slot => $units) {
+                    foreach($units as $unit) {
+                        $tp  += $unit['points'];
+                        $tpl += $unit['power'];
+                        $allUnits[] = array(
+                            'datasheet'      => $unit['name'],
+                            'name'           => ' ',
+                            'points'         => $unit['points'],
+                            'power'          => $unit['power'],
+                            'crusade points' => ' '
+                        );
+                    }
+                }
+            }
+
+            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Crusade Roster", 50, 32);
+
+            // header
+            $draw = $this->getDraw();
+            $draw->setFillColor('#EEEEEE');
+            $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
+                             $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
+            $this->image->drawImage($draw);
+            $this->renderAbilities('Crusade Force Name', array());
+            $this->currentY += 50;
+
+            $draw->setFillColor('#EEEEEE');
+            $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
+                             $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
+            $this->image->drawImage($draw);
+            $this->renderAbilities('Crusade Faction', array());
+            $this->currentY += 50;
+
+            $draw->setFillColor('#EEEEEE');
+            $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
+                             $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
+            $this->image->drawImage($draw);
+            $this->renderAbilities('Player Name', array());
+            $this->currentY += 50;
+
+            $this->renderTable(array(array(
+                'battles'               => ' ',
+                'wins'                  => ' ',
+                'requisition points'    => ' ',
+                'supply limit (pts/pl)' => '            pts /           PL',
+                'supply used (pts/pl)'  => "    $tp pts/$tpl PL"
+            )), array(
+                'wins'                  => 200,
+                'requisition points'    => 200,
+                'supply limit (pts/pl)' => 200,
+                'supply used (pts/pl)'   => 200 
+            ));
+
+            $this->currentY += 50;
+
+            // units
+            $this->renderTable($allUnits, array(
+                'name'   => 450,
+                'points' => 69,
+                'power'  => 69,
+                'crusade points' => 69
+            ));
+
+            $this->currentY += 50;
+
+            // notes
+            $draw->setFillColor('#EEEEEE');
+            $draw->rectangle(($this->margin + $this->currentX + 150), $this->currentY,
+                             $this->maxX - $this->margin + $this->currentX, $this->maxY - $this->margin - 50);
+            $this->image->drawImage($draw);
+            $this->renderAbilities('Notes', array());
+            $this->currentY = $this->maxY - $this->margin - 40;
+
+            $this->renderWatermark();
+
+            $url = '/var/tmp/'.uniqid().'.png';
+            $preview = clone $this->image;
+
+            $preview->setFormat('gif');
+            $preview->trimImage(0);
+            $preview->borderImage('white', 10, 10);
+            $preview->writeImages($url, false);
+
+            $this->bigBoys = false; // the rest of the crusade roster has to be in small boys mode
+            return $url;
+        } else {
+            // not a roster, abort!
+            array_unshift($this->units, $forces);
+            return null;
+        }
+    }
+
     public function renderList() {
         $forces = array_shift($this->units);
         if(array_key_exists('0', $forces)) {
@@ -466,7 +575,11 @@ class wh40kRenderer extends Renderer {
 
     public function renderToOutFile() {
         $files = array();
-        $summary  = $this->renderList();
+        if($this->crusade) {
+            $summary  = $this->renderOrder();
+        } else { 
+            $summary  = $this->renderList();
+        }
         if($summary) {
             $files['summary'] = $summary;
         }
@@ -487,9 +600,13 @@ class wh40kRenderer extends Renderer {
             }
 
             if(!$this->bigBoys) {
-                $i += 1;
-                if(array_key_exists($i, $this->units)) {
-                    $this->renderUnit($this->units[$i], ($this->res * 5.5), 0);
+                if($this->crusade) {
+//                    $this->renderCrusade($this->units[$i], ($this->res * 5.5), 0);
+                } else {
+                    $i += 1;
+                    if(array_key_exists($i, $this->units)) {
+                        $this->renderUnit($this->units[$i], ($this->res * 5.5), 0);
+                    }
                 }
             }
             $this->image->writeImages($this->outFile, true);
