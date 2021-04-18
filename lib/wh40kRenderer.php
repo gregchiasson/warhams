@@ -400,6 +400,10 @@ class wh40kRenderer extends Renderer {
     }
 
     public function renderCrusade($unit, $xOffset, $yOffset) {
+        $noXP = false;
+        if(in_array('Drone', $unit['keywords']) || in_array('Swarm', $unit['keywords'])) {
+            $noXP = true;
+        }
         $this->currentX = $xOffset + $this->margin;
         $this->currentY = $yOffset + $this->margin;
 
@@ -428,45 +432,49 @@ class wh40kRenderer extends Renderer {
         $this->labelBox('Battles Fought', 1);
         $this->labelBox('Relics', 2);
         $this->labelBox('Warlord Traits', 2);
-        $this->labelBox('Battle Honors', 3);
-        $this->labelBox('Battle Scars', 3);
+        if(!$noXP) {
+            $this->labelBox('Battle Honors', 3);
+            $this->labelBox('Battle Scars', 3);
+        }
 
         // XP track 
-        $this->currentX += 60;
-        $this->renderText($this->currentX + 20, $this->currentY + 30, "EXPERIENCE", 50, $this->getFontSize());
-        $this->currentX += 170;
-        $draw = $this->getDraw();
-        $draw->setStrokeWidth(1);
-        $boxSize = 30;
-        $height  = $boxSize + 10;
+        if(!$noXP) {
+            $this->currentX += 60;
+            $this->renderText($this->currentX + 20, $this->currentY + 30, "EXPERIENCE", 50, $this->getFontSize());
+            $this->currentX += 170;
+            $draw = $this->getDraw();
+            $draw->setStrokeWidth(1);
+            $boxSize = 30;
+            $height  = $boxSize + 10;
 
-        $x       = $this->currentX;
-        for($w = 0; $w < 52; $w++) {
-            if($w % 13 == 0 && $w > 0) {
-                $this->currentY += $height;
-                $x = $this->currentX;
+            $x       = $this->currentX;
+            for($w = 0; $w < 52; $w++) {
+                if($w % 13 == 0 && $w > 0) {
+                    $this->currentY += $height;
+                    $x = $this->currentX;
+                }
+                $draw->setStrokeOpacity(1);
+                $draw->setStrokeColor('#000000');
+                if($w == 0) { 
+                    $xx = $x;
+                    $xy = $this->currentY;
+                    $draw->setFillColor('#999999');
+                } else if($w == 6 || $w == 16 || $w == 31 || $w == 51) {
+                    $draw->setFillColor('#999999');
+                } else {
+                    $draw->setFillColor('#FFFFFF');
+                }
+                $draw->rectangle($x, $this->currentY, ($x + $boxSize), ($this->currentY + $boxSize));
+                $this->image->drawImage($draw);
+                $x += $boxSize + 10;
             }
-            $draw->setStrokeOpacity(1);
-            $draw->setStrokeColor('#000000');
-            if($w == 0) { 
-                $xx = $x;
-                $xy = $this->currentY;
-                $draw->setFillColor('#999999');
-            } else if($w == 6 || $w == 16 || $w == 31 || $w == 51) {
-                $draw->setFillColor('#999999');
-            } else {
-                $draw->setFillColor('#FFFFFF');
-            }
-            $draw->rectangle($x, $this->currentY, ($x + $boxSize), ($this->currentY + $boxSize));
-            $this->image->drawImage($draw);
-            $x += $boxSize + 10;
+            $this->currentY += $height;
+            $this->renderText($xx + 5, $xy + 25, "X", 50, $this->getFontSize() + 10);
+            $this->currentX -= 230;
         }
-        $this->currentY += $height;
-        $this->renderText($xx + 5, $xy + 25, "X", 50, $this->getFontSize() + 10);
 
         // TODO kill tallies etc
 
-        $this->currentX -= 230;
         $draw = $this->getDraw();
         $draw->setFillColor('#EEEEEE');
         $draw->rectangle(($this->margin + $this->currentX + 150), $this->currentY,
