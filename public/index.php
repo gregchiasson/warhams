@@ -38,15 +38,8 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>30 October 2020</strong></li>
-            <li>Merged "Fixed missing rules for selections" by gmccabe</li>
-            <li>Merged "Added Custom Names" by FreddieRa</li>
-            <li>Merged "Unpacking a rosz file properly" by Krizzzn</li>
-            <li>Units without an org-chart slot should appear now</li>
-            <li>(Kill Team) Specialisms shouldn't overlap with Abilities anymore</li>
-            <li>Added support for 40k 9th edition (changed the 8s to 9s)</li>
-            <li>The new Exarch Powers should show up now.</li>
-            <li>Fixed <i>some</i> of the issues with unit rosters not appearing properly (see below)</li>
+            <li>Latest update: <strong>20 April 2021</strong></li>
+            <li>Added support for Crusade rosters.</li>
         </ul>
     </div>
 </div>
@@ -77,7 +70,6 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Brains of this outfit: Robert "TheChirurgeon" Jones"</li>
             <li>Code: Greg Chiasson</li>
             <li>You: <a href="https://github.com/gregchiasson/warhams">submit PRs on GitHub</a></li>
         </ul>

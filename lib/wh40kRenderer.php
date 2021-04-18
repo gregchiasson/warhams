@@ -399,6 +399,92 @@ class wh40kRenderer extends Renderer {
         return $this->currentY;
     }
 
+    public function renderCrusade($unit, $xOffset, $yOffset) {
+        $this->currentX = $xOffset + $this->margin;
+        $this->currentY = $yOffset + $this->margin;
+
+        $draw = $this->getDraw();
+        $draw->setFillColor('#FFFFFF');
+        $draw->setStrokeWidth(2);
+        $draw->setStrokeColor('#222222');
+        $draw->rectangle($this->currentX, $this->currentY,
+                         $xOffset + $this->maxX - $this->margin, $this->maxY - $this->margin);
+        $this->image->drawImage($draw);
+
+        // headers
+        $draw = $this->getDraw();
+        $this->renderText($this->currentX + 20, $this->currentY + 30, "Unit Name", 50, 22);
+        $this->renderText($this->currentX + 450, $this->currentY + 30, "Crusade Points", 50, 22);
+        $this->currentY += 40;
+        $draw->setFillColor('#EEEEEE');
+        $draw->setStrokeWidth(0);
+        $draw->rectangle($this->currentX + 20, $this->currentY, $xOffset + 420, $this->currentY + 40);
+        $draw->rectangle($this->currentX + 450, $this->currentY, $xOffset + 550, $this->currentY + 40);
+        $this->image->drawImage($draw);
+
+        // upgrades
+        $this->currentX -= 60;
+        $this->currentY += 60;
+        $this->labelBox('Relics', 2);
+        $this->labelBox('Warlord Traits', 2);
+        $this->labelBox('Battle Honors', 3);
+        $this->labelBox('Battle Scars', 3);
+
+        // XP track 
+        $this->currentX += 60;
+        $this->renderText($this->currentX + 20, $this->currentY + 30, "EXPERIENCE", 50, $this->getFontSize());
+        $this->currentX += 170;
+        $draw = $this->getDraw();
+        $draw->setStrokeWidth(1);
+        $boxSize = 30;
+        $height  = $boxSize + 10;
+
+        $x       = $this->currentX;
+        for($w = 0; $w < 52; $w++) {
+            if($w % 13 == 0 && $w > 0) {
+                $this->currentY += $height;
+                $x = $this->currentX;
+            }
+            $draw->setStrokeOpacity(1);
+            $draw->setStrokeColor('#000000');
+            if($w == 0) { 
+                $xx = $x;
+                $xy = $this->currentY;
+                $draw->setFillColor('#999999');
+            } else if($w == 6 || $w == 16 || $w == 31 || $w == 51) {
+                $draw->setFillColor('#999999');
+            } else {
+                $draw->setFillColor('#FFFFFF');
+            }
+            $draw->rectangle($x, $this->currentY, ($x + $boxSize), ($this->currentY + $boxSize));
+            $this->image->drawImage($draw);
+            $x += $boxSize + 10;
+        }
+        $this->currentY += $height;
+        $this->renderText($xx + 5, $xy + 25, "X", 50, $this->getFontSize() + 10);
+
+        // TODO kill tallies etc
+
+        $this->currentX -= 230;
+        $draw = $this->getDraw();
+        $draw->setFillColor('#EEEEEE');
+        $draw->rectangle(($this->margin + $this->currentX + 150), $this->currentY,
+                         $this->maxX - $this->margin + $this->currentX, $this->maxY - $this->margin - 50);
+        $this->image->drawImage($draw);
+        $this->renderAbilities('Notes', array());
+        $this->currentY = $this->maxY - $this->margin - 40;
+    }
+
+    public function labelBox($title, $lines=1) {
+        $draw = $this->getDraw();
+        $draw->setFillColor('#EEEEEE');
+        $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
+                          $this->maxX - $this->margin + $this->currentX, $this->currentY + (40 * $lines));
+        $this->image->drawImage($draw);
+        $this->renderAbilities($title, array());
+        $this->currentY += (40 * $lines) + 10;
+    }
+
     public function renderOrder() {
         $forces = array_shift($this->units);
         if(array_key_exists('0', $forces)) {
@@ -433,27 +519,9 @@ class wh40kRenderer extends Renderer {
             $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Crusade Roster", 50, 32);
 
             // header
-            $draw = $this->getDraw();
-            $draw->setFillColor('#EEEEEE');
-            $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
-                             $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
-            $this->image->drawImage($draw);
-            $this->renderAbilities('Crusade Force Name', array());
-            $this->currentY += 50;
-
-            $draw->setFillColor('#EEEEEE');
-            $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
-                             $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
-            $this->image->drawImage($draw);
-            $this->renderAbilities('Crusade Faction', array());
-            $this->currentY += 50;
-
-            $draw->setFillColor('#EEEEEE');
-            $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
-                             $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
-            $this->image->drawImage($draw);
-            $this->renderAbilities('Player Name', array());
-            $this->currentY += 50;
+            $this->labelBox('Crusade Force Name');
+            $this->labelBox('Crusade Faction');
+            $this->labelBox('Player Name');
 
             $this->renderTable(array(array(
                 'battles'               => ' ',
@@ -481,6 +549,7 @@ class wh40kRenderer extends Renderer {
             $this->currentY += 50;
 
             // notes
+            $draw = $this->getDraw();
             $draw->setFillColor('#EEEEEE');
             $draw->rectangle(($this->margin + $this->currentX + 150), $this->currentY,
                              $this->maxX - $this->margin + $this->currentX, $this->maxY - $this->margin - 50);
@@ -601,7 +670,7 @@ class wh40kRenderer extends Renderer {
 
             if(!$this->bigBoys) {
                 if($this->crusade) {
-//                    $this->renderCrusade($this->units[$i], ($this->res * 5.5), 0);
+                    $this->renderCrusade($this->units[$i], ($this->res * 5.5), 0);
                 } else {
                     $i += 1;
                     if(array_key_exists($i, $this->units)) {
