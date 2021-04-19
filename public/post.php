@@ -67,10 +67,13 @@ try {
 <?php } else if(array_key_exists('summary', $downloads)) { ?>
     <?php ob_end_flush(); ?>
     <p><a href="<?php print($downloads['list']);?>" target="_blank">Click here to download/print list as a PDF</a></p>
-    <p>And here's a convenient list summary, that you can feel free to link this on Discord/Forums, or send to your TO (click for big):</p>
-    <a href="<?php print($downloads['summary']);?>" target="_blank">
-        <img src="<?php print($downloads['summary']);?>" style="width:500px; border:1px solid black"/>
-    </a>
+    <p>List summary:</p>
+    <p>
+        <a href="<?php print($downloads['summary']);?>" target="_blank">
+            <img src="<?php print($downloads['summary']);?>" style="width:500px; border:1px solid black"/>
+        </a>
+    </p>
+    <p><a href="/40k.php">Generate another</a></p>
     </div>
     </div>
     <?php include('inc/footer.php'); ?>
