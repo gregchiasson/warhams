@@ -417,19 +417,22 @@ class wh40kRenderer extends Renderer {
 
         // headers
         $draw = $this->getDraw();
-        $this->renderText($this->currentX + 20, $this->currentY + 30, "Unit Name", 50, 22);
-        $this->renderText($this->currentX + 450, $this->currentY + 30, "Crusade Points", 50, 22);
+        $this->renderText($this->currentX + 20, $this->currentY + 30, "UNIT NAME", 50, 22);
+        $this->renderText($this->currentX + 450, $this->currentY + 30, "CRUSADE POINTS", 50, 22);
         $this->currentY += 40;
         $draw->setFillColor('#EEEEEE');
         $draw->setStrokeWidth(0);
         $draw->rectangle($this->currentX + 20, $this->currentY, $xOffset + 420, $this->currentY + 40);
-        $draw->rectangle($this->currentX + 450, $this->currentY, $xOffset + 550, $this->currentY + 40);
+        $draw->rectangle($this->currentX + 450, $this->currentY, $xOffset + 730, $this->currentY + 40);
         $this->image->drawImage($draw);
+        $this->currentY += 70;
+
+        $this->labelBoxes(array('battles fought', 'battles survived'));
+        $this->labelBoxes(array('Melee Kills', 'Ranged Kills', 'Psyker Kills'));
 
         // upgrades
         $this->currentX -= 60;
-        $this->currentY += 60;
-        $this->labelBox('Battles Fought', 1);
+
         $this->labelBox('Relics', 2);
         $this->labelBox('Warlord Traits', 2);
         if(!$noXP) {
@@ -473,14 +476,12 @@ class wh40kRenderer extends Renderer {
             $this->currentX -= 230;
         }
 
-        // TODO kill tallies etc
-
         $draw = $this->getDraw();
         $draw->setFillColor('#EEEEEE');
         $draw->rectangle(($this->margin + $this->currentX + 150), $this->currentY,
                          $this->maxX - $this->margin + $this->currentX, $this->maxY - $this->margin - 50);
         $this->image->drawImage($draw);
-        $this->renderAbilities('Notes', array());
+        $this->renderAbilities("Notes,\nUpgrades,\nWargear", array());
         $this->currentY = $this->maxY - $this->margin - 40;
     }
 
@@ -492,6 +493,24 @@ class wh40kRenderer extends Renderer {
         $this->image->drawImage($draw);
         $this->renderAbilities($title, array());
         $this->currentY += (40 * $lines) + 10;
+    }
+
+    public function labelBoxes($titles) {
+        $draw = $this->getDraw();
+
+        $xStart = $this->currentX + 20;
+        $height = 40;
+        $margin = 20;
+        $width  = intval((($this->maxX - $this->margin + $this->currentX) - ($this->margin + $this->currentX) - 10) / count($titles));
+        foreach($titles as $title) {
+            $this->renderText($xStart, $this->currentY, strtoupper($title), 50, $this->getFontSize());
+            $draw->setFillColor('#EEEEEE');
+            $draw->setStrokeWidth(0);
+            $draw->rectangle($xStart, $this->currentY + 10, $xStart + $width - $margin, $this->currentY + $height + 10);
+            $this->image->drawImage($draw);
+            $xStart += $width;
+        }
+        $this->currentY += $height + $margin + 20;
     }
 
     public function renderOrder() {
