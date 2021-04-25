@@ -256,9 +256,7 @@ class wh40kRenderer extends Renderer {
             );
         }
 
-        if($width != 740) { // cool the default width was all busted up
-            $width = $this->bigBoys ? 1175 : 740;
-        }
+        $width = $this->bigBoys ? 1175 : 740;
 
         for($i = 0; $i < count($rows); $i++) {
             $draw = $this->getDraw();
