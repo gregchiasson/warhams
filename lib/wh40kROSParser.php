@@ -268,6 +268,11 @@ class wh40kROSParser extends wh40kParser {
                 if($dd->selections->selection) {
                     foreach($dd->selections->selection as $ddd) {
                         $clean = $this->readSelectionCosts($ddd, $clean);
+                        if($ddd->selections->selection) {
+                            foreach($ddd->selections->selection as $dddd) {
+                                $clean = $this->readSelectionCosts($dddd, $clean);
+                            }
+                        }
                     }
                 }
             }
