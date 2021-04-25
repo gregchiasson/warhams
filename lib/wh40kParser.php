@@ -3,6 +3,7 @@
 class wh40kParser {
     public $units = array();
     public $doc   = null;
+    public $cp    = 0;
 
     public $SLOTS = array(
         'HQ'                  => 'HQ',
@@ -27,6 +28,7 @@ class wh40kParser {
             'slot'        => null,        # FOC slot
             'power'       => 0,           # PL, points to come later
             'points'      => 0,           # its later now
+            'cp'          => 0,           # sure
             'title'       => 'unit name', # tactical squad
             'model_stat'  => array(),     # name M WS BS etc
             'weapon_stat' => array(),     # name range type etc
@@ -52,6 +54,13 @@ class wh40kParser {
             sort($unit['factions']);
             return $unit;
         } else {
+            $costs = array('points' => 0, 'cp' => 0, 'power' => 0);
+            $costs = $this->readSelectionCosts($d, $costs);
+            $this->cp += $costs['cp'];
+            if($d->selections->selection) {
+                $costs = $this->readSelectionCosts($d->selections->selection, $costs);
+                $this->cp += $costs['cp'];
+            }
             return null;
         }
     }
@@ -128,6 +137,8 @@ class wh40kParser {
             foreach($d->costs->cost as $cost) {
                 if((string) $cost['name'] == 'pts') {
                     $clean['points'] += (integer) $cost['value'];
+                } else if((string) $cost['name'] == 'CP') {
+                    $clean['cp'] += (integer) $cost['value'];
                 } else if((string) $cost['name'] == ' PL') {
                     $clean['power'] += (integer) $cost['value'];
                 }

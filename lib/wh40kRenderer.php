@@ -627,7 +627,11 @@ class wh40kRenderer extends Renderer {
                 }
             }
 
-            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL)", 50, 22);
+            if($this->isApoc) {
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tpl PL)", 50, 22);
+            } else {
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL) ".$force['cp']." CP", 50, 22);
+            }
 
             foreach($forces as $force) {
                 $pts = 0;
@@ -635,22 +639,33 @@ class wh40kRenderer extends Renderer {
                 $allUnits = array();
                 foreach($force['units'] as $slot => $units) {
                     foreach($units as $unit) {
+                        if($this->isApoc) {
+                            unset($unit['points']);
+                        }
                         $allUnits[] = $unit;
                         $pts += $unit['points'];
                         $pl  += $unit['power'];
                     }
                 }
 
-                $label = $force['faction'].' '.$force['detachment']." ($pts pts, $pl PL)";
+                if($this->isApoc) {
+                    $label = $force['faction'].' '.$force['detachment']." ($pl PL)";
+                } else {
+                    $label = $force['faction'].' '.$force['detachment']." ($pts pts, $pl PL)";
+                }
                 $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
                 
-                $this->renderTable($allUnits, array(
+                $unitColumns = array(
                     'name'   => $this->bigBoys ? 350 : 220,
                     'slot'   => 50,
                     'roster' => $this->bigBoys ? 350 : 280,
                     'points' => 69,
                     'power'  => 69
-                ));
+                );
+                if($this->isApoc) {
+                    unset($unitColumns['points']);
+                }
+                $this->renderTable($allUnits, $unitColumns);
             }
             $this->renderWatermark();
 

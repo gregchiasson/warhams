@@ -45,7 +45,8 @@ class wh40kROSParser extends wh40kParser {
             $forces[] = array(
                 'faction'    => (string) $force['catalogueName'],
                 'detachment' => (string) $force['name'],
-                'units'      => $units
+                'units'      => $units,
+                'cp'         => $this->cp
             );
         }
         array_unshift($this->units, $forces);

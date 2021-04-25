@@ -6,6 +6,7 @@ abstract class Renderer {
     protected $units   = array();
     protected $bigBoys = false;
     protected $crusade = false;
+    protected $isApoc  = false;
 
     protected $margin = 50;
     protected $res    = 144;
