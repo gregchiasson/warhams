@@ -256,7 +256,9 @@ class wh40kRenderer extends Renderer {
             );
         }
 
-        $width = $this->bigBoys ? 1175 : 740;
+        if($width != 740) { // cool the default width was all busted up
+            $width = $this->bigBoys ? 1175 : 740;
+        }
 
         for($i = 0; $i < count($rows); $i++) {
             $draw = $this->getDraw();
@@ -338,20 +340,20 @@ class wh40kRenderer extends Renderer {
         }
     }
 
-    protected function renderWoundBoxes($unit) {
+    protected function renderWoundBoxes($unit, $block=false) {
         # TODO: roster-based boxes:
         # 7 1W guys: X X X X X X 
         # 1 2W guy: X X
         # 1 2W guy: X X
 
         foreach($unit['model_stat'] as $type) {
-            if($type['W'] > 1) {
+            if($type['W'] > 1 || $this->isApoc) {
                 $draw = $this->getDraw();
                 $draw->setStrokeWidth(1);
                 $draw->setFontSize($this->getFontSize());
                 $draw->setFontWeight(600);
 
-                $text   = wordwrap(strtoupper($type['Unit']), 22, "\n", false);
+                $text   = wordwrap(strtoupper($type['Unit']), ($block ? 100 : 22), "\n", false);
                 $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
                 $height = (($lines + 1) * ($draw->getFontSize() + 4));
 
@@ -363,6 +365,10 @@ class wh40kRenderer extends Renderer {
 
                 $boxSize   = 30;
                 $boxOffset = ($this->bigBoys ? 400 : 340);
+                if($block) {
+                    $boxOffset = 90;
+                    $this->currentY += 30;
+                }
                 $x = $this->currentX + $boxOffset;
                 for($w = 0; $w < $type['W']; $w++) {
                     if($w % ($this->bigBoys ? 15 : 10 ) == 0 && $w > 0) {
@@ -643,7 +649,9 @@ class wh40kRenderer extends Renderer {
                             unset($unit['points']);
                         }
                         $allUnits[] = $unit;
-                        $pts += $unit['points'];
+                        if(!$this->isApoc) {
+                            $pts += $unit['points'];
+                        }
                         $pl  += $unit['power'];
                     }
                 }

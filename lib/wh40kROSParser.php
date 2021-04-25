@@ -36,7 +36,7 @@ class wh40kROSParser extends wh40kParser {
                             'name'   => $name,
                             'slot'   => $unit['slot'],
                             'roster' => implode($unit['roster'], ', '),
-                            'points' => $unit['points'],
+                            'points' => array_key_exists('points', $unit) ? $unit['points'] : 0,
                             'power'  => $unit['power']
                         );
                     }
