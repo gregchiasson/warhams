@@ -67,6 +67,7 @@ Uncomment if there's known outages
         <p><img src="/output.png" alt="Output data card example" width="100%"/></p>
         <p><img src="/output_crusade.png" alt="Output crusade example" width="100%"/></p>
         <p><img src="output_kt.png" alt="Output data card example" width="50%"/><img src="output_kard.png" alt="Output data card example" width="50%"/></p>
+        <p><img src="output_apoc.png" alt="Apocalypse data card example" width="50%"/></p>
     </div>
 </div>
 
