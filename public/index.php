@@ -40,9 +40,9 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>25 April 2021</strong></li>
-            <li>Added support for Apocalypse lists.</li>
-            <li>Updates to wording and sample images.</li>
+            <li>Latest update: <strong>2 May 2021</strong></li>
+            <li>Added support for Apocalypse. Works with both the official BattleScribe repo, and the unofficial <a href="https://github.com/normanthesquid/wh40k-fundapocalypse">Fundamalleus</a> extension.</li>
+            <li>Improvements to the ButtScribe code.</li>
         </ul>
     </div>
 </div>
