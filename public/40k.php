@@ -39,7 +39,7 @@
     </div>
     <div class="panel-body">
         <p>You should get a prompt to download a PDF that looks something like this:</p>
-        <p><img src="/output_roster.png" alt="Output data roster example" width="350"/></p>
+        <p><img src="/output_roster.png" alt="Output data roster example" style="width:100%"/></p>
         <p>Followed by a bunch of these:</p>
         <p><img src="/output.png" alt="Output data card example" style="width:100%"/></p>
         <p>Or, in Crusade mode:</p>

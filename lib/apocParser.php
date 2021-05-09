@@ -32,8 +32,10 @@ class apocParser extends wh40kROSParser {
     }
 
     public function populateUnit($d, $clean) {
-        // title
         $clean['title']  = (string) $d['name'];
+        if($d['customName']) {
+            $clean['title'] = (string) $d['customName'];
+        }
 
         // keywords, factions, slot
         if($d->categories->category) {

@@ -26,14 +26,14 @@ class wh40kROSParser extends wh40kParser {
                             $units[$slot] = array();
                         }
 
-                        if(array_key_exists('customName', $unit) && $unit['customName'] !== null) {
-                            $name = $unit['customName'];
-                        } else {
-                            $name = $unit['title'];
+                        $customName = null;
+                        if($d['customName']) {
+                            $customName = (string) $d['customName'];
                         }
 
                         $units[$slot][] = array(
-                            'name'   => $name,
+                            'name'   => $unit['title'],
+                            'customName' => $customName,
                             'slot'   => $unit['slot'],
                             'roster' => implode($unit['roster'], ', '),
                             'points' => array_key_exists('points', $unit) ? $unit['points'] : 0,
@@ -56,6 +56,12 @@ class wh40kROSParser extends wh40kParser {
     public function populateUnit($d, $clean) {
         // title
         $clean['title']  = (string) $d['name'];
+        if($d['customName']) {
+            $clean['customName'] = (string) $d['customName'];
+        }
+        if($d->customNotes) {
+            $clean['notes'] = (string) $d->customNotes;
+        }
 
         // keywords, factions, slot
         if($d->categories->category) {

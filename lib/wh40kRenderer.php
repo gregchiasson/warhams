@@ -157,16 +157,17 @@ class wh40kRenderer extends Renderer {
         $title_size = 28;
         $draw->setFontSize($title_size);
         $draw->setFont('../assets/title_font.otf');
-        $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+        $title = $unit['customName'] ? $unit['customName'] : $unit['title'];
+        $check = $this->image->queryFontMetrics($draw, strtoupper($title));
         $maxNameWidth = $this->bigBoys ? 600 : 420;
         while($iters < 6 && $check['textWidth'] > $maxNameWidth) {
             $iters += 1;
             $title_size -= 2;
             $draw->setFontSize($title_size);
-            $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+            $check = $this->image->queryFontMetrics($draw, strtoupper($title));
         }
         $title_x =  ceil((($this->maxX * .5) + $this->currentX) - ($check['textWidth'] / 2));
-        $this->image->annotateImage($draw, $title_x, 88, 0, strtoupper($unit['title']));
+        $this->image->annotateImage($draw, $title_x, 88, 0, strtoupper($title));
         $this->currentY += 100;
     }
 
@@ -236,7 +237,7 @@ class wh40kRenderer extends Renderer {
         $this->image->drawImage($draw);
     }
 
-    protected function renderTable($rows=array(), $col_widths = array(), $width=740, $showHeaders=true) {
+    protected function renderTable($rows=array(), $col_widths = array(), $width=null, $showHeaders=true) {
         # insanely dumb hack:
         if(empty($col_widths)) {
             $col_widths = array(
@@ -256,7 +257,9 @@ class wh40kRenderer extends Renderer {
             );
         }
 
-        $width = $this->bigBoys ? 1175 : 740;
+        if(!$width) { 
+            $width = $this->bigBoys ? 1175 : 740;
+        }
 
         for($i = 0; $i < count($rows); $i++) {
             $draw = $this->getDraw();
@@ -429,6 +432,8 @@ class wh40kRenderer extends Renderer {
         $draw->rectangle($this->currentX + 20, $this->currentY, $xOffset + 420, $this->currentY + 40);
         $draw->rectangle($this->currentX + 450, $this->currentY, $xOffset + 730, $this->currentY + 40);
         $this->image->drawImage($draw);
+        $this->renderText($this->currentX + 25, $this->currentY + 30, $unit['customName'], 50, 22);
+
         $this->currentY += 70;
 
         $this->labelBoxes(array('battles fought', 'battles survived'));
@@ -486,6 +491,7 @@ class wh40kRenderer extends Renderer {
                          $this->maxX - $this->margin + $this->currentX, $this->maxY - $this->margin - 50);
         $this->image->drawImage($draw);
         $this->renderAbilities("Notes,\nUpgrades,\nWargear", array());
+        $this->renderText($this->currentX + 210, $this->currentY + 20, $unit['notes'], 50, 22);
         $this->currentY = $this->maxY - $this->margin - 40;
     }
 
@@ -539,7 +545,7 @@ class wh40kRenderer extends Renderer {
                         $tpl += $unit['power'];
                         $allUnits[] = array(
                             'datasheet'      => $unit['name'],
-                            'name'           => ' ',
+                            'name'           => $unit['customName'],
                             'points'         => $unit['points'],
                             'power'          => $unit['power'],
                             'crusade points' => ' '
@@ -662,7 +668,8 @@ class wh40kRenderer extends Renderer {
                 $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
                 
                 $unitColumns = array(
-                    'name'   => $this->bigBoys ? 350 : 220,
+                    'name'   => $this->bigBoys ? 320 : 220,
+                    'customName' => 240,
                     'slot'   => 50,
                     'roster' => $this->bigBoys ? 350 : 280,
                     'points' => 69,
@@ -671,7 +678,7 @@ class wh40kRenderer extends Renderer {
                 if($this->isApoc) {
                     unset($unitColumns['points']);
                 }
-                $this->renderTable($allUnits, $unitColumns);
+                $this->renderTable($allUnits, $unitColumns, $this->res * 8);
             }
             $this->renderWatermark();
 

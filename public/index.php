@@ -40,9 +40,9 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>2 May 2021</strong></li>
+            <li>Latest update: <strong>9 May 2021</strong></li>
+            <li>Added unit custom names to Apocalypse and 40k, and custom notes to 40k Crusade.</li>
             <li>Added support for Apocalypse. Works with both the official BattleScribe repo, and the unofficial <a href="https://github.com/normanthesquid/wh40k-fundapocalypse">Fundamalleus</a> extension.</li>
-            <li>Improvements to the ButtScribe code.</li>
         </ul>
     </div>
 </div>
@@ -67,7 +67,7 @@ Uncomment if there's known outages
         <p><img src="/output.png" alt="Output data card example" width="100%"/></p>
         <p><img src="/output_crusade.png" alt="Output crusade example" width="100%"/></p>
         <p><img src="output_kt.png" alt="Output data card example" width="50%"/><img src="output_kard.png" alt="Output data card example" width="50%"/></p>
-        <p><img src="output_apoc.png" alt="Apocalypse data card example" width="50%"/></p>
+        <p><img src="output_apoc.png" alt="Apocalypse data card example" width="100%"/></p>
     </div>
 </div>
 

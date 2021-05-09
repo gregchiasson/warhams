@@ -435,6 +435,7 @@ class newRenderer extends Renderer {
                 
                 $unitColumns = array(
                     'name'   => $this->bigBoys ? 350 : 220,
+                    'customName' => 300,
                     'slot'   => 50,
                     'roster' => $this->bigBoys ? 350 : 280,
                     'points' => 69,
