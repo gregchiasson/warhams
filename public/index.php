@@ -40,9 +40,9 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>9 May 2021</strong></li>
-            <li>Added unit custom names to Apocalypse and 40k, and custom notes to 40k Crusade.</li>
-            <li>Added support for Apocalypse. Works with both the official BattleScribe repo, and the unofficial <a href="https://github.com/normanthesquid/wh40k-fundapocalypse">Fundamalleus</a> extension.</li>
+            <li>Latest update: <strong>15 May 2021</strong></li>
+            <li>Improved unit custom names in Apocalypse and 40k.</li>
+            <li>Added support for nested detachments. Strongly recommend <em>not</em> doing this, but it <em>is</em> supported.</li>
         </ul>
     </div>
 </div>
