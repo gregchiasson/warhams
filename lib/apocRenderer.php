@@ -106,10 +106,11 @@ class apocRenderer extends newRenderer {
         # unit name:
         $draw->setFillColor('#000000');
         $iters = 0;
+        $title = $unit['customName'] ? $unit['customName'] : $unit['title'];
         $title_size = 28;
         $draw->setFontSize($title_size);
         $draw->setFont('../assets/title_font.otf');
-        $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
+        $check = $this->image->queryFontMetrics($draw, strtoupper($title));
         $maxNameWidth = 420;
         while($iters < 6 && $check['textWidth'] > $maxNameWidth) {
             $iters += 1;
@@ -118,7 +119,7 @@ class apocRenderer extends newRenderer {
             $check = $this->image->queryFontMetrics($draw, strtoupper($unit['title']));
         }
         $title_x =  $x + 110;
-        $this->image->annotateImage($draw, $title_x, $y + 40, 0, strtoupper($unit['title']));
+        $this->image->annotateImage($draw, $title_x, $y + 40, 0, strtoupper($title));
         $this->currentY += 50;
         $this->renderLine();
     }

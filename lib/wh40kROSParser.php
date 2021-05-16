@@ -14,43 +14,54 @@ class wh40kROSParser extends wh40kParser {
             return $this->units;
         }
         foreach($this->doc->forces->force as $force) {
-            $units = array();
-            foreach($force->selections->selection as $d) {
-                $unit = $this->createUnit($d);
-                if($unit) {
-                    $this->units[] = $unit;
-
-                    if(array_key_exists('slot', $unit) && $unit['slot'] !== null) {
-                        $slot = $unit['slot'];
-                        if(!array_key_exists($slot, $units)) {
-                            $units[$slot] = array();
-                        }
-
-                        $customName = null;
-                        if($d['customName']) {
-                            $customName = (string) $d['customName'];
-                        }
-
-                        $units[$slot][] = array(
-                            'name'   => $unit['title'],
-                            'customName' => $customName,
-                            'slot'   => $unit['slot'],
-                            'roster' => implode($unit['roster'], ', '),
-                            'points' => array_key_exists('points', $unit) ? $unit['points'] : 0,
-                            'power'  => $unit['power']
-                        );
-                    }
+            $forces[] = $this->parseForce($force);
+            if($force->forces->force) {
+                foreach($force->forces->force as $ff) {
+                    $forces[] = $this->parseForce($ff);
                 }
             }
-            $forces[] = array(
-                'faction'    => (string) $force['catalogueName'],
-                'detachment' => (string) $force['name'],
-                'units'      => $units,
-                'cp'         => $this->cp
-            );
         }
         array_unshift($this->units, $forces);
         return $this->units;
+    }
+
+
+    protected function parseForce($force) {
+        $units = array();
+        foreach($force->selections->selection as $d) {
+            $unit = $this->createUnit($d);
+            if($unit) {
+                $this->units[] = $unit;
+
+                if(array_key_exists('slot', $unit) && $unit['slot'] !== null) {
+                    $slot = $unit['slot'];
+                    if(!array_key_exists($slot, $units)) {
+                        $units[$slot] = array();
+                    }
+
+                    $customName = null;
+                    if($d['customName']) {
+                        $customName = (string) $d['customName'];
+                    }
+
+                    $units[$slot][] = array(
+                        'name'   => $unit['title'],
+                        'customName' => $customName,
+                        'slot'   => $unit['slot'],
+                        'roster' => implode($unit['roster'], ', '),
+                        'points' => array_key_exists('points', $unit) ? $unit['points'] : 0,
+                        'power'  => $unit['power']
+                    );
+                }
+            }
+        }
+
+        return array(
+            'faction'    => (string) $force['catalogueName'],
+            'detachment' => (string) $force['name'],
+            'units'      => $units,
+            'cp'         => $this->cp
+        );
     }
 
     public function populateUnit($d, $clean) {

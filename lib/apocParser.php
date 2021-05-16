@@ -8,6 +8,7 @@ class apocParser extends wh40kROSParser {
             'slot'        => null,        # FOC slot
             'power'       => 0,           # PL, points to come later
             'title'       => 'unit name', # tactical squad
+            'customName'  => null,
             'model_stat'  => array(),     # name M WS BS etc
             'weapon_stat' => array(),     # name range type etc
             'abilities'   => array(),     # Deep Strike, etc
@@ -34,7 +35,7 @@ class apocParser extends wh40kROSParser {
     public function populateUnit($d, $clean) {
         $clean['title']  = (string) $d['name'];
         if($d['customName']) {
-            $clean['title'] = (string) $d['customName'];
+            $clean['customName'] = (string) $d['customName'];
         }
 
         // keywords, factions, slot
