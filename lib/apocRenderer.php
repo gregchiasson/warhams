@@ -29,6 +29,7 @@ class apocRenderer extends newRenderer {
         $this->renderLine();
         if(count($unit['abilities']) > 0) {
             $this->renderAbilities('Abilities', $unit['abilities']);
+            $this->currentY -= 20;
         }
         if(count($unit['rules']) > 0) {
             $this->renderKeywords('Rules', $unit['rules'], true);
@@ -38,7 +39,7 @@ class apocRenderer extends newRenderer {
         $this->renderLine();
         $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS:', 40, $this->getFontSize());
         $this->currentX += 60;
-        $this->renderWoundBoxes($unit, true);
+        $this->renderWoundBoxes($unit, true, 20);
         $this->currentX -= 60;
 
         # keywords and keyword-adjacents:
@@ -83,7 +84,7 @@ class apocRenderer extends newRenderer {
             $gon = new Imagick();
             $gon->readImage('../assets/icon_'.$unit['slot'].'.png');
             $gon->resizeimage(35, 35, \Imagick::FILTER_LANCZOS, 1);
-            $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x + 7, $y + 7);
+            $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x + 9, $y + 7);
         }
 
         $gon = new Imagick();
@@ -96,7 +97,9 @@ class apocRenderer extends newRenderer {
         $draw->setFillColor('#FFFFFF');
         if(strlen($unit['power']) == 1) {
             $this->image->annotateImage($draw, 71 + $x, $y + 33, 0, $unit['power']);
-        } else {
+        } else if(strlen($unit['power']) == 3) {
+            $this->image->annotateImage($draw, 56 + $x, $y + 33, 0, $unit['power']);
+        } else{
             $this->image->annotateImage($draw, 64 + $x, $y + 33, 0, $unit['power']);
         }
 

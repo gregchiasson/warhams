@@ -85,7 +85,7 @@ class newRenderer extends Renderer {
     }
 
     protected function renderWatermark() {
-        $content = 'CREATED WITH BUTTSCRIBE: http://www.buttscri.be';
+        $content = 'https://www.buttscri.be';
         $x = $this->currentX + $this->margin + 5;
         $y = $this->maxY - $this->margin - 5 + $this->yOffset;
         $this->currentY += $this->renderText($x, $y, $content, 90);
@@ -193,7 +193,7 @@ class newRenderer extends Renderer {
         }
     }
 
-    protected function renderWoundBoxes($unit, $block=false) {
+    protected function renderWoundBoxes($unit, $block=false, $boxSize=30) {
         foreach($unit['model_stat'] as $type) {
             if($type['W'] > 1 || $this->isApoc) {
                 $draw = $this->getDraw();
@@ -211,15 +211,23 @@ class newRenderer extends Renderer {
                 $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, $text);
                 $this->image->drawImage($draw);
 
-                $boxSize   = 30;
                 $boxOffset = ($this->bigBoys ? 400 : 340);
+
+                $perLine = 10;
+                if($this->layout == newRenderer::ONE_UP) {
+                    $perLine = 15;
+                } if($boxSize == 20) {
+                    // TODO: actually look up the width properly and auto-size these things.
+                    $perLine = 12;
+                }
+
                 if($block) {
                     $boxOffset = 90;
                     $this->currentY += 30;
                 }
                 $x = $this->currentX + $boxOffset;
                 for($w = 0; $w < $type['W']; $w++) {
-                    if($w % ($this->bigBoys ? 15 : 10 ) == 0 && $w > 0) {
+                    if($w % $perLine == 0 && $w > 0) {
                         $this->currentY += $boxSize + 10;
                         $x = $this->currentX + $boxOffset;
                     }
