@@ -35,7 +35,7 @@ class Upload {
             unlink($inPath); // removing roszfile
             rmdir('/var/tmp/'.$fileId); //assuming the directory is empty. But it should be because the Validate Method makes sure of that
         } else {
-            throw new Exception(supicousMessage." error 40000"); 
+            throw new Exception($supicousMessage." error 40000"); 
         }
 
         return Upload::ProcessRos('/var/tmp/'.$fileId.'.ros');    
@@ -45,18 +45,18 @@ class Upload {
     {
         if ($zip->numFiles != 1) {// if battlescribe changes the rosz format, this will break.
             $zip->close();
-            throw new Exception(supicousMessage." error 40001");
+            throw new Exception($supicousMessage." error 40001");
         }
 
         if (substr(strtolower($zip->getNameIndex(0)), -4) != '.ros'){ //look if we actually have a .ros file in out file
             $zip->close();
-            throw new Exception(supicousMessage." error 40002");
+            throw new Exception($supicousMessage." error 40002");
         }
 
         $fileinfo = $zip->statIndex(0);
         if ($fileinfo['size'] > 5000000){ //if the size is larger than 5MB, it is very suspicious
             $zip->close();
-            throw new Exception(supicousMessage." error 40003");
+            throw new Exception($supicousMessage." error 40003");
         }
         return true;
     }
