@@ -53,6 +53,7 @@ try {
         $new = str_replace('/var/tmp/', __DIR__.'/lists/', $file);
         copy($file, $new);
         $downloads[$key] = str_replace(__DIR__, '', $new);
+        unlink("$file"); // big old waste of space
     }
 } catch(Exception $e) {
     $error = $e->getMessage();

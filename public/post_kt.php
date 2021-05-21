@@ -39,6 +39,7 @@ try {
         header('Pragma: public');
         header('Content-Length: '.filesize($OUTFILE));
         readfile($OUTFILE);
+        unlink($OUTFILE);
     }
 } catch(Exception $e) {
     print($e->getMessage());
