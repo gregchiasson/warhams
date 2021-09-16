@@ -130,6 +130,15 @@ class wh40kROSParser extends wh40kParser {
                     }
                     $clean['explode_table'] = $headerRow;
                 }
+                if($this->checkProfileTypes($p, array('Psychic Power'))) {
+                    $guff = $p->characteristics->characteristic;
+                    $clean['powers'][] = array(
+                        'Psychic Power' => (string) $p['name'],
+                        'Warp Charge'   => (string) $guff[0],
+                        'Range'         => (string) $guff[1],
+                        'Details'       => (string) $guff[2]
+                    );
+                }
             }
             if(!empty($woundCols)) {
                 $clean['wound_track'] = $this->readSelectionChars($d, $clean['weapon_stat'], $trackName, $woundCols);

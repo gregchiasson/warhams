@@ -26,7 +26,7 @@ Uncomment if there's known outages
         <ul>
             <li><a href="/40k.php">40k 9th Edition</a> (including Crusade)</li>
             <li><a href="/apoc.php">Apocalypse (2019)</a></li>
-            <li><a href="/kt.php">Kill Team</a></li>
+            <li><a href="/kt.php">Kill Team (2018)</a></li>
         </ul>  
         <p>The goal with ButtScribe is to bridge a gap in <em>printed materials</em>: the codices have nicely-formatted unit entries, but these are intended for selecting a unit's options, so it has a raft of information that might not be relevant depending on what options you took, and they don't include the actual points/PL costs of your specific unit. That is, the codex will have all of the wargear and rules for <em>a</em> Tactical Squad, but what you really want during a game is the wargear and rules for <em>your</em> Tactical squads, which is where ButtScribe comes in.</p>
         <p>Also, BattleScribe does, obviously, support printing army lists, as anyone who has ever played 40k can tell you. ButtScribe is an attempt to improve on their layout, nothing more.</p>
@@ -40,9 +40,11 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>15 May 2021</strong></li>
-            <li>Improved unit custom names in Apocalypse and 40k.</li>
-            <li>Added support for nested detachments. Strongly recommend <em>not</em> doing this, but it <em>is</em> supported.</li>
+            <li>Coming soon: Kill Team 2021, and a refreshed look and feel of the 40k sheets</li>
+            <li>Latest update: <strong>16 September 2021</strong></li>
+            <li>Added ability to skip printing duplicate datasheets to 40k mode.</li>
+            <li>Fixed psychic power support on Grey Knights squads.</li>
+            <li>Re-order Abilities section, to always put PSYKER (cast x, deny Y) at the end. Readability/UX improvement.</li>
         </ul>
     </div>
 </div>

@@ -43,7 +43,8 @@ try {
         $OUTFILE   = '/var/tmp/'.uniqid().'.pdf';
         $big       = array_key_exists('big_data_sheet_appreciator', $_POST);
         $crusade   = array_key_exists('crusade', $_POST);
-        $output    = new wh40kRenderer($OUTFILE, $UNITS, $big, $crusade);
+        $dedupe    = array_key_exists('dedupe', $_POST);
+        $output    = new wh40kRenderer($OUTFILE, $UNITS, $big, $crusade, $dedupe);
         $downloads = $output->renderToOutFile();
     }
 

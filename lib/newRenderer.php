@@ -59,12 +59,13 @@ class newRenderer extends Renderer {
     }
 
     protected function renderAbilities($label='Abilities', $data=array()) {
-        $x = $this->currentX + $this->margin + 5;
-        $this->currentY += 20;
-        $fontSize = $this->getFontSize();
-
+        $x          = $this->currentX + $this->margin + 5;
+        $fontSize   = $this->getFontSize();
         $leftMargin = 0;
         $width      = 100;
+        $psyker     = null;
+        $this->currentY += 20;
+
         if($this->layout == newRenderer::ONE_UP) {
             $leftMargin = 250;
             $width      = 100;
@@ -77,8 +78,15 @@ class newRenderer extends Renderer {
         }
         $this->renderText($x, $this->currentY, strtoupper($label), 40, $fontSize);
         foreach($data as $label => $desc) {
-            $content = trim(strtoupper($label).": $desc");
-            $this->currentY += $this->renderText($x + $leftMargin, $this->currentY, $content, $width, $fontSize);
+            if(strtoupper($label) == 'PSYKER')) {
+                $psyker = trim(strtoupper($label).": $desc");
+            } else {
+                $content = trim(strtoupper($label).": $desc");
+                $this->currentY += $this->renderText($x + $leftMargin, $this->currentY, $content, $width, $fontSize);
+        }
+        // always show the "cast x deny y" bit last, if it's there.
+        if($psyker) {
+            $this->currentY += $this->renderText($x + $leftMargin, $this->currentY, $psyker, $width, $fontSize);
         }
         $this->currentY += 5;
         return $this->currentY;

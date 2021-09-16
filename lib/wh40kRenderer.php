@@ -34,7 +34,9 @@ class wh40kRenderer extends Renderer {
         if(count($unit['powers']) > 0) {
             $needs_smite = true;
             foreach($unit['powers'] as $power) {
-                if($power['Psychic Power'] == 'Smite') { $needs_smite = false; }
+                if(strpos(strtolower($power['Psychic Power']), 'smite') > -1) {
+                    $needs_smite = false;
+                }
             }
             if($needs_smite) {
                 array_unshift($unit['powers'], array(
@@ -175,11 +177,23 @@ class wh40kRenderer extends Renderer {
         $fontSize = $this->getFontSize();
         $leftMargin = $this->bigBoys ? 250 : 190;
         $this->renderText($this->currentX + 80, $this->currentY + 20, strtoupper($label), 40, $fontSize);
+        $width = $this->bigBoys ? 100 : 69;
+        $wizContent = null;
+
         foreach($data as $label => $desc) {
-            $content = trim(strtoupper($label).": $desc");
-            $width = $this->bigBoys ? 100 : 69;
-            $this->currentY += $this->renderText($this->currentX + $leftMargin, $this->currentY + 19, $content, $width, $fontSize);
+            // skip over the psyker one, and render it last.
+            if(strtoupper($label) == 'PSYKER') {
+                $wizContent = trim(strtoupper($label).": $desc");
+            } else {
+                $content = trim(strtoupper($label).": $desc");
+                $this->currentY += $this->renderText($this->currentX + $leftMargin, $this->currentY + 19, $content, $width, $fontSize);
+            }
         }
+
+        if($wizContent) {
+            $this->currentY += $this->renderText($this->currentX + $leftMargin, $this->currentY + 19, $wizContent, $width, $fontSize);
+        }
+
         $this->currentY += 5;
         return $this->currentY;
     }
@@ -708,6 +722,24 @@ class wh40kRenderer extends Renderer {
         if($summary) {
             $files['summary'] = $summary;
         }
+
+        if($this->skipDuplicates && !$this->crusade) {
+            $hashes = array(); 
+            $tmp    = array();
+            foreach($this->units as $unit) {
+                // hash the thing
+                $hash = md5(serialize($unit)); 
+                // if that hash exists, dump it, else add it to tmp
+                if(!in_array($hash, $hashes)) {
+                    $tmp[] = $unit;
+                }
+                // add hash to hashes
+                $hashes[] = $hash;
+            }
+            // replace units with tmp
+            $this->units = $tmp;
+        }
+
         for($i = 0; $i < count($this->units); $i++) {
             if($this->bigBoys) {
                 $height = $this->res * 11;
