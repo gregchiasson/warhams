@@ -83,6 +83,7 @@ class newRenderer extends Renderer {
             } else {
                 $content = trim(strtoupper($label).": $desc");
                 $this->currentY += $this->renderText($x + $leftMargin, $this->currentY, $content, $width, $fontSize);
+            }
         }
         // always show the "cast x deny y" bit last, if it's there.
         if($psyker) {
