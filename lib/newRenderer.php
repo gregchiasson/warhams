@@ -78,7 +78,7 @@ class newRenderer extends Renderer {
         }
         $this->renderText($x, $this->currentY, strtoupper($label), 40, $fontSize);
         foreach($data as $label => $desc) {
-            if(strtoupper($label) == 'PSYKER')) {
+            if(strtoupper($label) == 'PSYKER') {
                 $psyker = trim(strtoupper($label).": $desc");
             } else {
                 $content = trim(strtoupper($label).": $desc");
