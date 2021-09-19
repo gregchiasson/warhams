@@ -19,6 +19,59 @@ class newRenderer extends Renderer {
     protected $yOffset;
     protected $xOffset;
 
+    // width is in pixels now
+    protected function textHeight($text, $width=300, $fontSize=12, $font=null) {
+        $draw = $this->getDraw();
+        if($font) { $draw->setFont($font); }
+        $draw->setFontSize($fontSize);
+        $words  = explode(' ', $text);
+        $line   = array_shift($words);
+        $lines  = 1;
+
+        // TODO: handle existing \n in the rules text
+        foreach($words as $word) {
+            $test = $this->image->queryFontMetrics($draw, $line);
+            if($test['textWidth'] > $width) {
+                $lines  += 1;
+                $line   = $word;
+            } else {
+                $line   .= ' '.$word;
+            }
+        }
+        $height = ($lines * ($draw->getFontSize() + 4));
+        return $height; 
+    }
+
+    protected function renderText($x, $y, $text, $width=300, $fontSize=12, $font=null) {
+        $draw = $this->getDraw();
+        if($font) {
+            $draw->setFont($font);
+        }
+        $draw->setFontSize($fontSize);
+
+        $words  = explode(' ', $text);
+        $output = array_shift($words);
+        $line   = $output;
+        $lines  = 1;
+        foreach($words as $word) {
+            $test = $this->image->queryFontMetrics($draw, $line);
+            if($test['textWidth'] > $width) {
+                $lines  += 1;
+                $output .= "\n".$word;
+                $line   = $word;
+            } else {
+                $output .= ' '.$word;
+                $line   .= ' '.$word;
+            }
+        }
+
+        $height = ($lines * ($draw->getFontSize() + 4));
+
+        $this->image->annotateImage($draw, $x, $y, 0, $output);
+        $this->image->drawImage($draw);
+        return $height; // TODO ??
+    }
+
     protected function setHeightAndWidth($layout=null) {
         $layout = $layout ? $layout : $this->layout;
         if($layout == newRenderer::ONE_UP) {
@@ -68,15 +121,15 @@ class newRenderer extends Renderer {
 
         if($this->layout == newRenderer::ONE_UP) {
             $leftMargin = 250;
-            $width      = 100;
+            $width      = 1000;
         } else if($this->layout == newRenderer::TWO_UP) {
             $leftMargin = 190;
-            $width      = 69;
+            $width      = 470;
         } else if($this->layout == newRenderer::FOUR_UP) {
             $leftMargin = 120;
-            $width      = 55;
+            $width      = 480;
         }
-        $this->renderText($x, $this->currentY, strtoupper($label), 40, $fontSize);
+        $this->renderText($x, $this->currentY, strtoupper($label), 250, $fontSize);
         foreach($data as $label => $desc) {
             if(strtoupper($label) == 'PSYKER') {
                 $psyker = trim(strtoupper($label).": $desc");
@@ -97,7 +150,7 @@ class newRenderer extends Renderer {
         $content = 'https://www.buttscri.be';
         $x = $this->currentX + $this->margin + 5;
         $y = $this->maxY - $this->margin - 5 + $this->yOffset;
-        $this->currentY += $this->renderText($x, $y, $content, 90);
+        $this->currentY += $this->renderText($x, $y, $content, 600);
     }
 
     protected function renderTable($rows=array(), $col_widths = array(), $width=740, $showHeaders=true) {
@@ -114,6 +167,8 @@ class newRenderer extends Renderer {
                 'Remaining W' => $this->bigBoys ? 150 : 120,
                 'Dice Roll'   => $this->bigBoys ? 130 : 100,
                 'Distance'    => $this->bigBoys ? 130 : 100,
+                'Abilities'   => $this->bigBoys ? 350 : 220,
+                'Details'     => $this->bigBoys ? 450 : 320,
                 'Characteristic 1' => $this->bigBoys ? 130 : 110,
                 'Characteristic 2' => $this->bigBoys ? 130 : 110,
                 'Characteristic 3' => $this->bigBoys ? 130 : 110
@@ -145,31 +200,42 @@ class newRenderer extends Renderer {
                         $text = 'Manifest';
                     }
                     $hdraw = $this->getDrawFont();
-                    $this->renderText($x, ($this->currentY - 3), strtoupper($text), $this->getfontSize());
+
+
+                    $col_width = 65;
                     if($first) {
-                        $x     += $this->bigBoys ? 335 : 220;
+                        $col_width = $this->bigBoys ? 335 : 220;
                         $first = false;
                     } else if(array_key_exists($stat, $col_widths)) {
-                        $x += $col_widths[$stat];
+                        $col_width = $col_widths[$stat];
                     } else {
-                        $x += $this->bigBoys ? 65 : 45;
+                        $col_width = $this->bigBoys ? 65 : 45;
                     }
+                    $this->renderText($x, ($this->currentY - 3), strtoupper($text), $col_width);
+                    $x += $col_width;
                }
             }
 
             # data row:
             $height = 0;
             foreach($rows[$i] as $stat => $val) {
-                # TODO: use the width attribute here, or base it on actual rendered width instead
-                $char_limit = (($stat == 'Details' || $stat == 'roster') ? 55 : $this->bigBoys ? 45 : 30);
-                $text    = wordwrap($val, $char_limit, "\n", false);
-                $lines   = substr_count($text, "\n") + 1;
-                $theight = $this->currentY + ($lines * ($this->getFontSize() + 4));
+                // TODO: DRY
+                $col_width = 65;
+                $first     = true;
+                if($first) {
+                    $col_width = $this->bigBoys ? 335 : 220;
+                    $first = false;
+                } else if(array_key_exists($stat, $col_widths)) {
+                    $col_width = $col_widths[$stat];
+                } else {
+                    $col_width = $this->bigBoys ? 65 : 45;
+                }
+                $theight = $this->textHeight($val, $col_width);
                 if($theight > $height) {
                     $height = $theight;
                 }
             }
-
+/*
             $draw = $this->getDraw();
             $draw->setFillOpacity(1);
             if($i % 2) {
@@ -180,26 +246,33 @@ class newRenderer extends Renderer {
             $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, 
                              ($this->currentX + $width), $height);
             $this->image->drawImage($draw);
+*/
 
             $x     = $this->currentX + $this->margin + 5;
             $new_y = 0;
+
             $first = true;
             foreach($rows[$i] as $stat => $val) {
-                $fake_y = $this->renderText($x, ($this->currentY + 17), $val, $char_limit, $this->getFontSize());
+                // TODO: DRY
+                $col_width = 65;
+                if($first) {
+                    $col_width = $this->bigBoys ? 335 : 220;
+                    $first = false;
+                } else if(array_key_exists($stat, $col_widths)) {
+                    $col_width = $col_widths[$stat];
+                } else {
+                    $col_width = $this->bigBoys ? 65 : 45;
+                }
+
+                $fake_y = $this->renderText($x, ($this->currentY + 17), $val, $col_width);
                 if($fake_y > $new_y) {
                     $new_y = $fake_y;
                 }
-                if($first) {
-                    $x     += $this->bigBoys ? 335 : 220;
-                    $first = false;
-                } else if(array_key_exists($stat, $col_widths)) {
-                    $x += $col_widths[$stat];
-                } else {
-                    $x += $this->bigBoys ? 65 : 45;
-                }
+                $x += $col_width;
             }
             $this->currentY += $new_y;
         }
+        $this->currentY += 5;
     }
 
     protected function renderWoundBoxes($unit, $block=false, $boxSize=30) {
@@ -257,7 +330,7 @@ class newRenderer extends Renderer {
         $y = $this->currentY + $this->getFontSize();
         $text = strtoupper($label);
         $fontSize = $this->getFontSize(); 
-        $this->renderText($x, $y, $text, 40, $fontSize);
+        $this->renderText($x, $y, $text, 120, $fontSize);
 
         $data     = array_unique($data);
         $contents = implode(', ', $data);
@@ -269,13 +342,13 @@ class newRenderer extends Renderer {
         $width      = 100;
         if($this->layout == newRenderer::ONE_UP) {
             $leftMargin = 250;
-            $width      = 100;
+            $width      = 1000;
         } else if($this->layout == newRenderer::TWO_UP) {
             $leftMargin = 190;
-            $width      = 69;
+            $width      = 470;
         } else if($this->layout == newRenderer::FOUR_UP) {
             $leftMargin = 120;
-            $width      = 45;
+            $width      = 550;
         }
         $this->currentY += $this->renderText($x + $leftMargin, $y, $contents, $width, $fontSize);
         $this->currentY += 4;
@@ -300,7 +373,7 @@ class newRenderer extends Renderer {
         $margin = 20;
         $width  = intval((($this->maxX - $this->margin + $this->currentX) - ($this->margin + $this->currentX) - 10) / count($titles));
         foreach($titles as $title) {
-            $this->renderText($xStart, $this->currentY, strtoupper($title), 50, $this->getFontSize());
+            $this->renderText($xStart, $this->currentY, strtoupper($title), 500, $this->getFontSize());
             $draw->setFillColor('#EEEEEE');
             $draw->setStrokeWidth(0);
             $draw->rectangle($xStart, $this->currentY + 10, $xStart + $width - $margin, $this->currentY + $height + 10);
@@ -340,7 +413,7 @@ class newRenderer extends Renderer {
                 }
             }
 
-            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Crusade Roster", 50, 32);
+            $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Crusade Roster", 300, 32);
 
             // header
             $this->labelBox('Crusade Force Name');
@@ -400,6 +473,22 @@ class newRenderer extends Renderer {
         }
     }
 
+    protected function renderBorder() {
+        $draw = $this->getDraw();
+        $draw->setFillOpacity(0);
+        $draw->setStrokeColor('#222222');
+        $draw->setStrokeWidth(2);
+
+        $x1 = $this->currentX + $this->margin;
+        $y1 = $this->currentY + $this->margin;
+        $x2 = $this->currentX + $this->maxX - $this->margin;
+        $y2 = $this->currentY + $this->maxY - $this->margin;
+
+        $draw->rectangle($x1, $y1, $x2, $y2);
+
+        $this->image->drawImage($draw);
+    }
+
     public function renderList() {
         $forces = array_shift($this->units);
         if(array_key_exists('0', $forces)) {
@@ -421,9 +510,9 @@ class newRenderer extends Renderer {
             }
 
             if($this->isApoc) {
-                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tpl PL)", 50, 22);
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tpl PL)", 300, 22);
             } else {
-                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL) ".$force['cp']." CP", 50, 22);
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL) ".$force['cp']." CP", 300, 22);
             }
 
             foreach($forces as $force) {
@@ -448,7 +537,7 @@ class newRenderer extends Renderer {
                 } else {
                     $label = $force['faction'].' '.$force['detachment']." ($pts pts, $pl PL)";
                 }
-                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 150, 18);
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, $label, 900, 18);
                 
                 $unitColumns = array(
                     'name'   => $this->bigBoys ? 350 : 220,
@@ -482,7 +571,31 @@ class newRenderer extends Renderer {
         }
     }
 
+    protected function logoWrapper($x, $y) {
+        $gon = new Imagick();
+        $gon->readImage('../assets/octagon.png');
+        $gon->resizeimage(45, 45, \Imagick::FILTER_LANCZOS, 1);
+        $this->image->compositeImage($gon, Imagick::COMPOSITE_DEFAULT, $x, $y);
+    }
+
     public function renderToOutFile() {
+        if($this->skipDuplicates && !$this->crusade) {
+            $hashes = array();
+            $tmp    = array();
+            foreach($this->units as $unit) {
+                // hash the thing
+                $hash = md5(serialize($unit));
+                // if that hash exists, dump it, else add it to tmp
+                if(!in_array($hash, $hashes)) {
+                    $tmp[] = $unit;
+                }
+                // add hash to hashes
+                $hashes[] = $hash;
+            }
+            // replace units with tmp
+            $this->units = $tmp;
+        }
+
         $files = array();
 
         $currentLayout = $this->layout;

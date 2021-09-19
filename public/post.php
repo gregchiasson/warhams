@@ -19,6 +19,7 @@ ob_start();
 <?php
 
 require_once('../lib/wh40kRenderer.php');
+require_once('../lib/wh40kRendererNew.php');
 require_once('../lib/wh40kHTMLParser.php');
 require_once('../lib/wh40kROSParser.php');
 require_once('../lib/Upload.php');
@@ -45,7 +46,7 @@ try {
         $big       = array_key_exists('big_data_sheet_appreciator', $_POST);
         $crusade   = array_key_exists('crusade', $_POST);
         $dedupe    = array_key_exists('dedupe', $_POST);
-        $output    = new wh40kRenderer($OUTFILE, $UNITS, $big, $crusade, $dedupe);
+        $output    = new wh40kRendererNew($OUTFILE, $UNITS, $big, $crusade, $dedupe);
         $downloads = $output->renderToOutFile();
     }
 
