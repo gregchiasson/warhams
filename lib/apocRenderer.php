@@ -37,9 +37,9 @@ class apocRenderer extends newRenderer {
 
         # wound tracker:
         $this->renderLine();
-        $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS:', 40, $this->getFontSize());
+        $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS:', 400, $this->getFontSize());
         $this->currentX += 60;
-        $this->renderWoundBoxes($unit, true, 20);
+        $this->renderWoundBoxes($unit, true);
         $this->currentX -= 60;
 
         # keywords and keyword-adjacents:
@@ -47,22 +47,6 @@ class apocRenderer extends newRenderer {
         $this->renderKeywords('Factions', $unit['factions'], true);
         $this->renderKeywords('Keywords', $unit['keywords'], true);
         $this->renderWatermark();
-    }
-
-    protected function renderBorder() {
-        $draw = $this->getDraw();
-        $draw->setFillOpacity(0);
-        $draw->setStrokeColor('#222222');
-        $draw->setStrokeWidth(2);
-
-        $x1 = $this->currentX + $this->margin;
-        $y1 = $this->currentY + $this->margin;
-        $x2 = $this->currentX + $this->maxX - $this->margin;
-        $y2 = $this->currentY + $this->maxY - $this->margin;
-
-        $draw->rectangle($x1, $y1, $x2, $y2);
-
-        $this->image->drawImage($draw);
     }
 
     protected function renderHeader($unit) {

@@ -21,14 +21,14 @@ class newRenderer extends Renderer {
 
     // width is in pixels now
     protected function textHeight($text, $width=300, $fontSize=12, $font=null) {
+
         $draw = $this->getDraw();
         if($font) { $draw->setFont($font); }
         $draw->setFontSize($fontSize);
         $words  = explode(' ', $text);
         $line   = array_shift($words);
-        $lines  = 1;
+        $lines  = 1 + substr_count($text, "\n") + substr_count($text, "\r");
 
-        // TODO: handle existing \n in the rules text
         foreach($words as $word) {
             $test = $this->image->queryFontMetrics($draw, $line);
             if($test['textWidth'] > $width) {
@@ -52,7 +52,8 @@ class newRenderer extends Renderer {
         $words  = explode(' ', $text);
         $output = array_shift($words);
         $line   = $output;
-        $lines  = 1;
+        $lines  = 1 + substr_count($text, "\n") + substr_count($text, "\r");
+
         foreach($words as $word) {
             $test = $this->image->queryFontMetrics($draw, $line);
             if($test['textWidth'] > $width) {
@@ -69,7 +70,7 @@ class newRenderer extends Renderer {
 
         $this->image->annotateImage($draw, $x, $y, 0, $output);
         $this->image->drawImage($draw);
-        return $height; // TODO ??
+        return $height;
     }
 
     protected function setHeightAndWidth($layout=null) {
@@ -154,7 +155,7 @@ class newRenderer extends Renderer {
     }
 
     protected function renderTable($rows=array(), $col_widths = array(), $width=740, $showHeaders=true) {
-        # insanely dumb hack:
+        # insanely dumb:
         if(empty($col_widths)) {
             $col_widths = array(
                 'Range'       => $this->bigBoys ? 75 : 55,
@@ -177,92 +178,70 @@ class newRenderer extends Renderer {
 
         $width = $this->maxX - $this->margin - 2;
 
-        for($i = 0; $i < count($rows); $i++) {
-            $draw = $this->getDraw();
-            $draw->setFillOpacity(1);
+        $draw = $this->getDraw();
+        $draw->setFillOpacity(1);
 
-            # header row:
-            if($i == 0 && $showHeaders) {
-                $x      = $this->currentX + $this->margin + 5;
-                $height = $this->currentY + 22;
-                $draw->setFillColor('#AAAAAA');
-                $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, ($this->currentX + $width), $height);
-                $this->image->drawImage($draw);
+        # header row:
+        if($showHeaders) {
+            $x      = $this->currentX + $this->margin + 5;
+            $height = $this->currentY + 22;
+            $draw->setFillColor('#AAAAAA');
+            $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, ($this->currentX + $width), $height);
+            $this->image->drawImage($draw);
 
-                $first           = true;
-                $new_y           = 0;
-                $this->currentY = $height;
-                foreach($rows[$i] as $stat => $val) {
-                    $text = $stat;
-                    if(strpos($stat, 'Characteristic') !== false) {
-                        $text = 'Attribute';
-                    } else if($stat == 'Warp Charge') {
-                        $text = 'Manifest';
-                    }
-                    $hdraw = $this->getDrawFont();
-
-
-                    $col_width = 65;
-                    if($first) {
-                        $col_width = $this->bigBoys ? 335 : 220;
-                        $first = false;
-                    } else if(array_key_exists($stat, $col_widths)) {
-                        $col_width = $col_widths[$stat];
-                    } else {
-                        $col_width = $this->bigBoys ? 65 : 45;
-                    }
-                    $this->renderText($x, ($this->currentY - 3), strtoupper($text), $col_width);
-                    $x += $col_width;
-               }
-            }
-
-            # data row:
-            $height = 0;
-            foreach($rows[$i] as $stat => $val) {
-                // TODO: DRY
-                $col_width = 65;
-                $first     = true;
-                if($first) {
-                    $col_width = $this->bigBoys ? 335 : 220;
-                    $first = false;
-                } else if(array_key_exists($stat, $col_widths)) {
-                    $col_width = $col_widths[$stat];
-                } else {
-                    $col_width = $this->bigBoys ? 65 : 45;
+            $first           = true;
+            $new_y           = 0;
+            $this->currentY = $height;
+            foreach($rows[0] as $stat => $val) {
+                $text = $stat;
+                if(strpos($stat, 'Characteristic') !== false) {
+                    $text = 'Attribute';
+                } else if($stat == 'Warp Charge') {
+                    $text = 'Manifest';
                 }
+                $hdraw = $this->getDrawFont();
+
+                $col_width = $this->calcColWidth($stat, $first, $col_widths);
+                $first = false;
+
+                $this->renderText($x, ($this->currentY - 3), strtoupper($text), $col_width);
+                $x += $col_width;
+            }
+        }
+
+        # data rows:
+        for($i = 0; $i < count($rows); $i++) {
+            $height = 0;
+            $first     = true;
+            foreach($rows[$i] as $stat => $val) {
+                $col_width = $this->calcColWidth($stat, $first, $col_widths);
+                $first = false;
+
                 $theight = $this->textHeight($val, $col_width);
                 if($theight > $height) {
                     $height = $theight;
                 }
             }
-/*
+
             $draw = $this->getDraw();
-            $draw->setFillOpacity(1);
+            $draw->setFillOpacity(.3);
             if($i % 2) {
                 $draw->setFillColor('#EEEEEE');
             } else {
                 $draw->setFillColor('#FFFFFF');
             }
-            $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY, 
-                             ($this->currentX + $width), $height);
+            $draw->rectangle($this->currentX + $this->margin + 2, $this->currentY + 4, 
+                             ($this->currentX + $width), $this->currentY + $height + 4);
             $this->image->drawImage($draw);
-*/
+
 
             $x     = $this->currentX + $this->margin + 5;
             $new_y = 0;
 
             $first = true;
             foreach($rows[$i] as $stat => $val) {
-                // TODO: DRY
-                $col_width = 65;
-                if($first) {
-                    $col_width = $this->bigBoys ? 335 : 220;
-                    $first = false;
-                } else if(array_key_exists($stat, $col_widths)) {
-                    $col_width = $col_widths[$stat];
-                } else {
-                    $col_width = $this->bigBoys ? 65 : 45;
-                }
+                $col_width = $this->calcColWidth($stat, $first, $col_widths);
+                $first = false;
 
                 $fake_y = $this->renderText($x, ($this->currentY + 17), $val, $col_width);
                 if($fake_y > $new_y) {
@@ -273,6 +252,17 @@ class newRenderer extends Renderer {
             $this->currentY += $new_y;
         }
         $this->currentY += 5;
+    }
+
+    protected function calcColWidth($stat, $first, $col_widths) {
+        if($first) {
+            $col_width = $this->bigBoys ? 335 : 220;
+        } else if(array_key_exists($stat, $col_widths)) {
+            $col_width = $col_widths[$stat];
+        } else {
+            $col_width = $this->bigBoys ? 65 : 45;
+        }
+        return $col_width;
     }
 
     protected function renderWoundBoxes($unit, $block=false, $boxSize=30) {
@@ -293,20 +283,19 @@ class newRenderer extends Renderer {
                 $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, $text);
                 $this->image->drawImage($draw);
 
-                $boxOffset = ($this->bigBoys ? 400 : 340);
 
-                $perLine = 10;
+                $perLine   = 10;
+                $boxOffset = 320;
                 if($this->layout == newRenderer::ONE_UP) {
-                    $perLine = 15;
-                } if($boxSize == 20) {
-                    // TODO: actually look up the width properly and auto-size these things.
-                    $perLine = 12;
+                    $boxOffset = 400;
+                    $perLine   = 15;
                 }
 
                 if($block) {
                     $boxOffset = 90;
                     $this->currentY += 30;
                 }
+
                 $x = $this->currentX + $boxOffset;
                 for($w = 0; $w < $type['W']; $w++) {
                     if($w % $perLine == 0 && $w > 0) {
@@ -383,7 +372,6 @@ class newRenderer extends Renderer {
         $this->currentY += $height + $margin + 20;
     }
 
-    // TODO
     public function renderOrder() {
         $forces = array_shift($this->units);
         if(array_key_exists('0', $forces)) {
@@ -510,9 +498,9 @@ class newRenderer extends Renderer {
             }
 
             if($this->isApoc) {
-                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tpl PL)", 300, 22);
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tpl PL)", 900, 28);
             } else {
-                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL) ".$force['cp']." CP", 300, 22);
+                $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Army Roster ($tp pts, $tpl PL) ".$force['cp']." CP", 1000, 26);
             }
 
             foreach($forces as $force) {
@@ -543,14 +531,13 @@ class newRenderer extends Renderer {
                     'name'   => $this->bigBoys ? 350 : 220,
                     'customName' => 300,
                     'slot'   => 50,
-                    'roster' => $this->bigBoys ? 350 : 280,
+                    'roster' => $this->bigBoys ? 280 : 250,
                     'points' => 69,
                     'power'  => 69
                 );
                 if($this->isApoc) {
                     unset($unitColumns['points']);
                 }
-                // TODO override this so its ONE_UP instead of whatever the renderer settings are
                 $this->renderTable($allUnits, $unitColumns, $this->res * 8.5);
             }
             $this->renderWatermark();

@@ -71,21 +71,35 @@ class wh40kRendererNew extends newRenderer {
             $this->renderKeywords('Rules', $unit['rules'], true);
         }
 
-
-        # keywords 
+        //  keywords 
         $this->renderLine();
         $this->renderKeywords('Factions', $unit['factions'], true);
         $this->renderKeywords('Keywords', $unit['keywords'], true);
-        $this->renderKeywords('Contents', $unit['roster'], false);
-        $this->renderLine();
+        $this->renderKeywords('Models',   $unit['roster'], false);
 
-        // TODO: damage track
+        // damage track/explodes table
+        if(count($unit['wound_track']) > 0) {
+            $this->renderLine();
+            $this->renderTable($unit['wound_track']);
+        }
+
+        if(count($unit['explode_table']) > 0) {
+            $this->renderLine();
+            $this->renderTable($unit['explode_table']);
+        }
 
         # wound tracker:
-        $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS:', 400, $this->getFontSize());
-        $this->currentX += 60;
-        $this->renderWoundBoxes($unit, true, 20);
-        $this->currentX -= 60;
+        $hasTracks = false;
+        foreach($unit['model_stat'] as $type) {
+            if($type['W'] > 1) { $hasTracks = true; }
+        }
+        if($hasTracks) {
+            $this->renderLine();
+            $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS:', 400, $this->getFontSize());
+            $this->currentX += 60;
+            $this->renderWoundBoxes($unit, true);
+            $this->currentX -= 60;
+        }
 
         $this->renderWatermark();
     }
