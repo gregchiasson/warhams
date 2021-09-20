@@ -55,7 +55,7 @@ class newRenderer extends Renderer {
         $lines  = 1 + substr_count($text, "\n") + substr_count($text, "\r");
 
         foreach($words as $word) {
-            $test = $this->image->queryFontMetrics($draw, $line);
+            $test = $this->image->queryFontMetrics($draw, $line . ' ' . $word);
             if($test['textWidth'] > $width) {
                 $lines  += 1;
                 $output .= "\n".$word;
@@ -124,13 +124,13 @@ class newRenderer extends Renderer {
             $leftMargin = 250;
             $width      = 1000;
         } else if($this->layout == newRenderer::TWO_UP) {
-            $leftMargin = 190;
-            $width      = 470;
+            $leftMargin = 120;
+            $width      = 620;
         } else if($this->layout == newRenderer::FOUR_UP) {
             $leftMargin = 120;
             $width      = 480;
         }
-        $this->renderText($x, $this->currentY, strtoupper($label), 250, $fontSize);
+        $this->renderText($x, $this->currentY, strtoupper($label), 120, $fontSize);
         foreach($data as $label => $desc) {
             if(strtoupper($label) == 'PSYKER') {
                 $psyker = trim(strtoupper($label).": $desc");
@@ -266,23 +266,13 @@ class newRenderer extends Renderer {
     }
 
     protected function renderWoundBoxes($unit, $block=false, $boxSize=30) {
+        $draw = $this->getDraw();
+        $draw->setStrokeWidth(1);
+        $draw->setFontSize($this->getFontSize());
+        $draw->setFontWeight(600);
         foreach($unit['model_stat'] as $type) {
-            if($type['W'] > 1 || $this->isApoc) {
-                $draw = $this->getDraw();
-                $draw->setStrokeWidth(1);
-                $draw->setFontSize($this->getFontSize());
-                $draw->setFontWeight(600);
-
-                $text   = wordwrap(strtoupper($type['Unit']), ($block ? 100 : 22), "\n", false);
-                $lines  = substr_count($text, "\n") > 0 ? substr_count($text, "\n") : 1;
-                $height = (($lines + 1) * ($draw->getFontSize() + 4));
-
-                $lineHeight = 40;
-                $height = $height < $lineHeight ? $lineHeight : $height;
-
-                $this->image->annotateImage($draw, 80 + $this->currentX, $this->currentY + 20, 0, $text);
-                $this->image->drawImage($draw);
-
+            if(is_numeric($type['W'])) {
+                $label = strtoupper($type['Unit']);
 
                 $perLine   = 10;
                 $boxOffset = 320;
@@ -290,26 +280,46 @@ class newRenderer extends Renderer {
                     $boxOffset = 400;
                     $perLine   = 15;
                 }
-
                 if($block) {
                     $boxOffset = 90;
                     $this->currentY += 30;
                 }
 
-                $x = $this->currentX + $boxOffset;
-                for($w = 0; $w < $type['W']; $w++) {
+                // get number of models
+                $numModels = 1;
+                foreach($unit['roster'] as $model) {
+                    if(preg_match('/(\d+)\s'.$type['Unit'].'/', $model, $matches)) {
+                        $numModels = $matches[1];
+                        if($numModels > 1) {
+                            $label     = strtoupper($model).'S';
+                        }
+                    }
+                }
+
+                $this->renderText($this->currentX + $boxOffset, $this->currentY - 10, $label, 500, 16);
+
+                $x           = $this->currentX + $boxOffset;
+                $boxes       = $type['W'] * $numModels;
+                $modelWounds = $type['W'];
+                $color       = '#FFFFFF';
+                $draw->setFillColor($color);
+    
+                for($w = 0; $w < $boxes; $w++) {
                     if($w % $perLine == 0 && $w > 0) {
                         $this->currentY += $boxSize + 10;
                         $x = $this->currentX + $boxOffset;
                     }
                     $draw->setStrokeOpacity(1);
                     $draw->setStrokeColor('#000000');
-                    $draw->setFillColor('#FFFFFF');
+                    if($w > 0 && $w % $modelWounds == 0) {
+                        $color = $color == '#FFFFFF' ? '#EEEEEE' : '#FFFFFF';
+                        $draw->setFillColor($color);
+                    }
                     $draw->rectangle($x, $this->currentY, ($x + $boxSize), ($this->currentY + $boxSize));
                     $this->image->drawImage($draw);
                     $x += $boxSize + 10;
                 }
-                $this->currentY += $height;
+                $this->currentY += $boxSize + 10;
             }
         }
     }
@@ -333,8 +343,8 @@ class newRenderer extends Renderer {
             $leftMargin = 250;
             $width      = 1000;
         } else if($this->layout == newRenderer::TWO_UP) {
-            $leftMargin = 190;
-            $width      = 470;
+            $leftMargin = 120;
+            $width      = 620;
         } else if($this->layout == newRenderer::FOUR_UP) {
             $leftMargin = 120;
             $width      = 550;
@@ -531,7 +541,7 @@ class newRenderer extends Renderer {
                     'name'   => $this->bigBoys ? 350 : 220,
                     'customName' => 300,
                     'slot'   => 50,
-                    'roster' => $this->bigBoys ? 280 : 250,
+                    'roster' => $this->bigBoys ? 270 : 250,
                     'points' => 69,
                     'power'  => 69
                 );

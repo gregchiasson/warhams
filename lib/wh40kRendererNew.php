@@ -62,6 +62,8 @@ class wh40kRendererNew extends newRenderer {
             $this->renderTable($unit['powers']);
         }
 
+        $this->renderLine();
+
         // rules and abilities:
         if(count($unit['abilities']) > 0) {
             $this->renderAbilities('Abilities', $unit['abilities']);
@@ -82,24 +84,17 @@ class wh40kRendererNew extends newRenderer {
             $this->renderLine();
             $this->renderTable($unit['wound_track']);
         }
-
         if(count($unit['explode_table']) > 0) {
             $this->renderLine();
             $this->renderTable($unit['explode_table']);
         }
 
         # wound tracker:
-        $hasTracks = false;
-        foreach($unit['model_stat'] as $type) {
-            if($type['W'] > 1) { $hasTracks = true; }
-        }
-        if($hasTracks) {
-            $this->renderLine();
-            $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS:', 400, $this->getFontSize());
-            $this->currentX += 60;
-            $this->renderWoundBoxes($unit, true);
-            $this->currentX -= 60;
-        }
+        $this->renderLine();
+        $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS', 400, $this->getFontSize());
+        $this->currentX += 60;
+        $this->renderWoundBoxes($unit, true);
+        $this->currentX -= 60;
 
         $this->renderWatermark();
     }
