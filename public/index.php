@@ -42,6 +42,9 @@ Uncomment if there's known outages
         <ul>
             <li>Coming soon: Kill Team 2021, and a refreshed look and feel of the 40k sheets</li>
             <li>Latest update: <strong>16 September 2021</strong></li>
+            <li>Completely replaced 40k Renderer with new-style datasheets.</li>
+            <li>Improved detection of unit rosters (no more "1 Intercessor, 1 Interecessor Sergeant"). Still a problem on some units (see Known Issues).</li>
+            <li>Improvements to layout should prevent most, if not all, of the text overflowing the bounding boxes in the layout.</li>
             <li>Added ability to skip printing duplicate datasheets to 40k mode.</li>
             <li>Fixed psychic power support on Grey Knights squads.</li>
             <li>Re-order Abilities section, to always put PSYKER (cast x, deny Y) at the end. Readability/UX improvement.</li>

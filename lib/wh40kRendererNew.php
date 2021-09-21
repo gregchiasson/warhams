@@ -89,7 +89,7 @@ class wh40kRendererNew extends newRenderer {
             $this->renderTable($unit['explode_table']);
         }
 
-        # wound tracker:
+        // wound tracker:
         $this->renderLine();
         $this->renderText($this->currentX + $this->margin + 5, $this->currentY + 20, 'WOUNDS', 400, $this->getFontSize());
         $this->currentX += 60;

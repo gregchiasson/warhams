@@ -270,15 +270,16 @@ class newRenderer extends Renderer {
         $draw->setStrokeWidth(1);
         $draw->setFontSize($this->getFontSize());
         $draw->setFontWeight(600);
+
         foreach($unit['model_stat'] as $type) {
             if(is_numeric($type['W'])) {
                 $label = strtoupper($type['Unit']);
 
-                $perLine   = 10;
+                $perLine   = 12;
                 $boxOffset = 320;
                 if($this->layout == newRenderer::ONE_UP) {
                     $boxOffset = 400;
-                    $perLine   = 15;
+                    $perLine   = 18;
                 }
                 if($block) {
                     $boxOffset = 90;
@@ -288,10 +289,10 @@ class newRenderer extends Renderer {
                 // get number of models
                 $numModels = 1;
                 foreach($unit['roster'] as $model) {
-                    if(preg_match('/(\d+)\s'.$type['Unit'].'/', $model, $matches)) {
+                    if(preg_match('/^(\d+)\s'.$type['Unit'].'(s)?$/', $model, $matches)) {
                         $numModels = $matches[1];
                         if($numModels > 1) {
-                            $label     = strtoupper($model).'S';
+                            $label = strtoupper($model).'S';
                         }
                     }
                 }
@@ -303,6 +304,12 @@ class newRenderer extends Renderer {
                 $modelWounds = $type['W'];
                 $color       = '#FFFFFF';
                 $draw->setFillColor($color);
+
+
+                // avoid any weirdo dangling squares:
+                if($boxes == $perLine + 1 || $boxes == $perLine + 2) {
+                    $perLine = $boxes;
+                }
     
                 for($w = 0; $w < $boxes; $w++) {
                     if($w % $perLine == 0 && $w > 0) {

@@ -245,7 +245,16 @@ class wh40kROSParser extends wh40kParser {
                             }
                         }
                     }
-                } 
+                }
+                if((string) $dd['type'] == 'upgrade') {
+                    if($dd->profiles->profile) {
+                        foreach($dd->profiles->profile as $p) {
+                            if((string) $p['typeName'] == 'Unit' && (string) $p['name'] == (string) $dd['name']) {
+                                $clean = $this->addToRoster($clean, $dd);    
+                            }
+                        }
+                    }
+                }
             }
         }
 
