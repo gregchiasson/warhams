@@ -669,15 +669,15 @@ class newRenderer extends Renderer {
             array('label' => 'CRUSADE POINTS', 'format' => 'text', 'size' => 50,
                   'sort'  => 2, 'value'  => '3'),
             array('label' => 'Battles Fought', 'format' => 'text', 'size' => 40,
-                  'sort'  => 3, 'value'  => rand(0,6)),
+                  'sort'  => 3, 'value'  => ''),
             array('label' => 'Battles Survived', 'format' => 'text', 'size' => 40,
-                  'sort'  => 4, 'value'  => rand(0,3)),
+                  'sort'  => 4, 'value'  => ''),
             array('label' => 'Melee Kills', 'format' => 'tally', 'size' => 30,
-                  'sort'  => 7, 'value'  => rand(0,3)),
+                  'sort'  => 7, 'value'  => ''),
             array('label' => 'Ranged Kills', 'format' => 'tally', 'size' => 30,
-                  'sort'  => 8, 'value'  => rand(0,5)),
+                  'sort'  => 8, 'value'  => ''),
             array('label' => 'Psychic Kills', 'format' => 'tally', 'size' => 30,
-                  'sort'  => 9, 'value'  => rand(0,4))
+                  'sort'  => 9, 'value'  => ''),
         );
 
         if(!in_array('Drone', $unit['keywords']) && !in_array('Swarm', $unit['keywords'])) {
@@ -686,21 +686,21 @@ class newRenderer extends Renderer {
                 'format' => 'textarea',
                 'size'   => 5,
                 'sort'   => 5,
-                'value'  => 'guff'
+                'value'  => ''
             );
             $fields[] = array(
                 'label'  => 'Battle Scars',
                 'format' => 'textarea',
                 'size'   => 5,
                 'sort'   => 6,
-                'value'  => 'woof'
+                'value'  => ''
             );
             $fields[] = array(
                 'label'  => 'Experience',
                 'format' => 'boxes',
                 'size'   => 52,
                 'sort'   => 10,
-                'value'  => rand(1,20)
+                'value'  => ''
             );
         }
         $this->renderTracking($fields, $xOffset, $yOffset);
