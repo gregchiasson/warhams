@@ -122,13 +122,13 @@ class newRenderer extends Renderer {
 
         if($this->layout == newRenderer::ONE_UP) {
             $leftMargin = 250;
-            $width      = 1000;
+            $width      = 900;
         } else if($this->layout == newRenderer::TWO_UP) {
             $leftMargin = 120;
             $width      = 620;
         } else if($this->layout == newRenderer::FOUR_UP) {
             $leftMargin = 120;
-            $width      = 480;
+            $width      = 430;
         }
         $this->renderText($x, $this->currentY, strtoupper($label), 120, $fontSize);
         foreach($data as $label => $desc) {
@@ -168,8 +168,8 @@ class newRenderer extends Renderer {
                 'Remaining W' => $this->bigBoys ? 150 : 120,
                 'Dice Roll'   => $this->bigBoys ? 130 : 100,
                 'Distance'    => $this->bigBoys ? 130 : 100,
-                'Abilities'   => $this->bigBoys ? 350 : 220,
-                'Details'     => $this->bigBoys ? 450 : 320,
+                'Abilities'   => $this->bigBoys ? 450 : 220,
+                'Details'     => $this->bigBoys ? 550 : 320,
                 'Characteristic 1' => $this->bigBoys ? 130 : 110,
                 'Characteristic 2' => $this->bigBoys ? 130 : 110,
                 'Characteristic 3' => $this->bigBoys ? 130 : 110
@@ -279,7 +279,7 @@ class newRenderer extends Renderer {
                 $boxOffset = 320;
                 if($this->layout == newRenderer::ONE_UP) {
                     $boxOffset = 400;
-                    $perLine   = 18;
+                    $perLine   = 24;
                 }
                 if($block) {
                     $boxOffset = 90;
@@ -292,7 +292,7 @@ class newRenderer extends Renderer {
                     if(preg_match('/^(\d+)\s'.$type['Unit'].'(s)?$/', $model, $matches)) {
                         $numModels = $matches[1];
                         if($numModels > 1) {
-                            $label = strtoupper($model).'S';
+                            $label = strtoupper($model);
                         }
                     }
                 }
@@ -348,13 +348,13 @@ class newRenderer extends Renderer {
         $width      = 100;
         if($this->layout == newRenderer::ONE_UP) {
             $leftMargin = 250;
-            $width      = 1000;
+            $width      = 900;
         } else if($this->layout == newRenderer::TWO_UP) {
             $leftMargin = 120;
             $width      = 620;
         } else if($this->layout == newRenderer::FOUR_UP) {
             $leftMargin = 120;
-            $width      = 550;
+            $width      = 430;
         }
         $this->currentY += $this->renderText($x + $leftMargin, $y, $contents, $width, $fontSize);
         $this->currentY += 4;
@@ -445,7 +445,7 @@ class newRenderer extends Renderer {
                 'name'   => 450,
                 'points' => 69,
                 'power'  => 69,
-                'crusade points' => 69
+                'crusade points' => 200
             ));
 
             $this->currentY += 50;
@@ -660,5 +660,149 @@ class newRenderer extends Renderer {
         }
         $files['list'] = $this->outFile;
         return $files;
+    }
+
+    function renderCrusade($unit, $xOffset, $yOffset) { 
+        $fields = array(
+            array('label' => 'UNIT NAME', 'format' => 'text', 'size' => 50,
+                  'sort'  => 1, 'value'  => $unit['customName']),
+            array('label' => 'CRUSADE POINTS', 'format' => 'text', 'size' => 50,
+                  'sort'  => 2, 'value'  => '3'),
+            array('label' => 'Battles Fought', 'format' => 'text', 'size' => 40,
+                  'sort'  => 3, 'value'  => rand(0,6)),
+            array('label' => 'Battles Survived', 'format' => 'text', 'size' => 40,
+                  'sort'  => 4, 'value'  => rand(0,3)),
+            array('label' => 'Melee Kills', 'format' => 'tally', 'size' => 30,
+                  'sort'  => 7, 'value'  => rand(0,3)),
+            array('label' => 'Ranged Kills', 'format' => 'tally', 'size' => 30,
+                  'sort'  => 8, 'value'  => rand(0,5)),
+            array('label' => 'Psychic Kills', 'format' => 'tally', 'size' => 30,
+                  'sort'  => 9, 'value'  => rand(0,4))
+        );
+
+        if(!in_array('Drone', $unit['keywords']) && !in_array('Swarm', $unit['keywords'])) {
+            $fields[] = array(
+                'label'  => 'Battle Honors',
+                'format' => 'textarea',
+                'size'   => 5,
+                'sort'   => 5,
+                'value'  => 'guff'
+            );
+            $fields[] = array(
+                'label'  => 'Battle Scars',
+                'format' => 'textarea',
+                'size'   => 5,
+                'sort'   => 6,
+                'value'  => 'woof'
+            );
+            $fields[] = array(
+                'label'  => 'Experience',
+                'format' => 'boxes',
+                'size'   => 52,
+                'sort'   => 10,
+                'value'  => rand(1,20)
+            );
+        }
+        $this->renderTracking($fields, $xOffset, $yOffset);
+    }
+
+    function renderTracking($fields, $xOffset, $y) {
+        usort($fields, function($a, $b) {
+            if($a['sort'] == $b['sort']) {
+                return 0;
+            }
+            return ($a['sort'] < $b['sort']) ? -1 : 1;
+        });
+
+        $x          = $xOffset;
+        $tallest    = 0;
+        $lineWidth  = 0;
+        $fieldWidth = 0;
+        $height     = 0;
+$y = 40;
+
+// TODO convert all the goddamn weidths to px
+        foreach($fields as $field) {
+            switch($field['format']) {
+                case 'textarea':
+                    $fieldWidth = 100;
+                    $height = $this->getFontSize() * $field['size'];
+                    break;
+                case 'tally':
+                case 'text':
+                    $fieldWidth = $field['size'];
+                    $height = 20;
+                    break;
+                case 'boxes':
+                    $height = ceil($field['size'] / 15) * 40;
+                    break;
+            }
+
+            $lineOffset = ($lineWidth / 100) * 144 * 5; // TODO: not hardcode to .5 of 2-up
+            $pixWidth   = ($fieldWidth / 100) * 144 * 5; // TODO: not hardcode to .5 of 2-up
+
+            if($fieldWidth + $lineWidth > 100) {
+                $lineWidth = 0;
+                $y += $tallest + 40;
+                $x = $xOffset;
+                $tallest = 0;
+            }
+
+            if($height > $tallest) {
+                $tallest = $height;
+            }
+
+            switch($field['format']) {
+                case 'textarea':
+                    $height = $field['size'] * 20;
+                    $this->renderInput($x, $y, $pixWidth, $height, $field);
+                    break;
+                case 'tally':
+                    $field['value'] = str_repeat('|', intval($field['value']));
+                    $this->renderInput($x, $y, $pixWidth, $height, $field);
+                    break;
+                case 'text':
+                    $this->renderInput($x, $y, $pixWidth, $height, $field);
+                    break;
+                case 'boxes':
+                    $this->renderText($x, $y, $field['label'], $pixWidth);
+                    $this->renderBoxes($x, $y + 10, 15, $field['size'], $field['value']);
+                    break;
+            }
+            $lineWidth += $fieldWidth;
+            $x += $pixWidth;
+        }
+    }
+
+    protected function renderInput($x, $y, $pixWidth, $height, $field) {
+        $this->renderText($x, $y, $field['label'], $pixWidth);
+        $draw = $this->getDraw();
+        $draw->setFillColor('#EEEEEE');
+        $draw->setStrokeColor('#222222');
+        $draw->rectangle($x, $y + 10, $x + $pixWidth, $y + 10 + $height);
+        $this->image->drawImage($draw);
+        $this->renderText($x + 10, $y + 25, $field['value'], $pixWidth);
+    }
+
+    protected function renderBoxes($xOffset, $y, $perLine, $limit, $filled) {
+        $x    = $xOffset;
+        $draw = $this->getDraw();
+        $draw->setStrokeWidth(1);
+        $draw->setFillColor('#222222');
+        $draw->setStrokeOpacity(1);
+        $draw->setStrokeColor('#000000');
+
+        for($w = 0; $w < $limit; $w++) {
+            if($w % $perLine == 0 && $w > 0) {
+                $y += 40;
+                $x = $xOffset;
+            }
+            if($w >= $filled) {
+                $draw->setFillColor('#FFFFFF');
+            }
+            $draw->rectangle($x, $y, ($x + 30), ($y + 30));
+            $this->image->drawImage($draw);
+            $x += 40;
+        }
     }
 }

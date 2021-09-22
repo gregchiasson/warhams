@@ -7,7 +7,7 @@ class wh40kRendererNew extends newRenderer {
         $this->image = new Imagick();
         $this->units = $units;
 
-        if($bigBoys || $crusade) {
+        if($bigBoys) {
             $this->layout = newRenderer::ONE_UP;
         } else {
             $this->layout = newRenderer::TWO_UP;
