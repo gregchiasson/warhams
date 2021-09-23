@@ -168,7 +168,7 @@ class newRenderer extends Renderer {
                 'Remaining W' => $this->bigBoys ? 150 : 120,
                 'Dice Roll'   => $this->bigBoys ? 130 : 100,
                 'Distance'    => $this->bigBoys ? 130 : 100,
-                'Abilities'   => $this->bigBoys ? 450 : 220,
+                'Abilities'   => $this->bigBoys ? 450 : 250,
                 'Details'     => $this->bigBoys ? 550 : 320,
                 'Characteristic 1' => $this->bigBoys ? 130 : 110,
                 'Characteristic 2' => $this->bigBoys ? 130 : 110,
@@ -361,16 +361,6 @@ class newRenderer extends Renderer {
         return $this->currentY;
     }
 
-    public function labelBox($title, $lines=1) {
-        $draw = $this->getDraw();
-        $draw->setFillColor('#EEEEEE');
-        $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
-                          $this->maxX - $this->margin + $this->currentX, $this->currentY + (40 * $lines));
-        $this->image->drawImage($draw);
-        $this->renderAbilities($title, array());
-        $this->currentY += (40 * $lines) + 10;
-    }
-
     public function labelBoxes($titles) {
         $draw = $this->getDraw();
 
@@ -421,9 +411,15 @@ class newRenderer extends Renderer {
             $this->currentY += $this->renderText($this->currentX + 50, $this->currentY + 20, "Crusade Roster", 300, 32);
 
             // header
-            $this->labelBox('Crusade Force Name');
-            $this->labelBox('Crusade Faction');
-            $this->labelBox('Player Name');
+            foreach(array('Crusade Force Name', 'Crusade Faction', 'Player Name') as $h) {
+                $draw = $this->getDraw();
+                $draw->setFillColor('#EEEEEE');
+                $draw->rectangle(($this->margin + $this->currentX + 250), $this->currentY,
+                                 $this->maxX - $this->margin + $this->currentX, $this->currentY + 40);
+                $this->image->drawImage($draw);
+                $this->renderText($this->currentX + 30, $this->currentY + 30, $h, 250, 24);
+                $this->currentY += 50;
+            }
 
             $this->renderTable(array(array(
                 'battles'               => ' ',
@@ -665,41 +661,57 @@ class newRenderer extends Renderer {
     function renderCrusade($unit, $xOffset, $yOffset) { 
         $fields = array(
             array('label' => 'UNIT NAME', 'format' => 'text', 'size' => 50,
-                  'sort'  => 1, 'value'  => $unit['customName']),
+                  'sort'  => 1, 'value'  => $unit['customName'] ? $unit['customName'] : $unit['title']),
             array('label' => 'CRUSADE POINTS', 'format' => 'text', 'size' => 50,
-                  'sort'  => 2, 'value'  => '3'),
+                  'sort'  => 2, 'value'  => ''),
             array('label' => 'Battles Fought', 'format' => 'text', 'size' => 40,
                   'sort'  => 3, 'value'  => ''),
             array('label' => 'Battles Survived', 'format' => 'text', 'size' => 40,
                   'sort'  => 4, 'value'  => ''),
             array('label' => 'Melee Kills', 'format' => 'tally', 'size' => 30,
-                  'sort'  => 7, 'value'  => ''),
-            array('label' => 'Ranged Kills', 'format' => 'tally', 'size' => 30,
-                  'sort'  => 8, 'value'  => ''),
-            array('label' => 'Psychic Kills', 'format' => 'tally', 'size' => 30,
                   'sort'  => 9, 'value'  => ''),
+            array('label' => 'Ranged Kills', 'format' => 'tally', 'size' => 30,
+                  'sort'  => 10, 'value'  => ''),
+            array('label' => 'Psychic Kills', 'format' => 'tally', 'size' => 30,
+                  'sort'  => 11, 'value'  => ''),
+            array('label' => 'Notes', 'format' => 'textarea', 'size' => 5,
+                  'sort'  => 13, 'value'  => $unit['notes'])
         );
 
         if(!in_array('Drone', $unit['keywords']) && !in_array('Swarm', $unit['keywords'])) {
             $fields[] = array(
+                'label'  => 'Relics',
+                'format' => 'textarea',
+                'size'   => 2,
+                'sort'   => 5,
+                'value'  => ''
+            );
+            $fields[] = array(
+                'label'  => 'Warlord Traits',
+                'format' => 'textarea',
+                'size'   => 2,
+                'sort'   => 6,
+                'value'  => ''
+            );
+            $fields[] = array(
                 'label'  => 'Battle Honors',
                 'format' => 'textarea',
-                'size'   => 5,
-                'sort'   => 5,
+                'size'   => 3,
+                'sort'   => 7,
                 'value'  => ''
             );
             $fields[] = array(
                 'label'  => 'Battle Scars',
                 'format' => 'textarea',
-                'size'   => 5,
-                'sort'   => 6,
+                'size'   => 3,
+                'sort'   => 8,
                 'value'  => ''
             );
             $fields[] = array(
                 'label'  => 'Experience',
                 'format' => 'boxes',
-                'size'   => 52,
-                'sort'   => 10,
+                'size'   => 60,
+                'sort'   => 12,
                 'value'  => ''
             );
         }
@@ -715,23 +727,25 @@ class newRenderer extends Renderer {
         });
 
         $x          = $xOffset;
+        $y          = 40;
+
         $tallest    = 0;
         $lineWidth  = 0;
         $fieldWidth = 0;
         $height     = 0;
-$y = 40;
+        $margin     = 20;
 
-// TODO convert all the goddamn weidths to px
+        // TODO convert all the goddamn weidths to px
         foreach($fields as $field) {
             switch($field['format']) {
                 case 'textarea':
                     $fieldWidth = 100;
-                    $height = $this->getFontSize() * $field['size'];
+                    $height = ($field['size'] * 30);
                     break;
                 case 'tally':
                 case 'text':
                     $fieldWidth = $field['size'];
-                    $height = 20;
+                    $height = 40;
                     break;
                 case 'boxes':
                     $height = ceil($field['size'] / 15) * 40;
@@ -743,7 +757,7 @@ $y = 40;
 
             if($fieldWidth + $lineWidth > 100) {
                 $lineWidth = 0;
-                $y += $tallest + 40;
+                $y += $tallest + 30;
                 $x = $xOffset;
                 $tallest = 0;
             }
@@ -754,18 +768,18 @@ $y = 40;
 
             switch($field['format']) {
                 case 'textarea':
-                    $height = $field['size'] * 20;
-                    $this->renderInput($x, $y, $pixWidth, $height, $field);
+                    $height = $field['size'] * 30;
+                    $this->renderInput($x, $y, $pixWidth - $margin, $height, $field);
                     break;
                 case 'tally':
                     $field['value'] = str_repeat('|', intval($field['value']));
-                    $this->renderInput($x, $y, $pixWidth, $height, $field);
+                    $this->renderInput($x, $y, $pixWidth - $margin, $height, $field);
                     break;
                 case 'text':
-                    $this->renderInput($x, $y, $pixWidth, $height, $field);
+                    $this->renderInput($x, $y, $pixWidth - $margin, $height, $field);
                     break;
                 case 'boxes':
-                    $this->renderText($x, $y, $field['label'], $pixWidth);
+                    $this->renderText($x, $y, $field['label'], $pixWidth, 18);
                     $this->renderBoxes($x, $y + 10, 15, $field['size'], $field['value']);
                     break;
             }
@@ -775,13 +789,13 @@ $y = 40;
     }
 
     protected function renderInput($x, $y, $pixWidth, $height, $field) {
-        $this->renderText($x, $y, $field['label'], $pixWidth);
+        $this->renderText($x, $y + 3, $field['label'], $pixWidth, 18);
         $draw = $this->getDraw();
         $draw->setFillColor('#EEEEEE');
         $draw->setStrokeColor('#222222');
         $draw->rectangle($x, $y + 10, $x + $pixWidth, $y + 10 + $height);
         $this->image->drawImage($draw);
-        $this->renderText($x + 10, $y + 25, $field['value'], $pixWidth);
+        $this->renderText($x + 10, $y + 35, $field['value'], $pixWidth, 18);
     }
 
     protected function renderBoxes($xOffset, $y, $perLine, $limit, $filled) {
