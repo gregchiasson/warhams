@@ -96,6 +96,12 @@ class wh40kROSParser extends wh40kParser {
         if($d->selections->selection) {
             foreach($d->selections->selection as $dd) {
                 $clean['powers'] = $this->readSelectionChars($dd, $clean['powers'], 'Psychic Power', $cols);
+                // ughhhhhhhhhh
+                if($dd->selections->selection) {
+                    foreach($dd->selections->selection as $ddd) {
+                        $clean['powers'] = $this->readSelectionChars($ddd, $clean['powers'], 'Psychic Power', $cols);
+                    }
+                }
             }
         }
 
