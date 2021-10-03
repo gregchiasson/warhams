@@ -46,6 +46,8 @@ class wh40kParser {
 
         $unit = $this->populateUnit($d, $template);
 
+        $this->getCP($d);
+
         if($unit['slot'] == null) {
             $unit['slot'] = 'NA';
         }
@@ -56,14 +58,17 @@ class wh40kParser {
             sort($unit['factions']);
             return $unit;
         } else {
-            $costs = array('points' => 0, 'cp' => 0, 'power' => 0);
-            $costs = $this->readSelectionCosts($d, $costs);
-            $this->cp += $costs['cp'];
-            if($d->selections->selection) {
-                $costs = $this->readSelectionCosts($d->selections->selection, $costs);
-                $this->cp += $costs['cp'];
-            }
             return null;
+        }
+    }
+
+    protected function getCP($d) {
+        $costs = array('points' => 0, 'cp' => 0, 'power' => 0);
+        $costs = $this->readSelectionCosts($d, $costs);
+        $this->cp += $costs['cp'];
+        if($d->selections->selection) {
+            $costs = $this->readSelectionCosts($d->selections->selection, $costs);
+            $this->cp += $costs['cp'];
         }
     }
 

@@ -40,7 +40,8 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>24 September 2021</strong></li>
+            <li>Latest update: <strong>3 October 2021</strong></li>
+            <li>Fixed an issue with counting CP, should improve accuracy.</li>
             <li>Completely replaced 40k Renderer with new-style datasheets. This fixes a ton of issues, detailed below, and will likely introduce a ton of new ones.</li>
             <li>Updated the screenshots to match new format.</li>
             <li>Improved detection of unit rosters (no more "1 Intercessor, 1 Interecessor Sergeant"). Still a problem on some units (see Known Issues).</li>
