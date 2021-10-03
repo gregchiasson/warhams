@@ -660,6 +660,8 @@ class newRenderer extends Renderer {
 
     function renderCrusade($unit, $xOffset, $yOffset) { 
         $fields = array(
+            array('label' => 'Crusade Tracking', 'format' => 'label', 'size' => 24,
+                  'sort'  => 0, 'value'  => ''),
             array('label' => 'UNIT NAME', 'format' => 'text', 'size' => 50,
                   'sort'  => 1, 'value'  => $unit['customName'] ? $unit['customName'] : $unit['title']),
             array('label' => 'CRUSADE POINTS', 'format' => 'text', 'size' => 50,
@@ -668,14 +670,16 @@ class newRenderer extends Renderer {
                   'sort'  => 3, 'value'  => ''),
             array('label' => 'Battles Survived', 'format' => 'text', 'size' => 40,
                   'sort'  => 4, 'value'  => ''),
-            array('label' => 'Melee Kills', 'format' => 'tally', 'size' => 30,
+            array('label' => '', 'format' => 'whitespace', 'size' => 2,
                   'sort'  => 9, 'value'  => ''),
-            array('label' => 'Ranged Kills', 'format' => 'tally', 'size' => 30,
+            array('label' => 'Melee Kills', 'format' => 'tally', 'size' => 30,
                   'sort'  => 10, 'value'  => ''),
-            array('label' => 'Psychic Kills', 'format' => 'tally', 'size' => 30,
+            array('label' => 'Ranged Kills', 'format' => 'tally', 'size' => 30,
                   'sort'  => 11, 'value'  => ''),
+            array('label' => 'Psychic Kills', 'format' => 'tally', 'size' => 30,
+                  'sort'  => 12, 'value'  => ''),
             array('label' => 'Notes', 'format' => 'textarea', 'size' => 5,
-                  'sort'  => 13, 'value'  => $unit['notes'])
+                  'sort'  => 14, 'value'  => $unit['notes'])
         );
 
         if(!in_array('Drone', $unit['keywords']) && !in_array('Swarm', $unit['keywords'])) {
@@ -711,7 +715,7 @@ class newRenderer extends Renderer {
                 'label'  => 'Experience',
                 'format' => 'boxes',
                 'size'   => 60,
-                'sort'   => 12,
+                'sort'   => 13,
                 'value'  => ''
             );
         }
@@ -738,6 +742,10 @@ class newRenderer extends Renderer {
         // TODO convert all the goddamn weidths to px
         foreach($fields as $field) {
             switch($field['format']) {
+                case 'label': 
+                    $fieldWidth = 100;
+                    $height = $field['size'];
+                    break;
                 case 'textarea':
                     $fieldWidth = 100;
                     $height = ($field['size'] * 30);
@@ -749,6 +757,10 @@ class newRenderer extends Renderer {
                     break;
                 case 'boxes':
                     $height = ceil($field['size'] / 15) * 40;
+                    break;
+                case 'whitespace':
+                    $fieldWidth = 100;
+                    $height = ($field['size'] * 20);
                     break;
             }
 
@@ -767,6 +779,9 @@ class newRenderer extends Renderer {
             }
 
             switch($field['format']) {
+                case 'label':
+                    $this->renderText($x, $y + $field['size'], $field['label'], $pixWidth, $field['size']);
+                    break;
                 case 'textarea':
                     $height = $field['size'] * 30;
                     $this->renderInput($x, $y, $pixWidth - $margin, $height, $field);
@@ -781,6 +796,9 @@ class newRenderer extends Renderer {
                 case 'boxes':
                     $this->renderText($x, $y, $field['label'], $pixWidth, 18);
                     $this->renderBoxes($x, $y + 10, 15, $field['size'], $field['value']);
+                    break;
+                case 'whitespace':
+                    $y += $height;
                     break;
             }
             $lineWidth += $fieldWidth;
