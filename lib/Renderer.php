@@ -5,7 +5,8 @@ abstract class Renderer {
     protected $image          = null;
     protected $units          = array();
     protected $bigBoys        = false;
-    protected $crusade        = false;
+    protected $tracking       = false;
+    protected $reference      = false;
     protected $isApoc         = false;
     protected $skipDuplicates = false;
 
@@ -18,11 +19,12 @@ abstract class Renderer {
     protected $maxX = 0;
     protected $maxY = 0;
 
-    public function __construct($outFile, $units=array(), $bigBoys=false, $crusade=false, $skipDuplicates=false) {
+    public function __construct($outFile, $units=array(), $bigBoys=false, $tracking=false, $reference=true, $skipDuplicates=false) {
         $this->image            = new Imagick();
         $this->units            = $units;
         $this->bigBoys          = $bigBoys ? true : false;
-        $this->crusade          = $crusade ? true : false;
+        $this->tracking         = $tracking ? true : false;
+        $this->reference        = $reference ? true : false;
         $this->skipDuplicates   = $skipDuplicates ? true : false;
         $this->outFile          = $outFile;
     }

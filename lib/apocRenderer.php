@@ -3,7 +3,7 @@
 require_once('newRenderer.php');
 
 class apocRenderer extends newRenderer {
-    public function __construct($outFile, $units=array(), $bigBoys=false, $crusade=false) {
+    public function __construct($outFile, $units=array(), $bigBoys=false, $tracking=false, $reference=true, $skipDuplicates=false) {
         $this->isApoc = true;
         parent::__construct($outFile, $units);
         $this->layout = newRenderer::FOUR_UP;

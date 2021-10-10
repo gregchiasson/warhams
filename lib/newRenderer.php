@@ -465,7 +465,7 @@ class newRenderer extends Renderer {
             $preview->borderImage('white', 10, 10);
             $preview->writeImages($url, false);
 
-            $this->bigBoys = false; // the rest of the crusade roster has to be in small boys mode
+            $this->bigBoys = false; // the rest of the roster has to be in small boys mode
             return $url;
         } else {
             // not a roster, abort!
@@ -579,7 +579,7 @@ class newRenderer extends Renderer {
     }
 
     public function renderToOutFile() {
-        if($this->skipDuplicates && !$this->crusade) {
+        if($this->skipDuplicates && !$this->tracking) {
             $hashes = array();
             $tmp    = array();
             foreach($this->units as $unit) {
@@ -604,11 +604,12 @@ class newRenderer extends Renderer {
         $this->maxX = 144 * 8.5;
         $this->maxY = 144 * 11;
 
-        if($this->crusade) {
+        if($this->tracking) {
             $summary  = $this->renderOrder();
         } else { 
             $summary  = $this->renderList();
         }
+
         if($summary) {
             $files['summary'] = $summary;
         }
@@ -616,44 +617,74 @@ class newRenderer extends Renderer {
         $this->layout = $currentLayout;
         $this->setHeightAndWidth($currentLayout);
 
-        for($i = 0; $i < count($this->units); $i++) {
-            if($this->layout == newRenderer::ONE_UP || $this->layout == newRenderer::FOUR_UP) {
-                $height = $this->res * 11;
-                $width  = $this->res * 8.5;
-            } else {
-                $height = $this->res * 8.5;
-                $width  = $this->res * 11;
-            }
-            $this->image->newImage($width, $height, new ImagickPixel('white'), 'pdf');
-            $this->image->setResolution($this->res, $this->res);
-            $this->image->setColorspace(Imagick::COLORSPACE_RGB);
+        if($this->layout == newRenderer::ONE_UP || $this->layout == newRenderer::FOUR_UP) {
+            $height = $this->res * 11;
+            $width  = $this->res * 8.5;
+        } else {
+            $height = $this->res * 8.5;
+            $width  = $this->res * 11;
+        }
 
-            if(array_key_exists($i, $this->units)) {
-                $this->renderUnit($this->units[$i], 0, 0);
-            }
+        if($this->layout == newRenderer::TWO_UP) {
+            for($i = 0; $i < count($this->units); $i++) {
+                $this->image->newImage($width, $height, new ImagickPixel('white'), 'pdf');
+                $this->image->setResolution($this->res, $this->res);
+                $this->image->setColorspace(Imagick::COLORSPACE_RGB);
 
-            if($this->layout == newRenderer::TWO_UP) {
-                if($this->crusade) {
+                if($this->reference && $this->tracking) {
+                    $this->renderUnit($this->units[$i], 0, 0);
                     $this->renderCrusade($this->units[$i], $width / 2, 0);
-                } else {
+                }
+
+                if($this->reference && !$this->tracking) {
+                    $this->renderUnit($this->units[$i], 0, 0);
                     $i += 1;
                     if(array_key_exists($i, $this->units)) {
                         $this->renderUnit($this->units[$i], $width / 2, 0);
                     }
                 }
-            }
 
-            if($this->layout == newRenderer::FOUR_UP) {
+                if($this->tracking && !$this->reference) {
+                    $this->renderCrusade($this->units[$i], 0, 0);
+                    $i += 1;
+                    if(array_key_exists($i, $this->units)) {
+                        $this->renderCrusade($this->units[$i], $width / 2, 0);
+                    }
+                }
+                $this->image->writeImages($this->outFile, true);
+            }
+        } else if($this->layout == newRenderer::FOUR_UP) {
+            for($i = 0; $i < count($this->units); $i++) {
+                $this->image->newImage($width, $height, new ImagickPixel('white'), 'pdf');
+                $this->image->setResolution($this->res, $this->res);
+                $this->image->setColorspace(Imagick::COLORSPACE_RGB);
+
+                if(array_key_exists($i, $this->units)) {
+                    $this->renderUnit($this->units[$i], 0, 0);
+                }
+
                 $i += 1;
                 if(array_key_exists($i, $this->units)) { $this->renderUnit($this->units[$i], ($width / 2), 0); }
                 $i += 1;
                 if(array_key_exists($i, $this->units)) { $this->renderUnit($this->units[$i], 0, ($height / 2)); }
                 $i += 1;
                 if(array_key_exists($i, $this->units)) { $this->renderUnit($this->units[$i],  ($width / 2), ($height / 2)); }
-            }
 
-            $this->image->writeImages($this->outFile, true);
+                $this->image->writeImages($this->outFile, true);
+            }
+        } else {
+            for($i = 0; $i < count($this->units); $i++) {
+                $this->image->newImage($width, $height, new ImagickPixel('white'), 'pdf');
+                $this->image->setResolution($this->res, $this->res);
+                $this->image->setColorspace(Imagick::COLORSPACE_RGB);
+
+                if(array_key_exists($i, $this->units)) {
+                    $this->renderUnit($this->units[$i], 0, 0);
+                }
+                $this->image->writeImages($this->outFile, true);
+            }
         }
+
         $files['list'] = $this->outFile;
         return $files;
     }
@@ -730,7 +761,7 @@ class newRenderer extends Renderer {
             return ($a['sort'] < $b['sort']) ? -1 : 1;
         });
 
-        $x          = $xOffset;
+        $x          = $xOffset + 40;
         $y          = 40;
 
         $tallest    = 0;
@@ -770,7 +801,7 @@ class newRenderer extends Renderer {
             if($fieldWidth + $lineWidth > 100) {
                 $lineWidth = 0;
                 $y += $tallest + 30;
-                $x = $xOffset;
+                $x = $xOffset + 40;
                 $tallest = 0;
             }
 

@@ -3,7 +3,7 @@
 require_once('newRenderer.php');
 
 class wh40kRendererNew extends newRenderer {
-    public function __construct($outFile, $units=array(), $bigBoys=false, $crusade=false, $skipDuplicates=false) {
+    public function __construct($outFile, $units=array(), $bigBoys=false, $tracking=false, $reference=true, $skipDuplicates=false) {
         $this->image = new Imagick();
         $this->units = $units;
 
@@ -12,7 +12,8 @@ class wh40kRendererNew extends newRenderer {
         } else {
             $this->layout = newRenderer::TWO_UP;
         }
-        $this->crusade          = $crusade;
+        $this->tracking         = $tracking;
+        $this->reference        = $reference;
         $this->bigBoys          = $bigBoys;
         $this->skipDuplicates   = $skipDuplicates ? true : false;
         $this->outFile          = $outFile;

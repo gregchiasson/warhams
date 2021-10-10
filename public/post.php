@@ -44,9 +44,10 @@ try {
         $UNITS     = $parser->units;
         $OUTFILE   = '/var/tmp/'.uniqid().'.pdf';
         $big       = array_key_exists('big_data_sheet_appreciator', $_POST);
-        $crusade   = array_key_exists('crusade', $_POST);
+        $tracking  = array_key_exists('tracking', $_POST);
+        $reference = array_key_exists('reference', $_POST);
         $dedupe    = array_key_exists('dedupe', $_POST);
-        $output    = new wh40kRendererNew($OUTFILE, $UNITS, $big, $crusade, $dedupe);
+        $output    = new wh40kRendererNew($OUTFILE, $UNITS, $big, $tracking, $reference, $dedupe);
         $downloads = $output->renderToOutFile();
     }
 

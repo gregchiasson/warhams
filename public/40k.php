@@ -23,7 +23,10 @@
                     <input type="checkbox" name="dedupe">Skip duplicates? (will only print one sheet for each <em>identical</em> unit - 10 Guard with a Plasma gun is not considered a dulicate of 10 Guard with a Melta)
                 </div>
                 <div class="checkbox">
-                    <input type="checkbox" name="crusade">CRUSADE MODE (always uses small sheets, never removes duplicates)
+                    <input type="checkbox" name="tracking">Show Crusade tracking
+                </div>
+                <div class="checkbox">
+                    <input type="checkbox" checked="checked" name="reference">Show rules reference
                 </div>
             </div>
         </div>

@@ -40,18 +40,8 @@ Uncomment if there's known outages
     </div>
     <div class="panel-body">
         <ul>
-            <li>Latest update: <strong>3 October 2021</strong></li>
-            <li>Fixed an issue with counting CP, should improve accuracy.</li>
-            <li>Slight change to Crusade sheet formatting.</li>
-            <li>Fixed psychic powers on Kilosons Aspiring Sorcerers.</li>
-            <li>Completely replaced 40k Renderer with new-style datasheets. This fixes a ton of issues, detailed below, and will likely introduce a ton of new ones.</li>
-            <li>Updated the screenshots to match new format.</li>
-            <li>Improved detection of unit rosters (no more "1 Intercessor, 1 Interecessor Sergeant"). Still a problem on some units (see Known Issues).</li>
-            <li>Improvements to layout should prevent most, if not all, of the text overflowing the bounding boxes in the layout.</li>
-            <li>Fixed a lot, but not all, of the unit wound-tracking problems. For one, some units now properly show wound boxes for <em>all the models</em> instead of just one.</li>
-            <li>Added ability to skip printing duplicate datasheets to 40k mode.</li>
-            <li>Fixed psychic power support on Grey Knights squads.</li>
-            <li>Re-order Abilities section, to always put PSYKER (cast x, deny Y) at the end. Readability/UX improvement.</li>
+            <li>Latest update: <strong>9 October 2021</strong></li>
+            <li>Changed rendering options, for if, I don't know why, but you only wanted to render Crusade sheets, and not actual references?</li>
         </ul>
     </div>
 </div>
