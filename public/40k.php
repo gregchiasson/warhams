@@ -14,6 +14,18 @@
                 <input type="file" name="list">
             </div>
         </div>
+<!--
+        <p>&nbsp;</p>
+        <p>You can also use the GW app, I guess. Use this button instead.</p>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <input type="file" name="gw_list">
+            </div>
+        </div>
+
+        <p>&nbsp;</p>
+        <p>In either case, here are some options you can use:</p>
+-->
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <div class="checkbox">

@@ -25,7 +25,6 @@ class wh40kROSParser extends wh40kParser {
         return $this->units;
     }
 
-
     protected function parseForce($force) {
         $units = array();
         foreach($force->selections->selection as $d) {
