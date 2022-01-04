@@ -525,6 +525,7 @@ class newRenderer extends Renderer {
                         if($this->isApoc) {
                             unset($unit['points']);
                         }
+                        unset($unit['guid']);
                         $allUnits[] = $unit;
                         if(!$this->isApoc) {
                             $pts += $unit['points'];
@@ -551,6 +552,7 @@ class newRenderer extends Renderer {
                 if($this->isApoc) {
                     unset($unitColumns['points']);
                 }
+                unset($unitColumns['guid']);
                 $this->renderTable($allUnits, $unitColumns, $this->res * 8.5);
             }
             $this->renderWatermark();
