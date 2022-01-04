@@ -1,6 +1,6 @@
 <?php
-require_once('../../../lib/wh40kROSParser.php');
-require_once('../../../lib/Upload.php');
+require_once('../../lib/wh40kROSParser.php');
+require_once('../../lib/Upload.php');
 
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
@@ -41,6 +41,8 @@ try {
     }
 
     header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Origin');
     header('Content-Type: application/json');
     header('Expires: 0');
     header('Cache-Control: must-revalidate');
