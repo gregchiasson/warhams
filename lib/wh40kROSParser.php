@@ -45,6 +45,7 @@ class wh40kROSParser extends wh40kParser {
 
                     $units[$slot][] = array(
                         'name'   => $unit['title'],
+                        'guid'   => array_key_exists('guid', $unit) ? $unit['guid'] : '',
                         'customName' => $customName,
                         'slot'   => $unit['slot'],
                         'roster' => implode($unit['roster'], ', '),
@@ -66,6 +67,7 @@ class wh40kROSParser extends wh40kParser {
     public function populateUnit($d, $clean) {
         // title
         $clean['title']  = (string) $d['name'];
+        $clean['guid']   = (string) $d['id'];
         if($d['customName']) {
             $clean['customName'] = (string) $d['customName'];
         }

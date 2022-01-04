@@ -30,6 +30,7 @@ class wh40kParser {
             'points'      => 0,           # its later now
             'cp'          => 0,           # sure
             'title'       => 'unit name', # tactical squad
+            'guid'        => '',
             'customName'  => '',
             'notes'       => '',
             'model_stat'  => array(),     # name M WS BS etc
