@@ -1,5 +1,3 @@
-// sort units by epic > character > other, and alphabetically within
-
 $(document).ready(bind);
 
 function bind() {
@@ -8,9 +6,6 @@ function bind() {
     const reader = new FileReader();
     reader.onload = async function(event) {
       var xmlContent = '';
-      // try the unzip first, then fall back to assuming its not a zip
-      // cant use the file extension because bscribe mobile doesnt always include it.
-      // because it sucks.
       try {
         const reader  = new zip.ZipReader(new zip.BlobReader(file));
         const entries = await reader.getEntries();
