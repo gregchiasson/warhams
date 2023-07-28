@@ -41,8 +41,6 @@ function bind() {
 function xmlToJson(xml) {
   const obj = $.xml2json(xml);
   var army = [];
-
-  console.log(obj);
   
   // soup
   const forces = forceArray(obj.roster.forces.force);
@@ -51,10 +49,12 @@ function xmlToJson(xml) {
     list['faction'] = force['$'].catalogueName;
     list['cost'] = `${parseInt(obj.roster.costs.cost['$'].value)}${obj.roster.costs.cost['$'].name}`;
 
-    const rules = forceArray(force.rules.rule);
-    rules.forEach((rule) => {
-      list['rules'][rule['$'].name] = rule.description;
-    });
+    if(force.rules) {
+      const rules = forceArray(force.rules.rule);
+      rules.forEach((rule) => {
+        list['rules'][rule['$'].name] = rule.description;
+      });  
+    }
 
     const selections = forceArray(force.selections.selection);
     selections.forEach((selection) => {
@@ -114,44 +114,42 @@ function parseUnit(selection) {
   // model stat blocks and abilities
   const profiles = forceArray(selection.profiles.profile);
   profiles.forEach((profile) => {
-    if(profile['$'].typeName == 'Unit') {
-      const stats = profile.characteristics.characteristic;
-      var statblock = {};
-      stats.forEach((stat) => {
-        statblock[stat['$'].name] = stat['_'];
-      });
-      unit['profiles'][profile['$'].name] = statblock;
-    } else if(profile['$'].typeName == 'Abilities') {
-      unit['abilities'][profile['$'].name] = profile.characteristics.characteristic['_']; 
-    }
+    unit = parseProfile(unit, profile);
   });
 
   // weapon stat blocks
-  const selections = selection.selections.selection;
+  const selections = forceArray(selection.selections.selection);
   selections.forEach((item) => {
-    
     if(item.profiles) {
         const profiles = forceArray(item.profiles.profile);
         unit = parseGuns(unit, profiles);
     }
-    
     if(item.selections) {
       const itemSelections = forceArray(item.selections.selection);
       itemSelections.forEach((gear) => {
-        const profiles = forceArray(gear.profiles.profile);
-        unit = parseGuns(unit, profiles);
+        if(gear.profiles) {
+          const profiles = forceArray(gear.profiles.profile);
+          unit = parseGuns(unit, profiles);  
+        } 
+        if(gear.selections) {
+          const fuckGuard = forceArray(gear.selections.selection);
+          fuckGuard.forEach((fuckYou) => {
+            if(fuckYou.profiles) {
+              const profiles = forceArray(fuckYou.profiles.profile);
+              unit = parseGuns(unit, profiles);  
+            }     
+          });
+        }
       });  
     }
   });
 
   // unit points cost 
   unit['points'] = parseInt(selection.costs.cost['$'].value);
-  //if(unit['points'] == 0) {
-    const costSelections = forceArray(selection.selections.selection);
-    costSelections.forEach((item) => {
-      unit['points'] += parseInt(item.costs.cost['$'].value);
-    });
-  //}
+  const costSelections = forceArray(selection.selections.selection);
+  costSelections.forEach((item) => {
+    unit['points'] += parseInt(item.costs.cost['$'].value);
+  });
 
   // unit rules
   if(selection.rules) {
@@ -182,6 +180,21 @@ function parseUnit(selection) {
         rawModels[modelName] = 0;
       }
       rawModels[modelName] += parseInt(modelCount);  
+    }
+    // i love how i have to keep hacking this crap in because all the codex
+    // data maintainers are insane. this time, for guard infantry squads:
+    if(model.selections) {
+      const fuckGuard = forceArray(model.selections.selection);
+      fuckGuard.forEach((fuckYou) => {
+        if(fuckYou['$'].type == 'model') {
+          const modelName  = fuckYou['$'].name;
+          const modelCount = fuckYou['$'].number;
+          if(!rawModels[modelName]) {
+            rawModels[modelName] = 0;
+          }
+          rawModels[modelName] += parseInt(modelCount);  
+        }
+      });    
     }
   });
 
@@ -215,7 +228,6 @@ function renderUnits(units) {
 }
 
 function renderCover(force) {
-  console.log(force);
   var unitRows = '';
   force.units.forEach((unit) => {
     unitRows += `<tr>
@@ -300,7 +312,7 @@ function renderUnit(unit) {
       <h4>Wargear</h4>
       <div class="rules">${hashToLi(unit.wargear)}</div>  
       <h4>Rules</h4>
-      <ul><li>${unit.rules.length ? Object.keys(unit.rules).sort().join(', ') : 'None'}</li></ul>
+      <ul><li>${Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None'}</li></ul>
       </div>
     <div class="footer col-md-12"><strong>Keywords:</strong> ${unit.keywords.join(', ')}</div>
   </div></div>
@@ -322,7 +334,7 @@ function makeTable(data) {
     }
     content += `<tr><th>${row}</th>`;
     Object.keys(data[row]).forEach((col) => {
-      content += `<td>${data[row][col]}</td>`;
+      content += `<td>${data[row][col] || '-'}</td>`;
     });
     content += '</tr>';
   });
@@ -352,7 +364,22 @@ function parseGuns(unit, profiles) {
     } else if(profile['$'].typeName == 'Abilities') {
       unit['wargear'][profile['$'].name] = profile.characteristics.characteristic['_'];
     }
+    unit = parseProfile(unit, profile);
   });
+  return unit;
+}
+
+function parseProfile(unit, profile) {
+  if(profile['$'].typeName == 'Unit') {
+    const stats = profile.characteristics.characteristic;
+    var statblock = {};
+    stats.forEach((stat) => {
+      statblock[stat['$'].name] = stat['_'];
+    });
+    unit['profiles'][profile['$'].name] = statblock;
+  } else if(profile['$'].typeName == 'Abilities') {
+    unit['abilities'][profile['$'].name] = profile.characteristics.characteristic['_']; 
+  }
   return unit;
 }
 
