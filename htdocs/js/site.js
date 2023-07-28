@@ -1,7 +1,7 @@
 // https://github.com/eKoopmans/html2pdf.js
-// page 1: all rules mentioned on all sheets (distinct), faction/detachment rules too
-// cards: show name of rules but name/description of abilities
 // sort units by epic > character > other, and alphabetically within
+// sort keywords
+// sort most things i guess actually
 
 $(document).ready(bind);
 
@@ -114,30 +114,14 @@ function parseUnit(selection) {
     
     if(item.profiles) {
         const profiles = forceArray(item.profiles.profile);
-        profiles.forEach((profile) => {
-          if(profile['$'].typeName == 'Ranged Weapons') {
-            unit['weapons']['ranged'][profile['$'].name] = parseGun(profile);
-          } else if(profile['$'].typeName == 'Melee Weapons') {
-            unit['weapons']['melee'][profile['$'].name] = parseGun(profile);
-          } else if(profile['$'].typeName == 'Abilities') {
-            unit['wargear'][profile['$'].name] = profile.characteristics.characteristic['_'];
-          }
-        });
+        unit = parseGuns(unit, profiles);
     }
     
     if(item.selections) {
       const itemSelections = forceArray(item.selections.selection);
       itemSelections.forEach((gear) => {
         const profiles = forceArray(gear.profiles.profile);
-        profiles.forEach((profile) => {
-          if(profile['$'].typeName == 'Ranged Weapons') {
-            unit['weapons']['ranged'][profile['$'].name] = parseGun(profile);
-          } else if(profile['$'].typeName == 'Melee Weapons') {
-            unit['weapons']['melee'][profile['$'].name] = parseGun(profile);
-          } else if(profile['$'].typeName == 'Abilities') {
-            unit['wargear'][profile['$'].name] = profile.characteristics.characteristic['_'];
-          }
-        });
+        unit = parseGuns(unit, profiles);
       });  
     }
   });
@@ -189,7 +173,7 @@ function parseUnit(selection) {
 }
 
 function jsonToHTML(json) {
-  var html;
+  var html = '';
   json.forEach((force) => {
     html += renderCover(force);
     html += renderUnits(force['units']);
@@ -273,6 +257,19 @@ function hashToLi(items) {
   });
   content += '</ul>'
   return content;
+}
+
+function parseGuns(unit, profiles) {
+  profiles.forEach((profile) => {
+    if(profile['$'].typeName == 'Ranged Weapons') {
+      unit['weapons']['ranged'][profile['$'].name] = parseGun(profile);
+    } else if(profile['$'].typeName == 'Melee Weapons') {
+      unit['weapons']['melee'][profile['$'].name] = parseGun(profile);
+    } else if(profile['$'].typeName == 'Abilities') {
+      unit['wargear'][profile['$'].name] = profile.characteristics.characteristic['_'];
+    }
+  });
+  return unit;
 }
 
 function parseGun(gun) {
