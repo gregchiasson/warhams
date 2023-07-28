@@ -1,7 +1,4 @@
-// https://github.com/eKoopmans/html2pdf.js
 // sort units by epic > character > other, and alphabetically within
-// sort keywords
-// sort most things i guess actually
 
 $(document).ready(bind);
 
@@ -25,9 +22,17 @@ function bind() {
         xmlContent = event.target.result;
       }
       const listJson = xmlToJson(xmlContent);
+      $('#output-label').show();
       $('#output').html(jsonToHTML(listJson));
       var element = document.getElementById('output');
-      html2pdf(element);
+      /*
+      html2pdf(element, {
+        filename:  'your_list_sucks.pdf',
+        pagebreak: { mode: 'css', after: '.page' },
+        margin:    1,
+        jsPDF: { format: 'letter', orientation: 'landscape' }
+      });
+      */
     }
     reader.readAsText(file);
   });
@@ -36,6 +41,8 @@ function bind() {
 function xmlToJson(xml) {
   const obj = $.xml2json(xml);
   var army = [];
+
+  console.log(obj);
   
   // soup
   const forces = forceArray(obj.roster.forces.force);
@@ -52,15 +59,26 @@ function xmlToJson(xml) {
     const selections = forceArray(force.selections.selection);
     selections.forEach((selection) => {
       switch(selection['$'].type) {
+        case 'model':
         case 'unit':
           list['units'].push(parseUnit(selection));
           break;
         case 'upgrade':
           if(selection['$'].name == "Detachment") {
             list['detachment'] = selection.selections.selection['$'].name;
-            selection.selections.selection.rules.rule.forEach((rule) => {
-              list['rules'][rule['$'].name] = rule.description;
-            });
+            if(selection.selections.selection.rules) {
+              const rules = forceArray(selection.selections.selection.rules.rule);
+              rules.forEach((rule) => {
+                list['rules'][rule['$'].name] = rule.description;
+              });  
+            }
+            if(selection.selections.selection.profiles) {
+              const rules = forceArray(selection.selections.selection.profiles.profile);
+              rules.forEach((rule) => {
+                list['rules'][rule['$'].name] = rule.characteristics.characteristic['_'];
+              });  
+            }
+
           }
           break;
         case '':
@@ -128,23 +146,29 @@ function parseUnit(selection) {
 
   // unit points cost 
   unit['points'] = parseInt(selection.costs.cost['$'].value);
-  if(unit['points'] == 0) {
-    const selections = forceArray(selection.selections.selection);
-    selections.forEach((item) => {
+  //if(unit['points'] == 0) {
+    const costSelections = forceArray(selection.selections.selection);
+    costSelections.forEach((item) => {
       unit['points'] += parseInt(item.costs.cost['$'].value);
     });
-  }
+  //}
 
   // unit rules
-  const rules = forceArray(selection.rules.rule);
-  rules.forEach((rule) => {
-    unit['rules'][rule['$'].name] = rule.description;
-  });
+  if(selection.rules) {
+    const rules = forceArray(selection.rules.rule);
+    rules.forEach((rule) => {
+      unit['rules'][rule['$'].name] = rule.description;
+    });  
+  }
 
   // unit keywords (including faction, prefixed with "Faction: ")
   const keywords = forceArray(selection.categories.category);
   keywords.forEach((keyword) => {
     unit['keywords'].push(keyword['$'].name);
+  });
+
+  unit['keywords'].sort((a, b) => {
+    return a.match('Faction') ? -1 : 1;
   });
 
   // unit roster/model count
@@ -176,6 +200,7 @@ function jsonToHTML(json) {
   var html = '';
   json.forEach((force) => {
     html += renderCover(force);
+    html += renderArmory(force);
     html += renderUnits(force['units']);
   });
   return html;
@@ -190,54 +215,109 @@ function renderUnits(units) {
 }
 
 function renderCover(force) {
+  console.log(force);
+  var unitRows = '';
+  force.units.forEach((unit) => {
+    unitRows += `<tr>
+    <td>${unit.sheet}</td>
+    <td>${unit.points}</td>
+    <td>${unit.models.join(', ')}</td>
+    </tr>`
+  });
   return `<div id="coverPage" class="page">
-  <div class="header">
+  <div class="row">
+  <div class="col-md-11 header">
+    <h3 class="floater">${force.detachment} Detachment</h3>
     <h2>${force.faction} army - ${force.cost}</h2>
-    <hr/>
-    <h3>${force.detachment} Detachment</h3>
   </div>
+  <div class="col-md-12">
   <h4>Faction/Detachment Rules</h4>
   <div class="rules">${hashToLi(force.rules)}</div>
   <hr/>
+  <h4>Units</h4>
+  <table class="table table-striped">
+    <thead><tr>
+      <th>Datasheet</th>
+      <th>Points</th>
+      <th>Models</th>
+    </tr></thead><tbody>
+    ${unitRows}
+  </tbody></table>
+  </div></div></div>`;
+}
+
+function renderArmory(force) {
+  var allProfiles = {};
+  var allRangedWeapons = {};
+  var allMeleeWeapons = {};
+  force.units.forEach((unit) => {
+    Object.keys(unit.profiles).forEach((profile) => {
+      allProfiles[profile] = unit.profiles[profile];
+    })
+    Object.keys(unit.weapons['ranged']).forEach((profile) => {
+      allRangedWeapons[profile] = unit.weapons['ranged'][profile];
+    })
+    Object.keys(unit.weapons['melee']).forEach((profile) => {
+      allMeleeWeapons[profile] = unit.weapons['melee'][profile];
+    })
+  });
+  return `
+  <div id="refPage" class="page"><div class="row">
+  <div class="col-md-11 header"><h3>Rules Reference</h3></div>
+  <div class="row">
+  <div class="col-md-6">
+    <h4>Model Profiles</h4>
+    ${makeTable(allProfiles)}
+    </div>
+    <div class="col-md-6">
+    <h4>Ranged Weapons</h4>
+    ${makeTable(allRangedWeapons)}
+    <h4>Melee Weapons</h4>
+    ${makeTable(allMeleeWeapons)}
+  </div>
+  </div>
+  </div>
   </div>`;
 }
 
 function renderUnit(unit) {
-  return `<div class="page" style="border:1px solid black; margin:10px; padding 10px;">
+  return `<div class="page">
     <div class="row">
-    <div class="col-md-11 header"><h3>${unit.sheet} - ${unit.points} points</h3></div>
+    <div class="col-md-11 header">
+      <div class="floater">${unit.models.join(', ')}</div>
+      <h3>${unit.sheet} - ${unit.points} points</h3>
+      </div>
     <div class="col-md-7">
     ${makeTable(unit.profiles)}
     <h4>Ranged Weapons</h4>
     ${makeTable(unit.weapons['ranged'])}
     <h4>Melee Weapons</h4>
     ${makeTable(unit.weapons['melee'])}
-    <h4>Wargear</h4>
-    <div class="rules">${hashToLi(unit.wargear)}</div>
     </div>
-    <div class="col-md-4">
-      <h4>Models</h4>
-      <ul><li>${unit.models.join('</li><li>')}</li></ul>
+    <div class="col-md-5">
       <h4>Abilities</h4>
       <div class="rules">${hashToLi(unit.abilities)}</div>
+      <h4>Wargear</h4>
+      <div class="rules">${hashToLi(unit.wargear)}</div>  
       <h4>Rules</h4>
-      ${Object.keys(unit.rules).join(', ')}
+      <ul><li>${unit.rules.length ? Object.keys(unit.rules).sort().join(', ') : 'None'}</li></ul>
       </div>
-    <div class="col-md-11">Keywords: ${unit.keywords.join(', ')}</div>
+    <div class="footer col-md-12"><strong>Keywords:</strong> ${unit.keywords.join(', ')}</div>
   </div></div>
   `;
 }
 
 function makeTable(data) {
-  var content = '<table>';
+  var content = '<table class="table table-striped"><thead>';
+
   var first = true;
-  Object.keys(data).forEach((row) => {
+  Object.keys(data).sort().forEach((row) => {
     if(first == true) {
-      content += '<tr><td></td>';
+      content += '<tr><th></th>';
       Object.keys(data[row]).forEach((col) => {
         content += `<th>${col}</th>`;
       });
-      content += '</tr>';  
+      content += '</tr></thead><tbody>';  
       first = false;
     }
     content += `<tr><th>${row}</th>`;
@@ -246,14 +326,18 @@ function makeTable(data) {
     });
     content += '</tr>';
   });
-  content += '</table>'
+  content += '</tbody></table>'
   return content;
 }
 
 function hashToLi(items) {
   var content = '<ul>';
-  Object.keys(items).forEach((item) => {
-    content += `<li><strong>${item}:</strong> ${items[item]}</li>`
+  if(Object.keys(items).length == 0) {
+    content += '<li>None</li>'
+  }
+  Object.keys(items).sort().forEach((item) => {
+    const formatted = items[item].replace(/\n+/g, '<br>');
+    content += `<li><strong>${item}:</strong> ${formatted}</li>`
   });
   content += '</ul>'
   return content;
@@ -281,6 +365,9 @@ function parseGun(gun) {
 }
 
 function forceArray(item) {
+  if(!item) { 
+    return [];
+  }
   if(!Array.isArray(item)) {
     return [item];
   } else {
