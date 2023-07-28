@@ -25,14 +25,12 @@ function bind() {
       $('#output-label').show();
       $('#output').html(jsonToHTML(listJson));
       var element = document.getElementById('output');
-      /*
       html2pdf(element, {
         filename:  'your_list_sucks.pdf',
         pagebreak: { mode: 'css', after: '.page' },
         margin:    1,
         jsPDF: { format: 'letter', orientation: 'landscape' }
       });
-      */
     }
     reader.readAsText(file);
   });
@@ -114,10 +112,12 @@ function parseUnit(selection) {
   unit.sheet = selection['$'].name;
 
   // model stat blocks and abilities
-  const profiles = forceArray(selection.profiles.profile);
-  profiles.forEach((profile) => {
-    unit = parseProfile(unit, profile);
-  });
+  if(selection.profiles) {
+    const profiles = forceArray(selection.profiles.profile);
+    profiles.forEach((profile) => {
+      unit = parseProfile(unit, profile);
+    });  
+  }
 
   // weapon stat blocks
   const selections = forceArray(selection.selections.selection);
