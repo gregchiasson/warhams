@@ -41,6 +41,8 @@ function bind() {
 function xmlToJson(xml) {
   const obj = $.xml2json(xml);
   var army = [];
+
+  console.log(obj);
   
   // soup
   const forces = forceArray(obj.roster.forces.force);
@@ -64,7 +66,7 @@ function xmlToJson(xml) {
           list['units'].push(parseUnit(selection));
           break;
         case 'upgrade':
-          if(selection['$'].name == "Detachment") {
+          if(selection['$'].name == "Detachment" || selection['$'].name == "Detachment Choice") {
             list['detachment'] = selection.selections.selection['$'].name;
             if(selection.selections.selection.rules) {
               const rules = forceArray(selection.selections.selection.rules.rule);
