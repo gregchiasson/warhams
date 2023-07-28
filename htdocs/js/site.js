@@ -1,3 +1,4 @@
+// https://github.com/eKoopmans/html2pdf.js
 // page 1: all rules mentioned on all sheets (distinct), faction/detachment rules too
 // cards: show name of rules but name/description of abilities
 // sort units by epic > character > other, and alphabetically within
@@ -8,56 +9,74 @@ function bind() {
   $('#list').change((e) => {
     const file   = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = function(event) {
-      // unzip file if needed, or just try it anyway because of mobile extension shit
-      const listJson = xmlToJson(event.target.result);
-      $('#output').html(`<pre>${JSON.stringify(listJson)}</pre>`);
-      console.log(listJson);
+    reader.onload = async function(event) {
+      var xmlContent = '';
+      // try the unzip first, then fall back to assuming its not a zip
+      // cant use the file extension because bscribe mobile doesnt always include it.
+      // because it sucks.
+      try {
+        const reader  = new zip.ZipReader(new zip.BlobReader(file));
+        const entries = await reader.getEntries();
+        xmlContent = await entries[0].getData(new zip.TextWriter(), {onprogress: (index, max) => {}});
+        await reader.close();
+      } catch(err) {
+      }
+      if(!xmlContent) {
+        xmlContent = event.target.result;
+      }
+      const listJson = xmlToJson(xmlContent);
+      $('#output').html(jsonToHTML(listJson));
+      var element = document.getElementById('output');
+      html2pdf(element);
     }
     reader.readAsText(file);
   });
 }
 
 function xmlToJson(xml) {
-  var list = {'cost': 0, 'rules': {}, 'cheat': {}, 'units': [], 'faction': 'Unknown', 'detachment': 'Unknown'};
   const obj = $.xml2json(xml);
+  var army = [];
+  
+  // soup
+  const forces = forceArray(obj.roster.forces.force);
+  forces.forEach((force) => {
+    var list = {'cost': 0, 'rules': {}, 'cheat': {}, 'units': [], 'faction': 'Unknown', 'detachment': 'Unknown'};
+    list['faction'] = force['$'].catalogueName;
+    list['cost'] = `${parseInt(obj.roster.costs.cost['$'].value)}${obj.roster.costs.cost['$'].name}`;
 
-  // TODO soup
-  const force = forceArray(obj.roster.forces.force)[0];
-  list['faction'] = force['$'].catalogueName;
-  list['cost'] = `${parseInt(obj.roster.costs.cost['$'].value)}${obj.roster.costs.cost['$'].name}`;
+    const rules = forceArray(force.rules.rule);
+    rules.forEach((rule) => {
+      list['rules'][rule['$'].name] = rule.description;
+    });
 
-  const rules = forceArray(force.rules.rule);
-  rules.forEach((rule) => {
-    list['rules'][rule['$'].name] = rule.description;
+    const selections = forceArray(force.selections.selection);
+    selections.forEach((selection) => {
+      switch(selection['$'].type) {
+        case 'unit':
+          list['units'].push(parseUnit(selection));
+          break;
+        case 'upgrade':
+          if(selection['$'].name == "Detachment") {
+            list['detachment'] = selection.selections.selection['$'].name;
+            selection.selections.selection.rules.rule.forEach((rule) => {
+              list['rules'][rule['$'].name] = rule.description;
+            });
+          }
+          break;
+        case '':
+          break;
+      }
+    });
+
+    list['units'].forEach((unit) => {
+      Object.keys(unit['rules']).forEach((rule) => {
+        list['cheat'][rule] = unit['rules'][rule];
+      })
+    });
+    army.push(list);
   });
 
-  const selections = forceArray(force.selections.selection);
-  selections.forEach((selection) => {
-    switch(selection['$'].type) {
-      case 'unit':
-        list['units'].push(parseUnit(selection));
-        break;
-      case 'upgrade':
-        if(selection['$'].name == "Detachment") {
-          list['detachment'] = selection.selections.selection['$'].name;
-          selection.selections.selection.rules.rule.forEach((rule) => {
-            list['rules'][rule['$'].name] = rule.description;
-          });
-        }
-        break;
-      case '':
-        break;
-    }
-  });
-
-  list['units'].forEach((unit) => {
-    Object.keys(unit['rules']).forEach((rule) => {
-      list['cheat'][rule] = unit['rules'][rule];
-    })
-  });
-
-  return list;
+  return army;
 }
 
 function parseUnit(selection) {
@@ -88,8 +107,6 @@ function parseUnit(selection) {
       unit['abilities'][profile['$'].name] = profile.characteristics.characteristic['_']; 
     }
   });
-
-  // TODO character guns???
 
   // weapon stat blocks
   const selections = selection.selections.selection;
@@ -169,6 +186,93 @@ function parseUnit(selection) {
   }
 
   return unit;
+}
+
+function jsonToHTML(json) {
+  var html;
+  json.forEach((force) => {
+    html += renderCover(force);
+    html += renderUnits(force['units']);
+  });
+  return html;
+}
+
+function renderUnits(units) {
+  var content = '';
+  units.forEach((unit) => {
+    content += renderUnit(unit);
+  });
+  return content;
+}
+
+function renderCover(force) {
+  return `<div id="coverPage" class="page">
+  <div class="header">
+    <h2>${force.faction} army - ${force.cost}</h2>
+    <hr/>
+    <h3>${force.detachment} Detachment</h3>
+  </div>
+  <h4>Faction/Detachment Rules</h4>
+  <div class="rules">${hashToLi(force.rules)}</div>
+  <hr/>
+  </div>`;
+}
+
+function renderUnit(unit) {
+  return `<div class="page" style="border:1px solid black; margin:10px; padding 10px;">
+    <div class="row">
+    <div class="col-md-11 header"><h3>${unit.sheet} - ${unit.points} points</h3></div>
+    <div class="col-md-7">
+    ${makeTable(unit.profiles)}
+    <h4>Ranged Weapons</h4>
+    ${makeTable(unit.weapons['ranged'])}
+    <h4>Melee Weapons</h4>
+    ${makeTable(unit.weapons['melee'])}
+    <h4>Wargear</h4>
+    <div class="rules">${hashToLi(unit.wargear)}</div>
+    </div>
+    <div class="col-md-4">
+      <h4>Models</h4>
+      <ul><li>${unit.models.join('</li><li>')}</li></ul>
+      <h4>Abilities</h4>
+      <div class="rules">${hashToLi(unit.abilities)}</div>
+      <h4>Rules</h4>
+      ${Object.keys(unit.rules).join(', ')}
+      </div>
+    <div class="col-md-11">Keywords: ${unit.keywords.join(', ')}</div>
+  </div></div>
+  `;
+}
+
+function makeTable(data) {
+  var content = '<table>';
+  var first = true;
+  Object.keys(data).forEach((row) => {
+    if(first == true) {
+      content += '<tr><td></td>';
+      Object.keys(data[row]).forEach((col) => {
+        content += `<th>${col}</th>`;
+      });
+      content += '</tr>';  
+      first = false;
+    }
+    content += `<tr><th>${row}</th>`;
+    Object.keys(data[row]).forEach((col) => {
+      content += `<td>${data[row][col]}</td>`;
+    });
+    content += '</tr>';
+  });
+  content += '</table>'
+  return content;
+}
+
+function hashToLi(items) {
+  var content = '<ul>';
+  Object.keys(items).forEach((item) => {
+    content += `<li><strong>${item}:</strong> ${items[item]}</li>`
+  });
+  content += '</ul>'
+  return content;
 }
 
 function parseGun(gun) {
