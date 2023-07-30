@@ -210,6 +210,7 @@ function jsonToHTML(json) {
   var html = '';
   json.forEach((force) => {
     html += renderCover(force);
+    html += renderCheat(force);
     html += renderArmory(force);
     html += renderUnits(force['units']);
   });
@@ -226,6 +227,11 @@ function renderUnits(units) {
 
 function renderCover(force) {
   var unitRows = '';
+
+  force.units.sort((a, b) => {
+    return a.sheet.localeCompare(b.sheet);
+  });
+
   force.units.forEach((unit) => {
     unitRows += `<tr>
     <td>${unit.sheet}</td>
@@ -255,6 +261,48 @@ function renderCover(force) {
   </div></div></div>`;
 }
 
+function renderCheat(force) {
+  var unitData = '';
+
+  force.units.sort((a, b) => {
+    return a.sheet.localeCompare(b.sheet);
+  });
+
+  uniqueUnits = [];
+  seenUnits = [];
+  force.units.forEach((unit) => {
+    // TODO: de-dupe the unit list.
+    uniqueUnits.push(unit);
+  })
+
+  uniqueUnits.forEach((unit) => {
+    var allWeapons = unit.weapons['ranged'];
+    Object.keys(unit.weapons['melee']).forEach((gun) => {
+      allWeapons[gun] = unit.weapons['melee'][gun];
+    });
+    var allRules = unit.abilities;
+    Object.keys(unit.rules).forEach((rule) => {
+      allRules[rule] = unit.rules[rule];
+    })
+    unitData += `
+    <div class="col-md-6">
+    <h4>${unit.sheet}</h4>
+    <strong>Rules and Abilities</strong>: ${Object.keys(allRules).length ? Object.keys(allRules).sort().join(', ') : 'None'}
+    ${makeTable(unit.profiles)}
+    ${makeTable(allWeapons)}
+    </div>`;
+  });
+
+  return `
+  <div id="cheatPage" class="page"><div class="row">
+    <div class="col-md-11 header"><h3>Quick Reference Sheet</h3></div>
+      <div class="row">
+        ${unitData}
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderArmory(force) {
   var allProfiles = {};
   var allRangedWeapons = {};
@@ -264,10 +312,12 @@ function renderArmory(force) {
       allProfiles[profile] = unit.profiles[profile];
     })
     Object.keys(unit.weapons['ranged']).forEach((profile) => {
-      allRangedWeapons[profile] = unit.weapons['ranged'][profile];
+      const weaponName = `${unit.sheet}: ${profile}`;
+      allRangedWeapons[weaponName] = unit.weapons['ranged'][profile];
     })
     Object.keys(unit.weapons['melee']).forEach((profile) => {
-      allMeleeWeapons[profile] = unit.weapons['melee'][profile];
+      const weaponName = `${unit.sheet}: ${profile}`;
+      allMeleeWeapons[weaponName] = unit.weapons['melee'][profile];
     })
   });
   return `
