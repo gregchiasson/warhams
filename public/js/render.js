@@ -1,4 +1,7 @@
 const buttRender = {
+    skippables() {
+      return ['Leader', 'Feel No Pain'] 
+    },
     jsonToHTML(json) {
     var html = '';
     json.forEach((force) => {
@@ -6,7 +9,7 @@ const buttRender = {
       html += buttRender.renderCheat(force);
       html += buttRender.renderRules(force);
       //html += buttRender.renderArmory(force);
-      html += buttRender.renderUnits(force['units']);
+      html += buttRender.renderUnits(force);
     });
     return html;
   },
@@ -19,10 +22,10 @@ const buttRender = {
       jsPDF: { format: 'letter', orientation: 'portrait' }
     });
   },
-  renderUnits(units) {
+  renderUnits(force) {
     var content = '';
-    units.forEach((unit) => {
-      content += buttRender.renderUnit(unit);
+    force['units'].forEach((unit) => {
+      content += buttRender.renderUnit(unit, force['rules']);
     });
     return content;
   },
@@ -155,7 +158,21 @@ const buttRender = {
     </div>
     </div>`;
   },
-  renderUnit(unit) {
+  renderUnit(unit, skipRules) {
+    var abilities = {};
+    // filter out a few of the more obvious USRs. 
+    // these still show up under rules, just not as abilities
+    buttRender.skippables().forEach((skip) => {
+      skipRules[skip] = 'Nope.'
+    });
+    // anything that's in the army-wide rules also can be skipped
+    // these still show as rules, and the full text is available
+    // on the summary page, but they're too dang long
+    Object.keys(unit['abilities']).forEach((ruleName) => {
+      if(!skipRules[ruleName]) {
+        abilities[ruleName] = unit['abilities'][ruleName];
+      }
+    });
     return `<div class="page">
       <div class="row">
       <div class="col-md-11 header">
@@ -171,7 +188,7 @@ const buttRender = {
       </div>
       <div class="col-md-5">
         <h4>Abilities</h4>
-        <div class="rules">${buttRender.hashToLi(unit.abilities)}</div>
+        <div class="rules">${buttRender.hashToLi(abilities)}</div>
         <!--
         <h4>Wargear</h4>
         <div class="rules">${buttRender.hashToLi(unit.wargear)}</div>  

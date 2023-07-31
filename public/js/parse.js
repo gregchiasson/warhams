@@ -2,8 +2,6 @@ const buttParse = {
   xmlToJson(xml) {
     const obj = $.xml2json(xml);
     var army = [];
-
-    console.log(obj);
     
     // soup
     const forces = buttParse.forceArray(obj.roster.forces.force);
