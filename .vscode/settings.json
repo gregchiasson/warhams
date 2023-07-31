@@ -1,3 +1,4 @@
 {
-  "liveServer.settings.multiRootWorkspaceName": "buttscribe"
+  "liveServer.settings.multiRootWorkspaceName": "buttscribe",
+  "liveServer.settings.root": "/public"
 }
