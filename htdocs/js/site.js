@@ -211,7 +211,8 @@ function jsonToHTML(json) {
   json.forEach((force) => {
     html += renderCover(force);
     html += renderCheat(force);
-    html += renderArmory(force);
+    html += renderRules(force);
+    //html += renderArmory(force);
     html += renderUnits(force['units']);
   });
   return html;
@@ -271,8 +272,11 @@ function renderCheat(force) {
   uniqueUnits = [];
   seenUnits = [];
   force.units.forEach((unit) => {
-    // TODO: de-dupe the unit list.
-    uniqueUnits.push(unit);
+    const hash = JSON.stringify(unit);
+    if(seenUnits.indexOf(hash) == -1) {
+      seenUnits.push(hash);
+      uniqueUnits.push(unit);
+    }
   })
 
   uniqueUnits.forEach((unit) => {
@@ -301,6 +305,22 @@ function renderCheat(force) {
       </div>
     </div>
   </div>`;
+}
+
+function renderRules(force) {
+  var allRules = {};
+  force.units.forEach((unit) => {
+    Object.keys(unit.abilities).forEach((rule) => {
+      allRules[rule] = unit.abilities[rule];
+    })
+  });
+  return `
+  <div id="rulesPage" class="page"><div class="row">
+    <div class="col-md-11 header"><h3>Quick Reference Sheet</h3></div>
+      <div class="rules">${hashToLi(allRules)}</div>
+    </div>
+  </div>`;
+
 }
 
 function renderArmory(force) {
@@ -356,8 +376,10 @@ function renderUnit(unit) {
     <div class="col-md-5">
       <h4>Abilities</h4>
       <div class="rules">${hashToLi(unit.abilities)}</div>
+      <!--
       <h4>Wargear</h4>
       <div class="rules">${hashToLi(unit.wargear)}</div>  
+      -->
       <h4>Rules</h4>
       <ul><li>${Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None'}</li></ul>
       </div>
