@@ -22,9 +22,9 @@ function bind() {
       var element = document.getElementById('output');
       html2pdf(element, {
         filename:  'your_list_sucks.pdf',
-        pagebreak: { mode: 'css', after: '.page' },
-        margin:    1,
-        jsPDF: { format: 'letter', orientation: 'landscape' }
+        pagebreak: { mode: 'css', after: '.page', avoid: '.nitSummary' },
+        margin:    0,
+        jsPDF: { format: 'letter', orientation: 'portrait' }
       });
     }
     reader.readAsText(file);
@@ -289,7 +289,7 @@ function renderCheat(force) {
       allRules[rule] = unit.rules[rule];
     })
     unitData += `
-    <div class="col-md-6">
+    <div class="col-md-6 unitSummary">
     <h4>${unit.sheet}</h4>
     <strong>Rules and Abilities</strong>: ${Object.keys(allRules).length ? Object.keys(allRules).sort().join(', ') : 'None'}
     ${makeTable(unit.profiles)}
@@ -299,7 +299,7 @@ function renderCheat(force) {
 
   return `
   <div id="cheatPage" class="page"><div class="row">
-    <div class="col-md-11 header"><h3>Quick Reference Sheet</h3></div>
+    <div class="col-md-11 header"><h2>Unit Reference</h2></div>
       <div class="row">
         ${unitData}
       </div>
@@ -316,7 +316,7 @@ function renderRules(force) {
   });
   return `
   <div id="rulesPage" class="page"><div class="row">
-    <div class="col-md-11 header"><h3>Quick Reference Sheet</h3></div>
+    <div class="col-md-11 header"><h2>Rules Reference</h2></div>
       <div class="rules">${hashToLi(allRules)}</div>
     </div>
   </div>`;
@@ -342,7 +342,7 @@ function renderArmory(force) {
   });
   return `
   <div id="refPage" class="page"><div class="row">
-  <div class="col-md-11 header"><h3>Rules Reference</h3></div>
+  <div class="col-md-11 header"><h2>Rules Reference</h2></div>
   <div class="row">
   <div class="col-md-6">
     <h4>Model Profiles</h4>
@@ -364,7 +364,7 @@ function renderUnit(unit) {
     <div class="row">
     <div class="col-md-11 header">
       <div class="floater">${unit.models.join(', ')}</div>
-      <h3>${unit.sheet} - ${unit.points} points</h3>
+      <h2>${unit.sheet} - ${unit.points} points</h2>
       </div>
     <div class="col-md-7">
     ${makeTable(unit.profiles)}
