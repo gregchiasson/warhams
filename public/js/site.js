@@ -19,7 +19,8 @@ function bind() {
       const listJson = buttParse.xmlToJson(xmlContent);
       $('#output-label').show();
       $('#output').html(buttRender.jsonToHTML(listJson));
-      buttRender.HTMLtoPDF('output');
+      console.log(listJson);
+      //buttRender.HTMLtoPDF('output');
     }
     reader.readAsText(file);
   });

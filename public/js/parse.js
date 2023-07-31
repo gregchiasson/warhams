@@ -6,6 +6,7 @@ const buttParse = {
     // soup
     const forces = buttParse.forceArray(obj.roster.forces.force);
     forces.forEach((force) => {
+      console.log(force);
       var list = {'cost': 0, 'rules': {}, 'cheat': {}, 'units': [], 'faction': 'Unknown', 'detachment': 'Unknown'};
       list['faction'] = force['$'].catalogueName;
       list['cost'] = `${parseInt(obj.roster.costs.cost['$'].value)}${obj.roster.costs.cost['$'].name}`;
@@ -74,6 +75,7 @@ const buttParse = {
     // model stat blocks and abilities
     if(selection.profiles) {
       const profiles = buttParse.forceArray(selection.profiles.profile);
+      unit = buttParse.parseGuns(unit, profiles);
       profiles.forEach((profile) => {
         unit = buttParse.parseProfile(unit, profile);
       });  
