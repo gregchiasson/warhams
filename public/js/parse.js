@@ -6,7 +6,6 @@ const buttParse = {
     // soup
     const forces = buttParse.forceArray(obj.roster.forces.force);
     forces.forEach((force) => {
-      console.log(force);
       var list = {'cost': 0, 'rules': {}, 'cheat': {}, 'units': [], 'faction': 'Unknown', 'detachment': 'Unknown'};
       list['faction'] = force['$'].catalogueName;
       list['cost'] = `${parseInt(obj.roster.costs.cost['$'].value)}${obj.roster.costs.cost['$'].name}`;
@@ -171,11 +170,9 @@ const buttParse = {
   parseModels(unit) {
     var allModels = [];
     var rawModels = {};
-    console.log(unit);
     // unit roster/model count
     if(unit.selections) {
       const models = buttParse.forceArray(unit.selections.selection);
-      console.log(models);
       models.forEach((model) => {
         if(model['$'].type == 'model') {
           const modelName  = model['$'].name;
