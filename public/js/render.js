@@ -1,6 +1,13 @@
 const buttRender = {
     skippables() {
-      return ['Leader', 'Feel No Pain'] 
+      // probably a better way to handle this...
+      return [
+        'Leader', 'Feel No Pain', 'Kindred Sorcery', 'Reanimation Protocols', 'Deep Strike',
+        'Eye of the Ancestors', 'Ruthless Efficiency', 'Strands of Fate',
+        'Deadly Demise 1', 'Deadly Demise 3', 'Deadly Demise D3', 'Deadly Demise D6', 'Deadly Demise 6',
+        'Firing Deck 1', 'Firing Deck 2', 'Firing Deck 5', 'Firing Deck 11', 'Firing Deck 12',
+        'Cabal of Sorcerers 1', 'Cabal of Sorcerers 2', 'Cabal of Sorcerers 3', 'Cabal of Sorcerers 4'
+      ] 
     },
     jsonToHTML(json) {
     var html = '';

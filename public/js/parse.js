@@ -71,8 +71,27 @@ const buttParse = {
       'weapons':   {'ranged': {}, 'melee': {}}
     };    
     unit.sheet = selection['$'].name;
+    unit['models'] = buttParse.parseModels(selection);
+    unit['points'] = parseInt(selection.costs.cost['$'].value);
 
-    // model stat blocks and abilities
+    if(selection.rules) {
+      const rules = buttParse.forceArray(selection.rules.rule);
+      rules.forEach((rule) => {
+        unit['rules'][rule['$'].name] = rule.description;
+      });  
+    }
+
+    if(selection.categories) {
+      const keywords = buttParse.forceArray(selection.categories.category);
+      keywords.forEach((keyword) => {
+        unit['keywords'].push(keyword['$'].name);
+      });
+  
+      unit['keywords'].sort((a, b) => {
+        return a.match('Faction') ? -1 : 1;
+      });  
+    }
+
     if(selection.profiles) {
       const profiles = buttParse.forceArray(selection.profiles.profile);
       unit = buttParse.parseGuns(unit, profiles);
@@ -81,93 +100,37 @@ const buttParse = {
       });  
     }
 
-    // weapon stat blocks
-    const selections = buttParse.forceArray(selection.selections.selection);
-    selections.forEach((item) => {
-      if(item.profiles) {
-          const profiles = buttParse.forceArray(item.profiles.profile);
-          unit = buttParse.parseGuns(unit, profiles);
-      }
-      if(item.selections) {
-        const itemSelections = buttParse.forceArray(item.selections.selection);
-        itemSelections.forEach((gear) => {
-          if(gear.profiles) {
-            const profiles = buttParse.forceArray(gear.profiles.profile);
-            unit = buttParse.parseGuns(unit, profiles);  
-          } 
-          if(gear.selections) {
-            const fuckGuard = buttParse.forceArray(gear.selections.selection);
-            fuckGuard.forEach((fuckYou) => {
-              if(fuckYou.profiles) {
-                const profiles = buttParse.forceArray(fuckYou.profiles.profile);
-                unit = buttParse.parseGuns(unit, profiles);  
-              }     
-            });
-          }
-        });  
-      }
-    });
+    if(selection.selections) {      
+      const selections = buttParse.forceArray(selection.selections.selection);
 
-    // unit points cost 
-    unit['points'] = parseInt(selection.costs.cost['$'].value);
-    const costSelections = buttParse.forceArray(selection.selections.selection);
-    costSelections.forEach((item) => {
-      unit['points'] += parseInt(item.costs.cost['$'].value);
-    });
+      selections.forEach((item) => {
+        unit['points'] += parseInt(item.costs.cost['$'].value);
+      });
 
-    // unit rules
-    if(selection.rules) {
-      const rules = buttParse.forceArray(selection.rules.rule);
-      rules.forEach((rule) => {
-        unit['rules'][rule['$'].name] = rule.description;
-      });  
-    }
-
-    // unit keywords (including faction, prefixed with "Faction: ")
-    const keywords = buttParse.forceArray(selection.categories.category);
-    keywords.forEach((keyword) => {
-      unit['keywords'].push(keyword['$'].name);
-    });
-
-    unit['keywords'].sort((a, b) => {
-      return a.match('Faction') ? -1 : 1;
-    });
-
-    // unit roster/model count
-    const models = buttParse.forceArray(selection.selections.selection);
-    var rawModels = {};
-    models.forEach((model) => {
-      if(model['$'].type == 'model') {
-        const modelName  = model['$'].name;
-        const modelCount = model['$'].number;
-        if(!rawModels[modelName]) {
-          rawModels[modelName] = 0;
+      selections.forEach((item) => {
+        if(item.profiles) {
+            const profiles = buttParse.forceArray(item.profiles.profile);
+            unit = buttParse.parseGuns(unit, profiles);
         }
-        rawModels[modelName] += parseInt(modelCount);  
-      }
-      // i love how i have to keep hacking this crap in because all the codex
-      // data maintainers are insane. this time, for guard infantry squads:
-      if(model.selections) {
-        const fuckGuard = buttParse.forceArray(model.selections.selection);
-        fuckGuard.forEach((fuckYou) => {
-          if(fuckYou['$'].type == 'model') {
-            const modelName  = fuckYou['$'].name;
-            const modelCount = fuckYou['$'].number;
-            if(!rawModels[modelName]) {
-              rawModels[modelName] = 0;
+        if(item.selections) {
+          const itemSelections = buttParse.forceArray(item.selections.selection);
+          itemSelections.forEach((gear) => {
+            if(gear.profiles) {
+              const profiles = buttParse.forceArray(gear.profiles.profile);
+              unit = buttParse.parseGuns(unit, profiles);  
+            } 
+            if(gear.selections) {
+              const fuckGuard = buttParse.forceArray(gear.selections.selection);
+              fuckGuard.forEach((fuckYou) => {
+                if(fuckYou.profiles) {
+                  const profiles = buttParse.forceArray(fuckYou.profiles.profile);
+                  unit = buttParse.parseGuns(unit, profiles);  
+                }     
+              });
             }
-            rawModels[modelName] += parseInt(modelCount);  
-          }
-        });    
-      }
-    });
-
-    if(Object.keys(rawModels).length > 0) {
-      Object.keys(rawModels).forEach((model) => {
-        unit['models'].push(`${rawModels[model]} ${model}`)
-      });  
-    } else {
-      unit['models'].push(`1 ${unit['sheet']}`)    
+          });  
+        }
+      });        
     }
 
     return unit;
@@ -204,6 +167,50 @@ const buttParse = {
       stats[stat['$'].name] = stat['_'];
     })
     return stats;
+  },
+  parseModels(unit) {
+    var allModels = [];
+    var rawModels = {};
+    console.log(unit);
+    // unit roster/model count
+    if(unit.selections) {
+      const models = buttParse.forceArray(unit.selections.selection);
+      console.log(models);
+      models.forEach((model) => {
+        if(model['$'].type == 'model') {
+          const modelName  = model['$'].name;
+          const modelCount = model['$'].number;
+          if(!rawModels[modelName]) {
+            rawModels[modelName] = 0;
+          }
+          rawModels[modelName] += parseInt(modelCount);  
+        }
+        // i love how i have to keep hacking this crap in because all the codex
+        // data maintainers are insane. this time, for guard infantry squads:
+        if(model.selections) {
+          const fuckGuard = buttParse.forceArray(model.selections.selection);
+          fuckGuard.forEach((fuckYou) => {
+            if(fuckYou['$'].type == 'model') {
+              const modelName  = fuckYou['$'].name;
+              const modelCount = fuckYou['$'].number;
+              if(!rawModels[modelName]) {
+                rawModels[modelName] = 0;
+              }
+              rawModels[modelName] += parseInt(modelCount);  
+            }
+          });    
+        }
+      });  
+    }
+
+    if(Object.keys(rawModels).length > 0) {
+      Object.keys(rawModels).forEach((model) => {
+        allModels.push(`${rawModels[model]} ${model}`);
+      });  
+    } else {
+      allModels.push(`1 ${unit['$'].name}`);
+    }
+    return allModels;
   },
   forceArray(item) {
     if(!item) { 
