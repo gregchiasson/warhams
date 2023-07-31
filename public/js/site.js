@@ -20,7 +20,7 @@ function bind() {
       $('#output-label').show();
       $('#output').html(buttRender.jsonToHTML(listJson));
       console.log(listJson);
-      //buttRender.HTMLtoPDF('output');
+      buttRender.HTMLtoPDF('output');
     }
     reader.readAsText(file);
   });
