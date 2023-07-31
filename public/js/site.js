@@ -1,3 +1,4 @@
+// TODO: probably want to re-factor this so it's not one big file.
 $(document).ready(bind);
 
 function bind() {
