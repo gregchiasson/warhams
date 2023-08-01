@@ -89,7 +89,10 @@ const buttRender = {
     })
 
     uniqueUnits.forEach((unit) => {
-      var allWeapons = unit.weapons['ranged'];
+      var allWeapons = {};
+      Object.keys(unit.weapons['ranged']).forEach((gun) => {
+        allWeapons[gun] = unit.weapons['ranged'][gun];
+      });
       Object.keys(unit.weapons['melee']).forEach((gun) => {
         allWeapons[gun] = unit.weapons['melee'][gun];
       });
