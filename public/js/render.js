@@ -48,13 +48,20 @@ const buttRender = {
       <td>${unit.sheet}</td>
       <td>${unit.points}</td>
       <td>${unit.models.join(', ')}</td>
-      </tr>`
+      </tr>`;
     });
+
+    unitRows += `<tr>
+    <td><strong>Total Points</strong></td>
+    <td>${force.cost}</td>
+    <td>&nbsp;</td>
+    </tr>`;
+
     return `<div id="coverPage" class="page">
     <div class="row">
     <div class="col-md-11 header">
       <h3 class="floater">${force.detachment} Detachment</h3>
-      <h2>${force.faction} army - ${force.cost}</h2>
+      <h2>${force.faction} army - ${force.cost} points</h2>
     </div>
     <div class="col-md-12">
     <h4>Faction/Detachment Rules</h4>

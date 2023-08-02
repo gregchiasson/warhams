@@ -8,8 +8,7 @@ const buttParse = {
     forces.forEach((force) => {
       var list = {'cost': 0, 'rules': {}, 'cheat': {}, 'units': [], 'faction': 'Unknown', 'detachment': 'Unknown'};
       list['faction'] = force['$'].catalogueName;
-      list['cost'] = `${parseInt(obj.roster.costs.cost['$'].value)}${obj.roster.costs.cost['$'].name}`;
-
+      list['cost'] = parseInt(obj.roster.costs.cost['$'].value);
       if(force.rules) {
         const rules = buttParse.forceArray(force.rules.rule);
         rules.forEach((rule) => {
