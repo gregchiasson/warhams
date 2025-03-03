@@ -70,7 +70,8 @@ const buttParse = {
     };    
     unit.sheet = selection['$'].name;
     unit['models'] = buttParse.parseModels(selection);
-    unit['points'] = parseInt(selection.costs.cost['$'].value);
+    const costObj = Array.isArray(selection.costs.cost) ? selection.costs.cost[0] : selection.costs.cost;
+    unit['points'] = parseInt(costObj['$'].value);
 
     if(selection.rules) {
       const rules = buttParse.forceArray(selection.rules.rule);
@@ -102,7 +103,9 @@ const buttParse = {
       const selections = buttParse.forceArray(selection.selections.selection);
 
       selections.forEach((item) => {
-        unit['points'] += parseInt(item.costs.cost['$'].value);
+        console.log(item.costs.cost);
+        const costObj = Array.isArray(item.costs.cost) ? item.costs.cost[0] : item.costs.cost;
+        unit['points'] += parseInt(costObj['$'].value);
       });
 
       selections.forEach((item) => {
