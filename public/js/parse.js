@@ -103,7 +103,7 @@ const buttParse = {
       const selections = buttParse.forceArray(selection.selections.selection);
 
       selections.forEach((item) => {
-        console.log(item.costs.cost);
+//        console.log(item.costs.cost);
         const costObj = Array.isArray(item.costs.cost) ? item.costs.cost[0] : item.costs.cost;
         unit['points'] += parseInt(costObj['$'].value);
       });

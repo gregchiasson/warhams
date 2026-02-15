@@ -6,7 +6,21 @@ div.page {
 
 .header, .footer {
   background: #333;
-  color: #EEE;
+  color: #EEE !important;
+} 
+
+.keyword { 
+  font-variant: small-caps;
+}
+
+.header td, .footer td {
+  background: #EEE;
+  color: #CAB !important;
+  border: 1px solid blue;
+}
+
+.header th, .footer th {
+  color: #CAB !important;
 }
 
 .floater {
