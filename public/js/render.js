@@ -176,7 +176,7 @@ const buttRender = {
     </div>`;
   },
   renderLeader(leader) {
-    return leader && leader.length ? `<h4>Leader</h4><p>This model can be attached to the following units: <span class="keyword">${leader.join(', ').toUpperCase()}</span>` : '';
+    return leader && leader[0] ? `<h4>Leader</h4><p>This model can be attached to the following units: <span class="keyword">${leader.join(', ').toUpperCase()}</span>` : '';
   },
   renderSpecialism(specialism) {
     return specialism ? `<h4>Specialism</h4><p><span class="keyword">${specialism.toUpperCase()}</span>` : '';
@@ -216,6 +216,15 @@ const buttRender = {
       }
     });
 
+    Object.keys(unit.rules).forEach((rule) => {
+      if(!rule) {
+        delete unit.rules[rule];
+      }
+    });
+
+    const rules = Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None';
+    abilities['<span class="keyword">CORE/FACTION</span>'] = rules;
+
     return `<div class="page">
       <div class="row header">
         <div class="col-md-8">
@@ -235,11 +244,9 @@ const buttRender = {
           ${unit.models?.join(', ')}
         </div>
         <div class="col-md-4">
-          <h4>Rules</h4>
-          <ul><li>${Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None'}</li></ul>
           <h4>Abilities</h4>
           <div class="rules">${buttRender.hashToLi(abilities)}</div>
-          ${buttRender.renderSpecialism(unit.specialism) }
+          ${buttRender.renderSpecialism(unit.specialism)}
         </div>
       </div>
       <div class="row footer">

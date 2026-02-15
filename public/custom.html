@@ -48,15 +48,6 @@
             <div class="card-body">
               <h5 class="card-title">Enter some numbers here to get started</h5>
               <form>
-<!--
-      abilities: {"name": 'description'},
-      models: ['1 dude', '2 drones'],
-      rules: {"lone op": "text", "leader": "sure", "somthing": ""},
-      weapons: {
-        ranged: {"gun":  {Range: "24\"", A: "2", BS: "3+", S: "12", AP: "-2", D: "2", Keywords: "big, scary"}},
-        melee:  {"fist": {Range: "Melee", A: "3", WS: "4+", S: "5", AP: "-1", D: "1"}}
-      },
--->
                 <div class="row">
                   <div class="col-md-4">
                     <label>Custom name</label><input class="form-control" type="text" id="custom_sheet" placeholder="Johnny Knife, Adventure Punk"/>
@@ -82,12 +73,21 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <label>Models</label><input class="form-control" type="text" id="custom_models" placeholder="1 Guy"/>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-3">
+                    <label>Core/Faction Rules</label><input class="form-control" type="text" id="custom_rules" placeholder="Lone Operative, Deep Strike, Leader"/>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-2">
+                    <label>Ability Name</label><input class="form-control" type="text" id="profile_abilities_name" placeholder="Knife Crimes"/>
+                  </div>
+                  <div class="col-md-3">
+                    <label>Description</label><input class="form-control" type="text" id="profile_abilities_description" placeholder="stab good when you feel like it"/>
+                    <div id="profiles-abilities"></div>
+                  </div>
+                  <div class="col-md-1">
+                    <input id="add-profile-abilities" class="add-profile" type="button" value="+" />
                   </div>
                 </div>
 
@@ -164,9 +164,9 @@
               </form> 
             </div>
           </div>
-          <h2 id="output-label" style="display:none">Output Sample</h2>
-          <hr/>
           <div id="output"></div>
+          <input id="custom-download" type="button" value="Save card as PDF" />
+          <hr/>
         </div>
       </div>
 
