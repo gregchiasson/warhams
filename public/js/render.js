@@ -232,7 +232,7 @@ const buttRender = {
           ${buttRender.makeTable(unit.profiles || [])}
         </div>
         <div class="col-md-4">
-          image
+          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="120px">` : ''}
         </div>
       </div>
       <div class="row">

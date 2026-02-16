@@ -47,12 +47,16 @@
           <div class="card" style="width: 100%;">
             <div class="card-body">
               <h5 class="card-title">Enter some numbers here to get started</h5>
-              <form>
+              <form id="custom-card-form">
                 <div class="row">
                   <div class="col-md-4">
                     <label>Custom name</label><input class="form-control" type="text" id="custom_sheet" placeholder="Johnny Knife, Adventure Punk"/>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-2">
+                    Image (<a target="_blank" href="https://www.adobe.com/express/feature/image/remove-background">remove bg</a>)
+                    <input type="file" class="form-control" id="custom-image" accept="image/*">
+                  </div>
+                  <div class="col-md-2">
                     <label>Points Cost</label><input class="form-control" type="text" id="custom_points" placeholder="69"/>
                   </div>
                   <div class="col-md-4">
@@ -87,7 +91,7 @@
                     <div id="profiles-abilities"></div>
                   </div>
                   <div class="col-md-1">
-                    <input id="add-profile-abilities" class="add-profile" type="button" value="+" />
+                    <label>&nbsp;</label><input id="add-profile-abilities" class="form-control add-profile" type="button" value="+" />
                   </div>
                 </div>
 
@@ -110,7 +114,7 @@
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_W" placeholder="3"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_LD" placeholder="6+"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_OC" placeholder="1"/></div>
-                  <div class="col-md-1"><input id="add-profile-dudes" class="add-profile" type="button" value="+" /></div>
+                  <div class="col-md-1"><input id="add-profile-dudes" class="form-control add-profile" type="button" value="+" /></div>
                 </div>
                 <div id="profiles-dudes"></div>
 
@@ -133,7 +137,7 @@
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_AP" placeholder="-1"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_D" placeholder="1"/></div>
                   <div class="col-md-2"><input class="form-control" type="text" id="profile_guns_Keywords" placeholder="lethal hits"/></div>
-                  <div class="col-md-1"><input id="add-profile-guns" class="add-profile" type="button" value="+" /></div>
+                  <div class="col-md-1"><input id="add-profile-guns" class="form-control add-profile" type="button" value="+" /></div>
                 </div>
                 <div id="profiles-guns"></div>
 
@@ -156,7 +160,7 @@
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_AP" placeholder="-1"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_D" placeholder="1"/></div>
                   <div class="col-md-2"><input class="form-control" type="text" id="profile_fists_Keywords" placeholder="lethal hits"/></div>
-                  <div class="col-md-1"><input id="add-profile-fists" class="add-profile" type="button" value="+" /></div>
+                  <div class="col-md-1"><input id="add-profile-fists" class="form-control add-profile" type="button" value="+" /></div>
                 </div>
                 <div id="profiles-fists"></div>
 

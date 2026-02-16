@@ -1,17 +1,25 @@
 $(document).ready(bind);
 
 /*
-TODOs:
-add remove profiles
-add the image upload/preview thing
-big ass css changes
+TODOs: big ass css changes
 */
+
 PROFILES = {
   'guns': {},
   'fists': {},
   'dudes': {},
   'abilities': {}
 };
+
+previewUrl = null;
+
+function addProfileLinks(profileType) {
+  var html = '<strong>Saved Profiles: </strong>'
+  Object.keys(PROFILES[profileType]).forEach((profile) => {
+    html += `${profile} <input id="remove-profile-${profileType}" class="delete-profile" name="${profile}" type="button" value="-" />`;
+  });
+  $(`#profiles-${profileType}`).html(html);
+}
 
 function bind() {
   $('#custom-download').hide();
@@ -36,11 +44,7 @@ function bind() {
     PROFILES[profileType][profileName] = profile;
     console.log(PROFILES);
 
-    var html = ''
-    Object.keys(PROFILES[profileType]).forEach((profile) => {
-      html += `${profile} <input id="remove-profile-${profileType}" class="delete-profile" name="${profile}" type="button" value="-" />`;
-    });
-    $(`#profiles-${profileType}`).html(html);
+    addProfileLinks(profileType);
   });
 
   $(document).on('click', '.delete-profile', (e) => {
@@ -51,23 +55,30 @@ function bind() {
     console.log(profileName);
     delete PROFILES[profileType][profileName];
 
-    var html = ''
-    Object.keys(PROFILES[profileType]).forEach((profile) => {
-      html += `${profile} <input id="remove-profile-${profileType}" class="delete-profile" name="${profile}" type="button" value="-" />`;
-    });
-    $(`#profiles-${profileType}`).html(html);
+    addProfileLinks(profileType);
   });
 
   $("#custom-card").click((e) => {
     $('#custom-download').hide();
 
+    const imageFile = $('#custom-image').prop('files')[0];
+    if (imageFile && imageFile.type.match('image.*')) {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+        }
+        previewUrl = URL.createObjectURL(imageFile);
+        //$('#preview').attr('src', previewUrl).show();
+        //$('#status').text('Image ready: ' + imageFile.name);
+    }
+
     const unitJSON = {
-      sheet: $('#custom_sheet').val() || 'johnny bad ass',
+      sheet: $('#custom_sheet').val() || 'Some Guy',
+      imageUrl: previewUrl,
       abilities: PROFILES['abilities'],
-      keywords: ($('#custom_keywords').val() || "big, dude, hell yeah").split(','),
-      factionKeywords: ($('#custom_faction').val() || 'dudes, rock').split(','),
+      keywords: ($('#custom_keywords').val() || "None").split(','),
+      factionKeywords: ($('#custom_faction').val() || 'None').split(','),
       models: ($('#custom_models').val() || '1 model').split(','),
-      points: $('#custom_points').val() || 69,
+      points: $('#custom_points').val() || 0,
       profiles: PROFILES['dudes'],
       rules: ($('#custom_rules').val() || '').split(',').reduce((a,i)=> (a[i]='test',a),{}),
       wargear: {}, // SKIP
