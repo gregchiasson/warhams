@@ -43,12 +43,15 @@ function bind() {
     $(`#profiles-${profileType}`).html(html);
   });
 
-  $(".delete-profile").live('click', (e) => {
+  $(document).on('click', '.delete-profile', (e) => {
     console.log(e.target);
-    const profileType = e.target.id.replace('add-profile-', ''); 
-    const profile = e.target.name;
-    delete PROFILES[profileType][profile];
+    const profileType = e.target.id.replace('remove-profile-', ''); 
+    const profileName = $(e.target).attr('name');
+    console.log(profileType);
+    console.log(profileName);
+    delete PROFILES[profileType][profileName];
 
+    var html = ''
     Object.keys(PROFILES[profileType]).forEach((profile) => {
       html += `${profile} <input id="remove-profile-${profileType}" class="delete-profile" name="${profile}" type="button" value="-" />`;
     });
