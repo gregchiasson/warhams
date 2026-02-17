@@ -16,9 +16,43 @@ function addProfileLinks(profileType) {
   });
   $(`#profiles-${profileType}`).html(html);
 }
+function displayPreview() {
+  const unitJSONdemo = {
+    sheet: '[SAMPLE] Shas\'o Gun Shootman',
+    imageUrl: previewUrl,
+    abilities: {
+      "Quad Damage": "once per battle when this unit shoots, roll 4d6 for damage.",
+      "Heavy Armor": "this model has a 4+++ FnP against mortal wounds.",
+      "Battlesuit Support System": "Models in this unit can shoot after falling back."
+    },
+    keywords: 'Broadside, Battlesuit, Monster, Character, Fly, Epic Hero'.split(','),
+    factionKeywords: 'Tau Empire'.split(','),
+    models: '1 Battlesuit Veteran'.split(','),
+    points: 125,
+    profiles: {
+      'Battlesuit Veteran': {M: '5"', T: 6, SV: '2+', iSV: '4++', W: 8, LD: '5+', OC: 1}
+    },
+    rules: 'For the Greater Good, Deep Strike, Feel No Pain (3+)'.split(',').reduce((a,i)=> (a[i]='test',a),{}),
+    wargear: {}, // SKIP
+    weapons: {
+      ranged: {
+        'Heavy Rail Rifle':  {'Range': "36\"", 'A': 2, 'BS': '3+', 'S': 12, 'AP': '-4', 'D': 'd6+1', 'Keywords': 'heavy, devastating wounds'},
+        'Smart Missile System':  {'Range': "30\"", 'A': 6, 'BS': '4+', 'S': 5, 'AP': '-1', 'D': '1', 'Keywords': 'twin-linked, indirect'},
+      },
+      melee:  {
+        'Big Hands':  {'Range': "Melee", 'A': 3, 'WS': '5+', 'S': 6, 'AP': '0', 'D': '1', 'Keywords': ''},
+      }
+    },
+    leader: 'Broadside battlesuits'.split(',') || null,
+    specialism: '67IQ Railgun god'
+  };
+  unitHTML = buttRender.renderUnitCustom(unitJSONdemo, false);
+  $('#output').html(unitHTML);
+}
 
 function bind() {
   $('#custom-download').hide();
+  displayPreview();
 
   $(".add-profile").click((e) => {
     const profileType = e.target.id.replace('add-profile-', ''); 
@@ -86,37 +120,6 @@ function bind() {
       leader: $('#custom_leader').val().split(',') || null,
       specialism: $('#custom_specialism').val()
     };
-
-    const unitJSONdemo = {
-      sheet: 'Shas\'o Gun Shootman',
-      imageUrl: previewUrl,
-      abilities: {
-        "Quad Damage": "once per battle when this unit shoots, roll 4d6 for damage.",
-        "Heavy Armor": "this model has a 4+++ FnP against mortal wounds.",
-        "Battlesuit Support System": "Models in this unit can shoot after falling back."
-      },
-      keywords: 'Broadside, Battlesuit, Monster, Character, Fly, Epic Hero'.split(','),
-      factionKeywords: 'Tau Empire'.split(','),
-      models: '1 Battlesuit Veteran'.split(','),
-      points: 125,
-      profiles: {
-        'Battlesuit Veteran': {M: '5"', T: 6, SV: '2+', iSV: '4++', W: 8, LD: '5+', OC: 1}
-      },
-      rules: 'For the Greater Good, Deep Strike, Feel No Pain (3+)'.split(',').reduce((a,i)=> (a[i]='test',a),{}),
-      wargear: {}, // SKIP
-      weapons: {
-        ranged: {
-          'Heavy Rail Rifle':  {'Range': "36\"", 'A': 2, 'BS': '3+', 'S': 12, 'AP': '-4', 'D': 'd6+1', 'Keywords': 'heavy, devastating wounds'},
-          'Smart Missile System':  {'Range': "30\"", 'A': 6, 'BS': '4+', 'S': 5, 'AP': '-1', 'D': '1', 'Keywords': 'twin-linked, indirect'},
-        },
-        melee:  {
-          'Big Hands':  {'Range': "Melee", 'A': 3, 'WS': '5+', 'S': 6, 'AP': '0', 'D': '1', 'Keywords': ''},
-        }
-      },
-      leader: 'Broadside battlesuits'.split(',') || null,
-      specialism: '67IQ Railgun god'
-    };
-
 
     unitHTML = buttRender.renderUnitCustom(unitJSON, false);
     $('#output').html(unitHTML);
