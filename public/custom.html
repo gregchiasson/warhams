@@ -42,7 +42,7 @@
         <div class="col-md-12" id="contentWellFull">
           <h1>hello</h1>
           <h2>What is this?</h2>
-          <p>Invent a New Type Of Guy.</p>
+          <p>This is how you invent a New Type Of Guy.</p>
 
           <div class="card" style="width: 100%;">
             <div class="card-body">
@@ -52,15 +52,25 @@
                   <div class="col-md-4">
                     <label>Custom name</label><input class="form-control" type="text" id="custom_sheet" placeholder="Johnny Knife, Adventure Punk"/>
                   </div>
-                  <div class="col-md-2">
-                    Image (<a target="_blank" href="https://www.adobe.com/express/feature/image/remove-background">remove bg</a>)
+                  <div class="col-md-4">
+                    Image (<a target="_blank" href="https://www.adobe.com/express/feature/image/remove-background">remove image background</a>)
                     <input type="file" class="form-control" id="custom-image" accept="image/*">
                   </div>
                   <div class="col-md-2">
                     <label>Points Cost</label><input class="form-control" type="text" id="custom_points" placeholder="69"/>
                   </div>
+                </div>
+
+                <h5 class="card-title">Add model rules and keywords</h5>
+                <div class="row">
                   <div class="col-md-4">
                     <label>Keywords</label><input class="form-control" type="text" id="custom_keywords" placeholder="infantry, charater, fly"/>
+                  </div>
+                  <div class="col-md-4">
+                    <label>Faction Keywords</label><input class="form-control" type="text" id="custom_faction" placeholder="Dark Angels, Space Marines"/>
+                  </div>
+                  <div class="col-md-4">
+                    <label>Core/Faction Rules</label><input class="form-control" type="text" id="custom_rules" placeholder="Lone Operative, Deep Strike, Leader"/>
                   </div>
                 </div>
 
@@ -71,32 +81,29 @@
                   <div class="col-md-4">
                     <label>Leader (optional)</label><input class="form-control" type="text" id="custom_leader" placeholder="Guys, Dudes, Joes"/>
                   </div>
-                  <div class="col-md-4">
-                    <label>Faction Keywords</label><input class="form-control" type="text" id="custom_faction" placeholder="Dark Angels, Space Marines"/>
-                  </div>
-                </div>
-
-                <div class="row">
                   <div class="col-md-3">
                     <label>Models</label><input class="form-control" type="text" id="custom_models" placeholder="1 Guy"/>
                   </div>
-                  <div class="col-md-3">
-                    <label>Core/Faction Rules</label><input class="form-control" type="text" id="custom_rules" placeholder="Lone Operative, Deep Strike, Leader"/>
-                  </div>
-                  <div class="col-md-2">
-                    <label>Ability Name</label><input class="form-control" type="text" id="profile_abilities_name" placeholder="Knife Crimes"/>
-                  </div>
-                  <div class="col-md-3">
-                    <label>Description</label><input class="form-control" type="text" id="profile_abilities_description" placeholder="stab good when you feel like it"/>
-                    <div id="profiles-abilities"></div>
-                  </div>
-                  <div class="col-md-1">
-                    <label>&nbsp;</label><input id="add-profile-abilities" class="form-control add-profile" type="button" value="+" />
-                  </div>
                 </div>
 
                 <div class="row">
-                  <div class="col-md-3">Profile Name</div>
+                  <div class="col-md-3">
+                    <label>Ability Name</label><input class="form-control" type="text" id="profile_abilities_name" placeholder="Knife Crimes"/>
+                  </div>
+                  <div class="col-md-5">
+                    <label>Description</label><input class="form-control" type="text" id="profile_abilities_description" placeholder="stab good when you feel like it"/>
+                    <div id="profiles-abilities"></div>
+                  </div>
+                  <div class="col-md-3"></div>
+                  <div class="col-md-1">
+                    <label>&nbsp;</label><input id="add-profile-abilities" class="form-control add-profile" type="button" value="Save" />
+                  </div>
+                </div>
+
+                <h5 class="card-title">Add model and weapon profiles</h5>
+
+                <div class="row">
+                  <div class="col-md-3">Model Name</div>
                   <div class="col-md-1">M</div>
                   <div class="col-md-1">T</div>
                   <div class="col-md-1">SV</div>
@@ -107,19 +114,20 @@
                 </div>
                 <div class="row">
                   <div class="col-md-3"><input class="form-control" type="text" id="profile_dudes_name" placeholder="Veteran Murderer"/></div>
-                  <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_M" placeholder="12"/></div>
+                  <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_M" placeholder="12&quot;"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_T" placeholder="4"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_SV" placeholder="3+"/></div>
-                  <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_iSV" placeholder="5+"/></div>
+                  <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_iSV" placeholder="5++"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_W" placeholder="3"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_LD" placeholder="6+"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_dudes_OC" placeholder="1"/></div>
-                  <div class="col-md-1"><input id="add-profile-dudes" class="form-control add-profile" type="button" value="+" /></div>
+                  <div class="col-md-1">&nbsp;</div>
+                  <div class="col-md-1"><input id="add-profile-dudes" class="form-control add-profile" type="button" value="Save" /></div>
                 </div>
                 <div id="profiles-dudes"></div>
 
                 <div class="row">
-                  <div class="col-md-2">Ranged Weapon Name</div>
+                  <div class="col-md-3">Ranged Weapon Name</div>
                   <div class="col-md-1">Range</div>
                   <div class="col-md-1">A</div>
                   <div class="col-md-1">BS</div>
@@ -129,20 +137,20 @@
                   <div class="col-md-2">Keywords</div>
                 </div>
                 <div class="row">
-                  <div class="col-md-2"><input class="form-control" type="text" id="profile_guns_name" placeholder="Big Iron"/></div>
-                  <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_Range" placeholder="36"/></div>
+                  <div class="col-md-3"><input class="form-control" type="text" id="profile_guns_name" placeholder="Big Iron"/></div>
+                  <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_Range" placeholder="36&quot;"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_A" placeholder="2"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_BS" placeholder="3+"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_S" placeholder="4"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_AP" placeholder="-1"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_guns_D" placeholder="1"/></div>
                   <div class="col-md-2"><input class="form-control" type="text" id="profile_guns_Keywords" placeholder="lethal hits"/></div>
-                  <div class="col-md-1"><input id="add-profile-guns" class="form-control add-profile" type="button" value="+" /></div>
+                  <div class="col-md-1"><input id="add-profile-guns" class="form-control add-profile" type="button" value="Save" /></div>
                 </div>
                 <div id="profiles-guns"></div>
 
                 <div class="row">
-                  <div class="col-md-2">Melee Weapon Name</div>
+                  <div class="col-md-3">Melee Weapon Name</div>
                   <div class="col-md-1">Range</div>
                   <div class="col-md-1">A</div>
                   <div class="col-md-1">WS</div>
@@ -152,7 +160,7 @@
                   <div class="col-md-2">Keywords</div>
                 </div>
                 <div class="row">
-                  <div class="col-md-2"><input class="form-control" type="text" id="profile_fists_name" placeholder="Big Hand"/></div>
+                  <div class="col-md-3"><input class="form-control" type="text" id="profile_fists_name" placeholder="Big Hand"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_Range" value="Melee" readonly/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_A" placeholder="2"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_WS" placeholder="3+"/></div>
@@ -160,16 +168,25 @@
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_AP" placeholder="-1"/></div>
                   <div class="col-md-1"><input class="form-control" type="text" id="profile_fists_D" placeholder="1"/></div>
                   <div class="col-md-2"><input class="form-control" type="text" id="profile_fists_Keywords" placeholder="lethal hits"/></div>
-                  <div class="col-md-1"><input id="add-profile-fists" class="form-control add-profile" type="button" value="+" /></div>
+                  <div class="col-md-1"><input id="add-profile-fists" class="form-control add-profile" type="button" value="Save" /></div>
                 </div>
                 <div id="profiles-fists"></div>
-
-                <input id="custom-card" type="button" value="pres butan" />
+                <div class="row">
+                  <div class="col-md-4"></div>
+                  <div class="col-md-4">
+                  `<input id="custom-card" class="form-control button btn btn-primary" type="button" value="Generate Preview" />
+                  </div>
+                </div>
               </form> 
             </div>
           </div>
           <div id="output"></div>
-          <input id="custom-download" type="button" value="Save card as PDF" />
+          <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <input id="custom-download" class="form-control button btn btn-primary" type="button" value="Download Printable Card" />
+            </div>
+          </div>
           <hr/>
         </div>
       </div>
@@ -207,11 +224,10 @@ YouTube
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script type="text/javascript" src="./js/zip-fs.min.js"></script>
-    <script src="./js/site.js"></script>
-    <script src="./js/parse.js"></script>
-    <script src="./js/render.js"></script>
-    <script src="./js/xmltojson.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.12.1/html2pdf.bundle.min.js" integrity="sha512-D25Z8/1q2z65ZpJ3NzY6XiPZfwjhbv34OTQHDIZd+KPK+uWCovGt+fMkSzW8ArzCMFUgZt6Cdu7qoXNuy6a2GA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>    <script type="text/javascript" src="./js/zip-fs.min.js"></script>
+    <script src="/js/site.js"></script>
+    <script src="/js/parse.js"></script>
+    <script src="/js/render.js"></script>
+    <script src="/js/xmltojson.js"></script>
   </body>
 </html>

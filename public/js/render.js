@@ -179,7 +179,7 @@ const buttRender = {
     return leader && leader[0] ? `<h4>Leader</h4><p>This model can be attached to the following units: <span class="keyword">${leader.join(', ').toUpperCase()}</span>` : '';
   },
   renderSpecialism(specialism) {
-    return specialism ? `<h4>Specialism</h4><p><span class="keyword">${specialism.toUpperCase()}</span>` : '';
+    return specialism ? `<h4>Specialisms</h4><p><span class="keyword">${specialism.toUpperCase()}</span>` : '';
   },
   renderGunTable(title, data) {
     if(data && Object.keys(data).length > 0) {
@@ -200,7 +200,7 @@ const buttRender = {
       delete newGuns[newName].Keywords;
     });
    
-    return buttRender.makeTable(newGuns);
+    return buttRender.makeTable(newGuns, 'guns');
   },
   renderUnitCustom(unit) {
     var abilities = {};
@@ -225,14 +225,15 @@ const buttRender = {
     const rules = Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None';
     abilities['<span class="keyword">CORE/FACTION</span>'] = rules;
 
-    return `<div class="page">
+    return `<div id="custom_unit_card" class="page">
       <div class="row header">
         <div class="col-md-8">
-          <h2>${unit.sheet} - ${unit.points} points</h2>
+          <h2>${unit.sheet}</h2>
+          <p>${unit.models.join(' and ')}.........${unit.points} points</p>
           ${buttRender.makeTable(unit.profiles || [])}
         </div>
-        <div class="col-md-4">
-          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="160px">` : ''}
+        <div class="col-md-4" style="text-align:center">
+          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="170px; vertical-align:bottom">` : ''}
         </div>
       </div>
       <div class="row">
@@ -241,7 +242,7 @@ const buttRender = {
           ${buttRender.renderGunTable('Melee Weapons', unit.weapons['melee'] || {})}
           ${buttRender.renderLeader(unit.leader) }
           <h4>Unit Composition</h4>
-          ${unit.models?.join(', ')}
+          <strong>${unit.models?.join(', ')}</strong>
         </div>
         <div class="col-md-4" style="border-left: 2px dotted grey">
           <h4>Abilities</h4>
@@ -315,8 +316,8 @@ const buttRender = {
     </div>
     `;
   },
-  makeTable(data) {
-    var content = '<table class="table table-striped"><thead>';
+  makeTable(data, className) {
+    var content = `<table class="table table-striped ${className}"><thead>`;
 
     var first = true;
     Object.keys(data).sort().forEach((row) => {
