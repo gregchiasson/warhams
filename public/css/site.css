@@ -24,7 +24,6 @@ div.page {
   border-left-width: 10px;
   border-right-width: 0px;
   width:65px;
-  font-family: monospace;
 }
 
 .header thead th:first-of-type {
@@ -45,13 +44,30 @@ div.page {
   float:right;
 }
 
+@font-face {
+    font-family: 'goonfont';
+    src:
+        url('/fonts/ITC - ConduitITCPro-Regular.otf') 
+        format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'goonfont';
+    src:
+        url('/fonts/ITC - ConduitITCStd-Bold.otf') 
+        format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
 #output {
-  font-size: 80%;
-  font-family: sans-serif;
+  font-size: 90%;
+  font-family: 'goonfont';
 }
 
 table.guns td {
-  font-family: monospace;
   width: 55px;
 }
 
