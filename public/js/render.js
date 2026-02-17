@@ -32,7 +32,7 @@ const buttRender = {
   renderUnits(force, useCrusade=false) {
     var content = '';
     force['units'].forEach((unit) => {
-      content += buttRender.renderUnit(unit, force['rules'], useCrusade);
+      content += buttRender.renderUnitCustom(unit, force['rules'], useCrusade);
     });
     return content;
   },
@@ -232,7 +232,7 @@ const buttRender = {
           ${buttRender.makeTable(unit.profiles || [])}
         </div>
         <div class="col-md-4">
-          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="120px">` : ''}
+          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="160px">` : ''}
         </div>
       </div>
       <div class="row">
@@ -243,7 +243,7 @@ const buttRender = {
           <h4>Unit Composition</h4>
           ${unit.models?.join(', ')}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" style="border-left: 2px dotted grey">
           <h4>Abilities</h4>
           <div class="rules">${buttRender.hashToLi(abilities)}</div>
           ${buttRender.renderSpecialism(unit.specialism)}

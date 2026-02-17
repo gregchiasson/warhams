@@ -67,8 +67,6 @@ function bind() {
             URL.revokeObjectURL(previewUrl);
         }
         previewUrl = URL.createObjectURL(imageFile);
-        //$('#preview').attr('src', previewUrl).show();
-        //$('#status').text('Image ready: ' + imageFile.name);
     }
 
     const unitJSON = {

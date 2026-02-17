@@ -1,26 +1,32 @@
 div.page {
   border: 1px solid black; 
   margin: 10px; 
-  padding: 0px 10px;
+  padding: 15px;
 }
 
 .header, .footer {
   background: #333;
-  color: #EEE !important;
+  color: #F9F9F9 !important;
 } 
 
 .keyword { 
   font-variant: small-caps;
 }
 
-.header td, .footer td {
-  background: #EEE;
-  color: #CAB !important;
-  border: 1px solid blue;
+.header td {
+  background: #F9F9F9;
+  color: #333 !important;
+  border: 2px solid #699;
+  text-align: center;
+  font-size: 160%;
+  font-weight: bold;
 }
 
-.header th, .footer th {
-  color: #CAB !important;
+.header th {
+  text-align: center;
+  color: #F9F9F9 !important;
+  font-size:120%;
+  background-color: #699;
 }
 
 .floater {
@@ -28,9 +34,42 @@ div.page {
 }
 
 #output {
-  font-size: 60%;
+  font-size: 80%;
+  font-family: sans-serif;
 }
 
-#output h2 { color: #FFF; font-size: 160%; }
-#output h3 { color: #EEE; font-size: 150%; }
-#output h4 { color: #111; font-size: 130%; }
+div.page div.header, div.page div.footer {
+  background-color: #8BB;
+  color:#111;
+}
+
+div.page div.header {
+  margin-bottom:15px;
+}
+
+div.page div.footer {
+  margin-top:15px;
+  padding:5px 0px;
+}
+
+div.rules li {
+  list-style: none;
+  border-bottom: 1px dotted grey;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+
+div.rules ul {
+  padding-left: 0;
+}
+
+#output h2 { color: #FFF; font-size: 220%; font-weight: bold; }
+#output h3 { color: #F9F9F9; font-size: 150%; }
+#output h4 { 
+  color: #111; 
+  font-size: 130%;
+  background: #699;
+  padding: 4px 8px;
+  color: #F9F9F9;
+  font-variant: small-caps;
+}
