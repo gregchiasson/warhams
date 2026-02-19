@@ -1,14 +1,3 @@
-Codex Blue-grey 243b43
-Aeldari Teal 22777e
-Greenskin 6b8335
-Crucible Red a61033
-Mechanicus Standard Grey 4c5954
-Militarum Green 43543e
-Ministorum Red 621f16
-Excessive Purple 644e72
-Imperial Bronze 775d43
-Void Black 000000
-
 <!doctype html>
 <html lang="en">
   <head> 
@@ -63,12 +52,28 @@ Void Black 000000
                   <div class="col-md-4">
                     <label>Custom Unit Name</label><input class="form-control" type="text" id="custom_sheet" placeholder="Johnny Knife, Adventure Punk"/>
                   </div>
+                  <div class="col-md-2">
+                    <label>Points Cost</label><input class="form-control" type="text" id="custom_points" placeholder="69"/>
+                  </div>
                   <div class="col-md-4">
-                    Image (<a target="_blank" href="https://www.adobe.com/express/feature/image/remove-background">remove image background</a>)
+                    Image (PRO TIP: <a target="_blank" href="https://www.adobe.com/express/feature/image/remove-background">remove image background</a>)
                     <input type="file" class="form-control" id="custom-image" accept="image/*">
                   </div>
                   <div class="col-md-2">
-                    <label>Points Cost</label><input class="form-control" type="text" id="custom_points" placeholder="69"/>
+                    <label>Color Scheme</label>
+
+                    <select class="form-select custom-select-lg mb-3" name="custom_color" id="custom_color">
+                      <option value="codex">Codex Blue-grey </option>
+                      <option value="teal" selected="selected">Aeldari Teal </option>
+                      <option value="ork">Greenskin</option>
+                      <option value="red">Crucible Red</option>
+                      <option value="grey">Mechanicus Standard Grey</option>
+                      <option value="guard">Militarum Green</option>
+                      <option value="otherred">Ministorum Red</option>
+                      <option value="purple">Excessive Purple</option>
+                      <option value="bronze">Imperial Bronze</option>
+                      <option value="black">Void Black</option>
+                    </select>
                   </div>
                 </div>
 

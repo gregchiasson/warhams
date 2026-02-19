@@ -36,7 +36,7 @@ div.page {
   vertical-align: middle;
   color: #F9F9F9 !important;
   font-size:120%;
-  background-color: #699;
+  background-color: #777;
   /* border-right:10px solid #333; */
 }
 
@@ -72,7 +72,7 @@ table.guns td {
 }
 
 div.page div.header, div.page div.footer {
-  background-color: #8BB;
+  background-color: #777;
   color:#111;
 }
 
@@ -104,8 +104,19 @@ div.rules ul {
 #output h4 { 
   color: #111; 
   font-size: 130%;
-  background: #699;
+  background: #777;
   padding: 4px 8px;
   color: #F9F9F9;
   font-variant: small-caps;
 }
+
+#output div.ork h4, div.ork .header th, div.ork div.header, div.ork div.footer { background-color: #6b8335; } 
+#output div.codex h4, div.codex .header th, div.codex div.header, div.codex div.footer { background-color: #243b43; } 
+#output div.teal h4, div.teal .header th, div.teal div.header, div.teal div.footer { background-color: #22777e; } 
+#output div.red h4, div.red .header th, div.red div.header, div.red div.footer { background-color: #a61033; } 
+#output div.grey h4, div.ogreyrk .header th, div.grey div.header, div.grey div.footer { background-color: #4c5954; } 
+#output div.guard h4, div.guard .header th, div.guard div.header, div.guard div.footer { background-color: #43543e; } 
+#output div.otherred h4, div.otherred .header th, div.otherred div.header, div.otherred div.footer { background-color: #621f16; } 
+#output div.purple h4, div.orpurplek .header th, div.purple div.header, div.purple div.footer { background-color: #644e72; } 
+#output div.bronze h4, div.bronze .header th, div.bronze div.header, div.bronze div.footer { background-color: #775d43; } 
+#output div.black h4, div.black .header th, div.black div.header, div.black div.footer { background-color: #000000; } 

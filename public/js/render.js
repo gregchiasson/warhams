@@ -32,7 +32,7 @@ const buttRender = {
   renderUnits(force, useCrusade=false) {
     var content = '';
     force['units'].forEach((unit) => {
-      content += buttRender.renderUnitCustom(unit, force['rules'], useCrusade);
+      content += buttRender.renderUnitCustom(unit);
     });
     return content;
   },
@@ -202,7 +202,7 @@ const buttRender = {
    
     return buttRender.makeTable(newGuns, 'guns');
   },
-  renderUnitCustom(unit) {
+  renderUnitCustom(unit, cssClass) {
     var abilities = {};
     Object.keys(unit['abilities'] || []).forEach((ruleName) => {
       if(!unit.rules[ruleName]) {
@@ -225,7 +225,7 @@ const buttRender = {
     const rules = Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None';
     abilities['<span class="keyword">CORE/FACTION</span>'] = rules;
 
-    return `<div id="custom_unit_card" class="page">
+    return `<div id="custom_unit_card" class="page ${cssClass}">
       <div class="row header">
         <div class="col-md-8">
           <h2>${unit.sheet}</h2>
@@ -261,61 +261,6 @@ const buttRender = {
       </div>
     </div>
   </div>`;
-  },
-  renderUnit(unit, skipRules, useCrusade) {
-    var abilities = {};
-    // filter out a few of the more obvious USRs. 
-    // these still show up under rules, just not as abilities
-    buttRender.skippables().forEach((skip) => {
-      skipRules[skip] = 'Nope.';
-    });
-    Object.keys(unit['rules'] || []).forEach((ruleName) => {
-      skipRules[ruleName] = 'Nope.';
-    });
-    // anything that's in the army-wide rules also can be skipped
-    // these still show as rules, and the full text is available
-    // on the summary page, but they're too dang long
-    Object.keys(unit['abilities'] || []).forEach((ruleName) => {
-      if(!skipRules[ruleName]) {
-        abilities[ruleName] = unit['abilities'][ruleName];
-      }
-    });
-    return `<div class="page">
-      <div class="row">
-      <div class="col-md-11 header">
-        <div class="floater">${unit.models?.join(', ')}</div>
-        <h2>${unit.sheet} - ${unit.points} points</h2>
-        </div>
-      <div class="col-md-7">
-      ${buttRender.makeTable(unit.profiles)}
-      <h4>Ranged Weapons</h4>
-      ${buttRender.makeTable(unit.weapons['ranged'])}
-      <h4>Melee Weapons</h4>
-      ${buttRender.makeTable(unit.weapons['melee'])}
-      </div>
-      <div class="col-md-5">
-        <h4>Abilities</h4>
-        <div class="rules">${buttRender.hashToLi(abilities)}</div>
-        <!--
-        <h4>Wargear</h4>
-        <div class="rules">${buttRender.hashToLi(unit.wargear)}</div>  
-        -->
-        <h4>Rules</h4>
-        <ul><li>${Object.keys(unit.rules).length ? Object.keys(unit.rules).sort().join(', ') : 'None'}</li></ul>
-        </div>
-      <div class="footer col-md-12"><strong>Keywords:</strong> ${unit.keywords.join(', ')}</div>
-    </div>
-    ${useCrusade ? buttRender.crusadeForm() : ''}
-  </div>`;
-  },
-  crusadeForm() {
-    return `
-    <div class="row">
-      <div class="col-md-11 header">
-        <h2>Crusade</h2>
-      </div>
-    </div>
-    `;
   },
   makeTable(data, className) {
     var content = `<table class="table table-striped ${className}"><thead>`;

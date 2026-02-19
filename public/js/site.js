@@ -52,7 +52,7 @@ function displayPreview() {
     leader: 'Broadside battlesuits'.split(',') || null,
     specialism: '67IQ Railgun god'
   };
-  unitHTML = buttRender.renderUnitCustom(unitJSONdemo, false);
+  unitHTML = buttRender.renderUnitCustom(unitJSONdemo, 'teal');
   $('#output').html(unitHTML);
 }
 
@@ -131,7 +131,9 @@ function bind() {
       specialism: $('#custom_specialism').val()
     };
 
-    unitHTML = buttRender.renderUnitCustom(unitJSON, false);
+    const cssClass = $('#custom_color').val();
+
+    unitHTML = buttRender.renderUnitCustom(unitJSON, cssClass);
     $('#output').html(unitHTML);
     $('#custom-download').show();
   });
