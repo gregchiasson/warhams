@@ -1,14 +1,4 @@
 const buttRender = {
-  skippables() {
-    // probably a better way to handle this...
-    return [
-      'Leader', 'Feel No Pain', 'Kindred Sorcery', 'Reanimation Protocols', 'Deep Strike',
-      'Eye of the Ancestors', 'Ruthless Efficiency', 'Strands of Fate',
-      'Deadly Demise 1', 'Deadly Demise 3', 'Deadly Demise D3', 'Deadly Demise D6', 'Deadly Demise 6',
-      'Firing Deck 1', 'Firing Deck 2', 'Firing Deck 5', 'Firing Deck 11', 'Firing Deck 12',
-      'Cabal of Sorcerers 1', 'Cabal of Sorcerers 2', 'Cabal of Sorcerers 3', 'Cabal of Sorcerers 4'
-    ] 
-  },
   jsonToHTML(json, format) {
     var html = '';
     json.forEach((force) => {
@@ -111,8 +101,8 @@ const buttRender = {
       <div class="col-md-6 unitSummary">
       <h4>${unit.sheet}</h4>
       <strong>Rules and Abilities</strong>: ${Object.keys(allRules).length ? Object.keys(allRules).sort().join(', ') : 'None'}
-      ${buttRender.makeTable(unit.profiles)}
-      ${buttRender.makeGunTable(allWeapons)}
+      ${buttRender.makeTable('Model Profiles', unit.profiles)}
+      ${buttRender.makeGunTable('Weapon Profiles', allWeapons)}
       </div>`;
     });
 
@@ -162,14 +152,11 @@ const buttRender = {
     <div class="col-md-11 header"><h2>Rules Reference</h2></div>
     <div class="row">
     <div class="col-md-6">
-      <h4>Model Profiles</h4>
-      ${buttRender.makeTable(allProfiles)}
+      ${buttRender.makeTable('Model Profiles', allProfiles)}
       </div>
       <div class="col-md-6">
-      <h4>Ranged Weapons</h4>
-      ${buttRender.makeGunTable(allRangedWeapons)}
-      <h4>Melee Weapons</h4>
-      ${buttRender.makeGunTable(allMeleeWeapons)}
+      ${buttRender.makeGunTable('Ranged Weapons', allRangedWeapons)}
+      ${buttRender.makeGunTable('Melee Weapons', allMeleeWeapons)}
     </div>
     </div>
     </div>
@@ -183,12 +170,12 @@ const buttRender = {
   },
   renderGunTable(title, data) {
     if(data && Object.keys(data).length > 0) {
-      return `<h4>${title}</h4>${buttRender.makeGunTable(data || {})}`;
+      return `${buttRender.makeGunTable(title, data || {})}`;
     } else {
       return '';
     }
   },
-  makeGunTable(guns) {
+  makeGunTable(type, guns) {
     var newGuns = {};
     Object.keys(guns).forEach((gun) => {
       const oldGun = guns[gun];
@@ -200,7 +187,7 @@ const buttRender = {
       delete newGuns[newName].Keywords;
     });
    
-    return buttRender.makeTable(newGuns, 'guns');
+    return buttRender.makeTable(type, newGuns, 'guns');
   },
   renderUnitCustom(unit, cssClass) {
     var abilities = {};
@@ -230,7 +217,7 @@ const buttRender = {
         <div class="col-md-8">
           <h2>${unit.sheet}</h2>
           <p>${unit.models.join(' and ')}.........${unit.points} points</p>
-          ${buttRender.makeTable(unit.profiles || [])}
+          ${buttRender.makeTable('', unit.profiles || [])}
         </div>
         <div class="col-md-4" style="text-align:center">
           ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="170px; vertical-align:bottom">` : ''}
@@ -262,13 +249,13 @@ const buttRender = {
     </div>
   </div>`;
   },
-  makeTable(data, className) {
+  makeTable(title, data, className) {
     var content = `<table class="table table-striped ${className}"><thead>`;
 
     var first = true;
     Object.keys(data).sort().forEach((row) => {
       if(first == true) {
-        content += '<tr><th></th>';
+        content += `<tr class="table_header"><th>${title}</th>`;
         Object.keys(data[row]).forEach((col) => {
           content += `<th>${col}</th>`;
         });

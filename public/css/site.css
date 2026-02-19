@@ -27,7 +27,7 @@ div.page {
 }
 
 .header thead th:first-of-type {
-  background-color: inherit;
+  background-color: inherit !important;
   border-right: 10px solid #222;
 }
 
@@ -109,14 +109,20 @@ div.rules ul {
   color: #F9F9F9;
   font-variant: small-caps;
 }
+div.page thead th {
+  color:#F9F9F9;
+  background-color: #777;
+  font-size: 110%;
+  text-transform: uppercase;
+}
 
-#output div.ork h4, div.ork .header th, div.ork div.header, div.ork div.footer { background-color: #6b8335; } 
-#output div.codex h4, div.codex .header th, div.codex div.header, div.codex div.footer { background-color: #243b43; } 
-#output div.teal h4, div.teal .header th, div.teal div.header, div.teal div.footer { background-color: #22777e; } 
-#output div.red h4, div.red .header th, div.red div.header, div.red div.footer { background-color: #a61033; } 
-#output div.grey h4, div.ogreyrk .header th, div.grey div.header, div.grey div.footer { background-color: #4c5954; } 
-#output div.guard h4, div.guard .header th, div.guard div.header, div.guard div.footer { background-color: #43543e; } 
-#output div.otherred h4, div.otherred .header th, div.otherred div.header, div.otherred div.footer { background-color: #621f16; } 
-#output div.purple h4, div.orpurplek .header th, div.purple div.header, div.purple div.footer { background-color: #644e72; } 
-#output div.bronze h4, div.bronze .header th, div.bronze div.header, div.bronze div.footer { background-color: #775d43; } 
-#output div.black h4, div.black .header th, div.black div.header, div.black div.footer { background-color: #000000; } 
+div.ork thead th, #output div.ork h4, div.ork .header th, div.ork div.header, div.ork div.footer { background-color: #6b8335; } 
+div.codex thead th, #output div.codex h4, div.codex .header th, div.codex div.header, div.codex div.footer { background-color: #243b43; } 
+div.teal thead th, #output div.teal h4, div.teal .header th, div.teal div.header, div.teal div.footer { background-color: #22777e; } 
+div.red thead th, #output div.red h4, div.red .header th, div.red div.header, div.red div.footer { background-color: #a61033; } 
+div.grey thead th, #output div.grey h4, div.ogreyrk .header th, div.grey div.header, div.grey div.footer { background-color: #4c5954; } 
+div.guard thead th, #output div.guard h4, div.guard .header th, div.guard div.header, div.guard div.footer { background-color: #43543e; } 
+div.otherred thead th, #output div.otherred h4, div.otherred .header th, div.otherred div.header, div.otherred div.footer { background-color: #621f16; } 
+div.purple thead th, #output div.purple h4, div.orpurplek .header th, div.purple div.header, div.purple div.footer { background-color: #644e72; } 
+div.bronze thead th, #output div.bronze h4, div.bronze .header th, div.bronze div.header, div.bronze div.footer { background-color: #775d43; } 
+div.black thead th, #output div.black h4, div.black .header th, div.black div.header, div.black div.footer { background-color: #000000; } 
