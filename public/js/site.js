@@ -1,16 +1,21 @@
 $(document).ready(bind);
 
+
+// color picker
+// swappable image (default space)
+
 PROFILES = {
   'guns': {},
   'fists': {},
   'dudes': {},
-  'abilities': {}
+  'abilities': {},
+  'wargear': {}
 };
 
 previewUrl = null;
 
 function addProfileLinks(profileType) {
-  var html = '<strong>Saved Profiles: </strong>'
+  var html = `<strong>Saved ${profileType }: </strong>`;
   Object.keys(PROFILES[profileType]).forEach((profile) => {
     html += `${profile} <input id="remove-profile-${profileType}" class="delete-profile" name="${profile}" type="button" value="-" />`;
   });
@@ -22,8 +27,7 @@ function displayPreview() {
     imageUrl: previewUrl,
     abilities: {
       "Quad Damage": "once per battle when this unit shoots, roll 4d6 for damage.",
-      "Heavy Armor": "this model has a 4+++ FnP against mortal wounds.",
-      "Battlesuit Support System": "Models in this unit can shoot after falling back."
+      "Heavy Armor": "this model has a 4+++ FnP against mortal wounds."
     },
     keywords: 'Broadside, Battlesuit, Monster, Character, Fly, Epic Hero'.split(','),
     factionKeywords: 'Tau Empire'.split(','),
@@ -33,7 +37,9 @@ function displayPreview() {
       'Battlesuit Veteran': {M: '5"', T: 6, SV: '2+', iSV: '4++', W: 8, LD: '5+', OC: 1}
     },
     rules: 'For the Greater Good, Deep Strike, Feel No Pain (3+)'.split(',').reduce((a,i)=> (a[i]='test',a),{}),
-    wargear: {}, // SKIP
+    wargear: {
+      "Battlesuit Support System": "Models in this unit can shoot after falling back."
+    },
     weapons: {
       ranged: {
         'Heavy Rail Rifle':  {'Range': "36\"", 'A': 2, 'BS': '3+', 'S': 12, 'AP': '-4', 'D': 'd6+1', 'Keywords': 'heavy, devastating wounds'},
@@ -55,7 +61,7 @@ function bind() {
   displayPreview();
 
   $(".add-profile").click((e) => {
-    const profileType = e.target.id.replace('add-profile-', ''); 
+    var profileType = e.target.id.replace('add-profile-', ''); 
     let profile = {};
     const profileFields = {
       'dudes': ['M', 'T', 'SV', 'iSV', 'W', 'LD', 'OC'],
@@ -65,9 +71,13 @@ function bind() {
     const profileName = $(`#profile_${profileType}_name`).val() || 'whatever';
     $(`#profile_${profileType}_name`).val(null)
     if(profileType == 'abilities') {
-      profile = $(`#profile_${profileType}_description`).val()
-       $(`#profile_${profileType}_description`).val(null)
-    } else {
+        profile = $(`#profile_abilities_description`).val();
+        if($('#profile_abilities_wargear').is(':checked')) {
+          profileType = 'wargear'
+        }
+        $(`#profile_abilities_description`).val(null)
+        $('#profile_abilities_wargear').prop('checked', false);
+      } else {
       profileFields[profileType].forEach((field) => {
         profile[field] = $(`#profile_${profileType}_${field}`).val();
         $(`#profile_${profileType}_${field}`).val(null);
@@ -112,7 +122,7 @@ function bind() {
       points: $('#custom_points').val() || 0,
       profiles: PROFILES['dudes'],
       rules: ($('#custom_rules').val() || '').split(',').reduce((a,i)=> (a[i]='test',a),{}),
-      wargear: {}, // SKIP
+      wargear: PROFILES['wargear'],
       weapons: {
         ranged: PROFILES['guns'],
         melee:  PROFILES['fists']

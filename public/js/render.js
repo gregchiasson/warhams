@@ -247,6 +247,7 @@ const buttRender = {
         <div class="col-md-4" style="border-left: 2px dotted grey">
           <h4>Abilities</h4>
           <div class="rules">${buttRender.hashToLi(abilities)}</div>
+          ${Object.keys(unit.wargear).length > 0 ? '<h4>Wargear Abilities</h4><div class="rules">' +buttRender.hashToLi(unit.wargear) + '</div>' : ""}
           ${buttRender.renderSpecialism(unit.specialism)}
         </div>
       </div>
