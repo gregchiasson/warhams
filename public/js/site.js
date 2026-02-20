@@ -24,7 +24,7 @@ function addProfileLinks(profileType) {
 function displayPreview() {
   const unitJSONdemo = {
     sheet: '[SAMPLE] Shas\'o Gun Shootman',
-    imageUrl: previewUrl,
+    imageUrl: 'https://40kstats.goonhammer.com/img/Gregbot_Shrug.png',
     abilities: {
       "Quad Damage": "once per battle when this unit shoots, roll 4d6 for damage.",
       "Heavy Armor": "this model has a 4+++ FnP against mortal wounds."

@@ -219,8 +219,8 @@ const buttRender = {
           <p>${unit.models.join(' and ')}.........${unit.points} points</p>
           ${buttRender.makeTable('', unit.profiles || [])}
         </div>
-        <div class="col-md-4" style="text-align:center">
-          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="170px; vertical-align:bottom">` : ''}
+        <div class="col-md-4" style="text-align:center;">
+          ${unit.imageUrl ? `<img src="${unit.imageUrl}" height="190px;" style="vertical-align:bottom">` : ''}
         </div>
       </div>
       <div class="row">
