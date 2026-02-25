@@ -50,7 +50,7 @@ function displayPreview() {
       }
     },
     leader: 'Broadside battlesuits'.split(',') || null,
-    specialism: '67IQ Railgun god'
+    specialism: '140IQ Railgun god'
   };
   unitHTML = buttRender.renderUnitCustom(unitJSONdemo, 'teal');
   $('#output').html(unitHTML);
