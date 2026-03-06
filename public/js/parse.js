@@ -25,14 +25,14 @@ const buttParse = {
             break;
           case 'upgrade':
             if(selection['$'].name == "Detachment" || selection['$'].name == "Detachment Choice") {
-              list['detachment'] = selection.selections.selection['$'].name;
-              if(selection.selections.selection.rules) {
+              list['detachment'] = selection.selections?.selection['$'].name || 'Unknown';
+              if(selection.selections?.selection.rules) {
                 const rules = buttParse.forceArray(selection.selections.selection.rules.rule);
                 rules.forEach((rule) => {
                   list['rules'][rule['$'].name] = rule.description;
                 });  
               }
-              if(selection.selections.selection.profiles) {
+              if(selection.selections?.selection.profiles) {
                 const rules = buttParse.forceArray(selection.selections.selection.profiles.profile);
                 rules.forEach((rule) => {
                   list['rules'][rule['$'].name] = rule.characteristics.characteristic['_'];
@@ -64,6 +64,7 @@ const buttParse = {
       'abilities': {},
       'rules':     {},
       'keywords':  [],
+      'factionKeywords': [],
       'models':    [],
       'wargear':   {},
       'weapons':   {'ranged': {}, 'melee': {}}
@@ -83,12 +84,12 @@ const buttParse = {
     if(selection.categories) {
       const keywords = buttParse.forceArray(selection.categories.category);
       keywords.forEach((keyword) => {
-        unit['keywords'].push(keyword['$'].name);
+        if(keyword['$'].name.match('Faction: ')) {
+          unit['factionKeywords'].push(keyword['$'].name.replace('Faction: ', ''));
+        } else {
+          unit['keywords'].push(keyword['$'].name);
+        }
       });
-  
-      unit['keywords'].sort((a, b) => {
-        return a.match('Faction') ? -1 : 1;
-      });  
     }
 
     if(selection.profiles) {
@@ -104,8 +105,8 @@ const buttParse = {
 
       selections.forEach((item) => {
 //        console.log(item.costs.cost);
-        const costObj = Array.isArray(item.costs.cost) ? item.costs.cost[0] : item.costs.cost;
-        unit['points'] += parseInt(costObj['$'].value);
+        const costObj = Array.isArray(item.costs?.cost) ? item.costs?.cost[0] : item.costs?.cost;
+        unit['points'] += parseInt(costObj ? costObj['$']?.value : 0);
       });
 
       selections.forEach((item) => {

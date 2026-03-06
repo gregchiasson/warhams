@@ -192,7 +192,7 @@ const buttRender = {
   renderUnitCustom(unit, cssClass) {
     var abilities = {};
     Object.keys(unit['abilities'] || []).forEach((ruleName) => {
-      if(!unit.rules[ruleName]) {
+      if(!unit.rules[ruleName] && !unit.wargear[ruleName]) {
         abilities[ruleName] = unit.abilities[ruleName];
       }
     });
@@ -243,7 +243,7 @@ const buttRender = {
           <strong>KEYWORDS:</strong> <span class="keyword">${unit.keywords.join(', ')}</span>
         </div>
         <div class="col-md-4">
-          <strong>FACTION KEYWORDS:</strong> <span class="keyword">${unit.factionKeywords?.join(', ')}</span>
+          <strong>FACTION KEYWORDS:</strong> <span class="keyword">${unit.factionKeywords?.join(', ') || 'None'}</span>
         </div>
       </div>
     </div>
