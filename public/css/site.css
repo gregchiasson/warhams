@@ -116,6 +116,11 @@ div.page thead th {
   text-transform: uppercase;
 }
 
+#navbarGlobalNav {
+    font-size: .8em;
+    padding-left: 10px;
+}
+
 div.ork thead th, #output div.ork h4, div.ork .header th, div.ork div.header, div.ork div.footer { background-color: #6b8335; } 
 div.codex thead th, #output div.codex h4, div.codex .header th, div.codex div.header, div.codex div.footer { background-color: #243b43; } 
 div.teal thead th, #output div.teal h4, div.teal .header th, div.teal div.header, div.teal div.footer { background-color: #22777e; } 
